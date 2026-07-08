@@ -19,7 +19,7 @@ $whatsapp  = $site_settings->field( 'whatsapp_number' );
         <div class="row align-items-center">
 
             <div class="col-lg-6 col-md-12">
-                <span class="badge-custom">🏥 Premium Vaccination Services</span>
+                <span class="badge-custom">Premium Vaccination Services</span>
                 <h1>
                     Protect Your Family With 
                     <span>Safe Vaccination</span>
