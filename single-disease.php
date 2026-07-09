@@ -25,21 +25,21 @@ $related_vaccines = get_posts( [
 
 <style>
 .disease-hero {
-    background: linear-gradient(135deg, #da7215 0%, #d35324 100%);
+    background: var(--color-navy);
     color: white; padding: 60px 0; margin-bottom: 50px;
 }
 .disease-detail-card {
-    background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(10,42,56,0.08);
     padding: 40px; margin-bottom: 30px;
 }
-.disease-detail-card h2 { color: #da7215; font-weight: 700; margin-bottom: 16px; }
-.disease-detail-card p { line-height: 1.8; color: #555; white-space: pre-line; }
+.disease-detail-card h2 { color: var(--color-blue); font-weight: 700; margin-bottom: 16px; }
+.disease-detail-card p { line-height: 1.8; color: var(--color-ink); white-space: pre-line; }
 .vaccine-chip-link {
     display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
-    border-radius: 50px; background: #f0f9ff; border: 1.5px solid #107fa0;
-    color: #107fa0; font-weight: 600; text-decoration: none; margin: 0 8px 8px 0;
+    border-radius: 50px; background: var(--color-blue-tint); border: 1.5px solid var(--color-blue);
+    color: var(--color-blue); font-weight: 600; text-decoration: none; margin: 0 8px 8px 0;
 }
-.vaccine-chip-link:hover { background: #107fa0; color: white; }
+.vaccine-chip-link:hover { background: var(--color-blue); color: white; }
 </style>
 
 <section class="disease-hero">

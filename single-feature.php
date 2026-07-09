@@ -14,7 +14,7 @@ $pod = pods('feature', get_the_ID());
 .single-feature-header {
     position: relative;
     padding: 100px 0 60px;
-    background: linear-gradient(135deg, #7bb14f 0%, #6a9f3e 100%);
+    background: #0a2a38;
     color: white;
     overflow: hidden;
 }
@@ -60,7 +60,7 @@ $pod = pods('feature', get_the_ID());
     margin: 0 auto;
     font-size: 18px;
     line-height: 1.8;
-    color: #333;
+    color: #16232b;
 }
 
 .feature-content h1,
@@ -69,7 +69,7 @@ $pod = pods('feature', get_the_ID());
 .feature-content h4,
 .feature-content h5,
 .feature-content h6 {
-    color: #107fa0;
+    color: #0b5c87;
     margin-top: 40px;
     margin-bottom: 20px;
     font-weight: 700;
@@ -77,14 +77,14 @@ $pod = pods('feature', get_the_ID());
 
 .feature-content h2 {
     font-size: 32px;
-    border-bottom: 3px solid #7bb14f;
+    border-bottom: 3px solid #0b5c87;
     padding-bottom: 10px;
     margin-bottom: 25px;
 }
 
 .feature-content h3 {
     font-size: 26px;
-    color: #7bb14f;
+    color: #0b5c87;
 }
 
 .feature-content p {
@@ -103,12 +103,12 @@ $pod = pods('feature', get_the_ID());
 }
 
 .feature-content ul li::marker {
-    color: #7bb14f;
+    color: #0b5c87;
     font-size: 1.2em;
 }
 
 .feature-content ol li::marker {
-    color: #7bb14f;
+    color: #0b5c87;
     font-weight: bold;
 }
 
@@ -121,24 +121,24 @@ $pod = pods('feature', get_the_ID());
 }
 
 .feature-content blockquote {
-    background: #f8f9fa;
-    border-left: 5px solid #7bb14f;
+    background: #f6f3ec;
+    border-left: 5px solid #0b5c87;
     padding: 20px 30px;
     margin: 30px 0;
     font-style: italic;
-    color: #555;
+    color: #4a575e;
     border-radius: 0 10px 10px 0;
 }
 
 .feature-content a {
-    color: #107fa0;
+    color: #0b5c87;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
 .feature-content a:hover {
-    color: #7bb14f;
+    color: #0b5c87;
     text-decoration: underline;
 }
 
@@ -151,18 +151,18 @@ $pod = pods('feature', get_the_ID());
 .feature-content table th,
 .feature-content table td {
     padding: 12px 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #e7e0d3;
     text-align: left;
 }
 
 .feature-content table th {
-    background: #7bb14f;
+    background: #0b5c87;
     color: white;
     font-weight: 600;
 }
 
 .feature-content table tr:nth-child(even) {
-    background: #f8f9fa;
+    background: #f6f3ec;
 }
 
 .back-to-home {
@@ -170,7 +170,7 @@ $pod = pods('feature', get_the_ID());
     align-items: center;
     gap: 8px;
     background: white;
-    color: #7bb14f;
+    color: #0b5c87;
     padding: 12px 30px;
     border-radius: 50px;
     text-decoration: none;
@@ -181,20 +181,20 @@ $pod = pods('feature', get_the_ID());
 }
 
 .back-to-home:hover {
-    background: #7bb14f;
+    background: #0b5c87;
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .related-features {
-    background: #f8f9fa;
+    background: #f6f3ec;
     padding: 60px 0;
 }
 
 .related-features h3 {
     text-align: center;
-    color: #107fa0;
+    color: #0b5c87;
     margin-bottom: 40px;
     font-weight: 700;
 }

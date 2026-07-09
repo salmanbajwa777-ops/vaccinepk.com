@@ -61,7 +61,7 @@ switch ($availability) {
 
 <style>
 .vaccine-hero {
-    background: linear-gradient(135deg, #da7215 0%, #d35324 100%);
+    background: var(--color-navy, #0a2a38);
     color: white;
     padding: 60px 0;
     margin-bottom: 50px;
@@ -84,14 +84,14 @@ switch ($availability) {
 
 .info-item {
     padding: 20px;
-    background: #f8f9fa;
+    background: var(--color-blue-tint, #eaf2f6);
     border-radius: 12px;
-    border-left: 4px solid #da7215;
+    border-left: 4px solid var(--color-blue, #0b5c87);
 }
 
 .info-label {
     font-size: 13px;
-    color: #666;
+    color: var(--color-label-muted, #8a959a);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
@@ -101,24 +101,24 @@ switch ($availability) {
 .info-value {
     font-size: 18px;
     font-weight: 700;
-    color: #333;
+    color: var(--color-ink-strong, #16232b);
 }
 
 .price-tag {
     font-size: 36px;
-    font-weight: 800;
-    background: linear-gradient(135deg, #da7215, #d35324);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    color: var(--color-gold, #c9a24b);
     margin: 20px 0;
 }
 
 .contact-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: var(--color-ivory, #f6f3ec);
+    border: 1px solid var(--color-sand, #e7e0d3);
     border-radius: 16px;
     padding: 35px;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(10,42,56,0.06);
 }
 
 .contact-buttons {
@@ -147,7 +147,7 @@ switch ($availability) {
 }
 
 .btn-phone {
-    background: #da7215;
+    background: var(--color-blue, #0b5c87);
     color: white;
 }
 
@@ -157,26 +157,27 @@ switch ($availability) {
 }
 
 .btn-email {
-    background: #0066cc;
+    background: var(--color-navy, #0a2a38);
     color: white;
 }
 
 .btn-book {
-    background: linear-gradient(135deg, #da7215, #d35324);
-    color: white;
+    background: var(--color-gold, #c9a24b);
+    color: var(--color-navy, #0a2a38);
     padding: 18px 40px;
     font-size: 18px;
+    font-weight: 700;
 }
 
 .feature-icon {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #da7215, #d35324);
+    background: var(--color-navy, #0a2a38);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--color-gold, #c9a24b);
     font-size: 24px;
     margin-bottom: 15px;
 }
@@ -198,12 +199,12 @@ switch ($availability) {
 
 .description-content {
     line-height: 1.8;
-    color: #555;
+    color: var(--color-ink, #4a575e);
 }
 
 .description-content h2,
 .description-content h3 {
-    color: #da7215;
+    color: var(--color-blue, #0b5c87);
     margin-top: 30px;
     margin-bottom: 15px;
 }
@@ -256,7 +257,7 @@ switch ($availability) {
             <div class="col-lg-8">
                 <!-- Vaccine Details Card -->
                 <div class="vaccine-detail-card">
-                    <h2 class="fw-bold mb-4" style="color: #da7215;">
+                    <h2 class="fw-bold mb-4" style="color: var(--color-blue, #0b5c87);">
                         <i class="bi bi-info-circle-fill me-2"></i>Vaccine Information
                     </h2>
                     
@@ -318,7 +319,7 @@ switch ($availability) {
 
                     <?php if ($vaccine_description): ?>
                     <div class="mt-5">
-                        <h3 class="fw-bold mb-3" style="color: #da7215;">
+                        <h3 class="fw-bold mb-3" style="color: var(--color-blue, #0b5c87);">
                             <i class="bi bi-file-text-fill me-2"></i>Description
                         </h3>
                         <div class="description-content">
@@ -329,7 +330,7 @@ switch ($availability) {
 
                     <?php if (get_the_content()): ?>
                     <div class="mt-5">
-                        <h3 class="fw-bold mb-3" style="color: #da7215;">
+                        <h3 class="fw-bold mb-3" style="color: var(--color-blue, #0b5c87);">
                             <i class="bi bi-info-circle-fill me-2"></i>Additional Information
                         </h3>
                         <div class="description-content">
@@ -341,7 +342,7 @@ switch ($availability) {
 
                 <!-- Why Choose Us -->
                 <div class="vaccine-detail-card">
-                    <h2 class="fw-bold mb-4" style="color: #da7215;">
+                    <h2 class="fw-bold mb-4" style="color: var(--color-blue, #0b5c87);">
                         <i class="bi bi-star-fill me-2"></i>Why Choose Our Service?
                     </h2>
                     <div class="row">

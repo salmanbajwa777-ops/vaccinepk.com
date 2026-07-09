@@ -1,17 +1,38 @@
-/* ==================== GLOBAL STYLES ==================== */
+/* ==================== GLOBAL STYLES ====================
+   Brand tokens per vaccinepk-color-theme.md — trust-building + quiet luxury.
+   Blue leads (navy/trust-blue = dominant); gold is rare (one premium moment
+   per screen); green means verified only (never decorative). */
 :root {
-  --primary-gradient-start: #f79237;
-  --primary-gradient-end: #d35324;
-  --accent-green: #7bb14f;
-  --accent-blue: #107fa0;
-  --text-dark: #1f2937;
-  --text-light: #6b7280;
-  --bg-light: #f9fafb;
-  --bg-white: #ffffff;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.2);
+  --color-navy: #0a2a38;
+  --color-blue: #0b5c87;
+  --color-green: #6bb63f;
+  --color-gold: #c9a24b;
+  --color-ivory: #f6f3ec;
+  --color-white: #ffffff;
+  --color-ink: #4a575e;
+  --color-ink-strong: #16232b;
+  --color-sand: #e7e0d3;
+  --color-label-muted: #8a959a;
+  --color-ink-on-navy: #a9bac2;
+  --color-sub-on-blue: #b9d2de;
+  --color-green-tint: #eaf3e4;
+  --color-blue-tint: #eaf2f6;
+
+  /* legacy aliases kept so existing markup using these tokens still resolves
+     to the new palette without a full find/replace across every file */
+  --primary-gradient-start: var(--color-blue);
+  --primary-gradient-end: var(--color-navy);
+  --accent-green: var(--color-green);
+  --accent-blue: var(--color-blue);
+  --text-dark: var(--color-ink-strong);
+  --text-light: var(--color-ink);
+  --bg-light: var(--color-ivory);
+  --bg-white: var(--color-white);
+
+  --shadow-sm: 0 6px 16px -10px rgba(10, 42, 56, 0.35);
+  --shadow-md: 0 16px 32px -18px rgba(10, 42, 56, 0.4);
+  --shadow-lg: 0 20px 40px -20px rgba(10, 42, 56, 0.45);
+  --shadow-xl: 0 30px 60px -20px rgba(10, 42, 56, 0.5);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -23,25 +44,31 @@
 
 body {
   font-family:
-    "Poppins",
+    "Manrope",
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     Roboto,
     Arial,
     sans-serif;
-  background-color: var(--bg-light);
-  color: var(--text-dark);
+  background-color: var(--color-ivory);
+  color: var(--color-ink);
   line-height: 1.7;
   overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  color: var(--color-ink-strong);
+  letter-spacing: -0.01em;
 }
 
 /* ==================== HEADER STYLES ==================== */
 header {
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--color-sand);
+  box-shadow: 0 2px 20px rgba(10, 42, 56, 0.06);
   transition: var(--transition);
   position: sticky;
   top: 0;
@@ -49,7 +76,7 @@ header {
 }
 
 header.scrolled {
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 30px rgba(10, 42, 56, 0.12);
 }
 
 header .container {
@@ -78,14 +105,15 @@ header .nav {
 }
 
 header .nav a {
-  color: var(--text-dark);
-  font-weight: 400;
+  color: var(--color-ink-strong);
+  font-family: "Manrope", sans-serif;
+  font-weight: 500;
   margin-left: 24px;
   text-decoration: none;
   padding: 8px 0;
   position: relative;
   transition: var(--transition);
-  font-size: 21px;
+  font-size: 15px;
 }
 
 header .nav a::after {
@@ -95,16 +123,12 @@ header .nav a::after {
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-gradient-start),
-    var(--primary-gradient-end)
-  );
+  background: var(--color-gold);
   transition: var(--transition);
 }
 
 header .nav a:hover {
-  color: var(--primary-gradient-start);
+  color: var(--color-blue);
 }
 
 header .nav a:hover::after {
@@ -112,45 +136,43 @@ header .nav a:hover::after {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-green), #6a9f3e);
-  color: white;
+  background: var(--color-gold);
+  color: var(--color-navy);
   padding: 12px 28px;
-  border-radius: 50px;
+  border-radius: 999px;
   text-decoration: none;
+  font-family: "Manrope", sans-serif;
   font-weight: 600;
   transition: var(--transition);
   border: none;
-  box-shadow: 0 4px 15px rgba(218, 114, 21, 0.3);
+  box-shadow: 0 10px 24px -10px rgba(201, 162, 75, 0.55);
   display: inline-block;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(218, 114, 21, 0.4);
-  color: white;
+  box-shadow: 0 14px 30px -10px rgba(201, 162, 75, 0.65);
+  color: var(--color-navy);
 }
 
 .btn-outline-primary {
   background: transparent;
-  color: var(--primary-gradient-start);
+  color: var(--color-blue);
   padding: 12px 28px;
-  border-radius: 50px;
+  border-radius: 999px;
   text-decoration: none;
+  font-family: "Manrope", sans-serif;
   font-weight: 600;
   transition: var(--transition);
-  border: 2px solid var(--primary-gradient-start);
+  border: 2px solid var(--color-blue);
   display: inline-block;
 }
 
 .btn-outline-primary:hover {
-  background: linear-gradient(
-    135deg,
-    var(--primary-gradient-start),
-    var(--primary-gradient-end)
-  );
+  background: var(--color-blue);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(218, 114, 21, 0.4);
+  box-shadow: 0 14px 30px -10px rgba(11, 92, 135, 0.4);
 }
 
 
@@ -161,16 +183,16 @@ header .nav a:hover::after {
 }
 
 .site-logo img {
-    max-height: 48px;   /* yahan aap apni desired height set karein */
-    width: auto;        /* ratio maintain kare */
+    max-height: 48px;
+    width: auto;
     height: auto;
 }
 
 .site-title {
-    font-family: "Ubuntu", "Segoe UI", sans-serif;
-    font-weight: 700;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 600;
     font-size: 2rem;
-    color: #0b2540;
+    color: var(--color-navy);
     text-decoration: none;
     line-height: 1;
 }
@@ -188,7 +210,7 @@ header .nav a:hover::after {
 /* ==================== HERO SECTION ==================== */
 .hero-section {
   padding: 100px 0 120px;
-  background: linear-gradient(135deg, #fff5eb 0%, #ffe8d5 50%, #ffeee5 100%);
+  background: linear-gradient(160deg, var(--color-navy) 0%, #0e3446 55%, var(--color-navy) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -202,7 +224,7 @@ header .nav a:hover::after {
   height: 800px;
   background: radial-gradient(
     circle,
-    rgba(218, 114, 21, 0.1) 0%,
+    rgba(201, 162, 75, 0.14) 0%,
     transparent 70%
   );
   border-radius: 50%;
@@ -218,7 +240,7 @@ header .nav a:hover::after {
   height: 600px;
   background: radial-gradient(
     circle,
-    rgba(123, 177, 79, 0.1) 0%,
+    rgba(107, 182, 63, 0.12) 0%,
     transparent 70%
   );
   border-radius: 50%;
@@ -244,29 +266,23 @@ header .nav a:hover::after {
 }
 
 .hero-section h1 {
-  font-size: 52px;
-  font-weight: 800;
+  font-size: 56px;
+  font-weight: 600;
   margin-bottom: 24px;
-  line-height: 1.2;
-  color: var(--text-dark);
+  line-height: 1.08;
+  color: var(--color-ivory);
   animation: fadeInUp 0.8s ease-out;
 }
 
 .hero-section h1 span {
-  background: linear-gradient(
-    135deg,
-    var(--primary-gradient-start),
-    var(--primary-gradient-end)
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-gold);
 }
 
 .hero-section p {
-  font-size: 19px;
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
   margin-bottom: 35px;
-  color: var(--text-light);
+  color: var(--color-ink-on-navy);
   max-width: 540px;
   animation: fadeInUp 0.8s ease-out 0.2s both;
 }
@@ -280,7 +296,7 @@ header .nav a:hover::after {
 .hero-image {
   max-width: 100%;
   border-radius: 20px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 25px 60px rgba(10, 42, 56, 0.45);
   transition: var(--transition);
   animation: fadeInRight 1s ease-out 0.3s both;
   position: relative;
@@ -292,18 +308,18 @@ header .nav a:hover::after {
   inset: -10px;
   background: linear-gradient(
     135deg,
-    var(--primary-gradient-start),
-    var(--accent-green)
+    var(--color-gold),
+    var(--color-green)
   );
   border-radius: 25px;
   z-index: -1;
-  opacity: 0.3;
+  opacity: 0.25;
   filter: blur(20px);
 }
 
 .hero-image:hover {
   transform: scale(1.02);
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 30px 70px rgba(10, 42, 56, 0.5);
 }
 
 @keyframes fadeInUp {
@@ -331,22 +347,23 @@ header .nav a:hover::after {
 /* ==================== SERVICES SECTION ==================== */
 .services-section {
   padding: 100px 0;
-  background: var(--bg-white);
+  background: var(--color-white);
   position: relative;
 }
 
 .services-section h2 {
   text-align: center;
   font-size: 42px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 20px;
-  color: var(--accent-blue);
+  color: var(--color-blue);
 }
 
 .services-section .section-subtitle {
   text-align: center;
+  font-family: "Manrope", sans-serif;
   font-size: 18px;
-  color: var(--text-light);
+  color: var(--color-ink);
   margin-bottom: 60px;
   max-width: 600px;
   margin-left: auto;
@@ -355,14 +372,14 @@ header .nav a:hover::after {
 
 .service-box,
 .service-card {
-  background: var(--bg-white);
+  background: var(--color-white);
   padding: 40px 30px;
   border-radius: 20px;
   text-align: center;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
   transition: var(--transition);
   height: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-sand);
   position: relative;
   overflow: hidden;
 }
@@ -374,12 +391,8 @@ header .nav a:hover::after {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--primary-gradient-start),
-    var(--primary-gradient-end)
-  );
+  height: 3px;
+  background: var(--color-gold);
   transform: scaleX(0);
   transform-origin: left;
   transition: var(--transition);
@@ -393,14 +406,14 @@ header .nav a:hover::after {
 .service-box:hover,
 .service-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
 }
 
 .service-box .icon,
 .service-card .icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #fff5eb, #ffe8d5);
+  background: var(--color-blue-tint);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -408,16 +421,12 @@ header .nav a:hover::after {
   margin: 0 auto 25px;
   font-size: 36px;
   transition: var(--transition);
-  color: var(--primary-gradient-start);
+  color: var(--color-blue);
 }
 
 .service-box:hover .icon,
 .service-card:hover .icon {
-  background: linear-gradient(
-    135deg,
-    var(--primary-gradient-start),
-    var(--primary-gradient-end)
-  );
+  background: var(--color-blue);
   color: white;
   transform: scale(1.1) rotate(10deg);
 }
@@ -437,14 +446,15 @@ header .nav a:hover::after {
 .service-box h4,
 .service-card h4 {
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 15px;
-  color: var(--text-dark);
+  color: var(--color-ink-strong);
 }
 
 .service-box p,
 .service-card p {
-  color: var(--text-light);
+  font-family: "Manrope", sans-serif;
+  color: var(--color-ink);
   font-size: 15px;
   line-height: 1.7;
   margin-bottom: 0;
@@ -453,74 +463,76 @@ header .nav a:hover::after {
 /* ==================== APPOINTMENT SECTION ==================== */
 .appointment-section {
   padding: 100px 0;
-  background: linear-gradient(135deg, #e0f4ff 0%, #cceeff 100%);
+  background: var(--color-navy);
   position: relative;
 }
 
 .appointment-section h2 {
   font-size: 42px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 20px;
-  color: var(--accent-blue);
+  color: var(--color-ivory);
 }
 
 .appointment-section > .container > .row > div > p {
+  font-family: "Manrope", sans-serif;
   font-size: 18px;
-  color: var(--text-light);
+  color: var(--color-ink-on-navy);
   margin-bottom: 40px;
 }
 
 /* ==================== FAQ SECTION ==================== */
 .faq-section {
   padding: 100px 0;
-  background: linear-gradient(135deg, #f0ffe0 0%, #e5ffcc 50%, #f5ffe5 100%);
+  background: var(--color-ivory);
 }
 
 .faq-section h2 {
   text-align: center;
   font-size: 42px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 60px;
-  color: var(--accent-green);
+  color: var(--color-blue);
 }
 
 .faq-card {
-  background: var(--bg-white);
+  background: var(--color-white);
   padding: 30px;
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   margin-bottom: 20px;
   transition: var(--transition);
   border-left: 4px solid transparent;
+  border-top: 1px solid var(--color-sand);
+  border-right: 1px solid var(--color-sand);
+  border-bottom: 1px solid var(--color-sand);
 }
 
 .faq-card:hover {
-  border-left-color: var(--accent-green);
+  border-left-color: var(--color-green);
   transform: translateX(5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .faq-card h5 {
-  font-size: 18px;
-  font-weight: 600;
+  font-family: "Manrope", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
   margin-bottom: 12px;
-  color: var(--text-dark);
+  color: var(--color-ink-strong);
 }
 
 .faq-card p {
-  color: var(--text-light);
+  font-family: "Manrope", sans-serif;
+  color: var(--color-ink);
   margin-bottom: 0;
   line-height: 1.7;
 }
 
 /* ==================== FOOTER ==================== */
 footer {
-  background: linear-gradient(
-    135deg,
-    var(--primary-gradient-start),
-    var(--primary-gradient-end)
-  );
-  color: var(--bg-white);
+  background: var(--color-navy);
+  color: var(--color-ivory);
   padding: 60px 0 30px;
   margin-top: 0;
 }
@@ -548,21 +560,23 @@ footer {
 }
 
 .footer-section ul li a {
-  color: rgba(255, 255, 255, 0.8);
+  font-family: "Manrope", sans-serif;
+  color: var(--color-ink-on-navy);
   text-decoration: none;
   transition: var(--transition);
 }
 
 .footer-section ul li a:hover {
-  color: white;
+  color: var(--color-gold);
   padding-left: 5px;
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(246, 243, 236, 0.15);
   padding-top: 25px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.8);
+  font-family: "Manrope", sans-serif;
+  color: var(--color-ink-on-navy);
 }
 
 /* ==================== FEATURE BOXES ==================== */
@@ -580,6 +594,7 @@ footer {
   box-shadow: var(--shadow-md);
   transition: var(--transition);
   text-align: center;
+  border: 1px solid var(--color-sand);
 }
 
 .feature-box:hover {
@@ -590,45 +605,45 @@ footer {
 .feature-icon {
   width: 70px;
   height: 70px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-gradient-start),
-    var(--primary-gradient-end)
-  );
+  background: var(--color-navy);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
   font-size: 32px;
-  color: white;
+  color: var(--color-gold);
 }
 
 /* ==================== BADGES & TAGS ==================== */
 .badge-custom {
   display: inline-block;
   padding: 8px 20px;
-  background: linear-gradient(135deg, var(--accent-green), #6a9f3e);
-  color: white;
-  border-radius: 50px;
-  font-size: 14px;
-  font-weight: 600;
+  background: var(--color-green-tint);
+  color: var(--color-green);
+  border: 1px solid rgba(107, 182, 63, 0.3);
+  border-radius: 999px;
+  font-family: "Manrope", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   margin-bottom: 20px;
 }
 
 /* ==================== CTA SECTIONS ==================== */
 .cta-section {
-  background: linear-gradient(135deg, var(--accent-green), #6a9f3e);
+  background: var(--color-navy);
 }
 
 .cta-section h2 {
-  color: white;
+  color: var(--color-ivory);
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
 @media (max-width: 992px) {
   .hero-section h1 {
-    font-size: 42px;
+    font-size: 44px;
   }
 
   .services-section h2,
@@ -700,14 +715,7 @@ footer {
 }
 
 .text-gradient {
-  background: linear-gradient(
-    135deg,
-    var(--primary-gradient-start),
-    var(--primary-gradient-end)
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-gold);
 }
 
 .shadow-hover {
@@ -727,7 +735,7 @@ footer {
   position: fixed;
   right: 30px;
   bottom: 30px;
-  background: #25d366;
+  background: var(--color-green);
   color: #fff;
   width: 55px;
   height: 55px;
@@ -737,12 +745,12 @@ footer {
   justify-content: center;
   font-size: 28px;
   z-index: 9999;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
   text-decoration: none;
 }
 
 .floating-whatsapp:hover {
-  background: #1ebe5d;
+  background: #5a9c34;
 }
 
 
@@ -756,7 +764,7 @@ footer {
 /* ==================== SHARED SEARCH RESULTS (header + homepage hero search) ==================== */
 .search-result-item {
   padding: 15px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-sand);
   transition: all 0.2s;
   cursor: pointer;
   text-decoration: none;
@@ -764,15 +772,16 @@ footer {
   color: inherit;
 }
 .search-result-item:hover {
-  background: #f8f9fa;
+  background: var(--color-blue-tint);
   transform: translateX(5px);
 }
 .search-result-item:last-child {
   border-bottom: none;
 }
 .search-result-title {
-  font-weight: 600;
-  color: var(--primary-gradient-start);
+  font-family: "Manrope", sans-serif;
+  font-weight: 700;
+  color: var(--color-blue);
   margin-bottom: 5px;
   display: flex;
   align-items: center;
@@ -780,29 +789,31 @@ footer {
   flex-wrap: wrap;
 }
 .search-result-meta {
+  font-family: "Manrope", sans-serif;
   font-size: 14px;
-  color: #666;
+  color: var(--color-ink);
 }
 .search-result-badge {
   display: inline-block;
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: 999px;
   font-size: 12px;
   margin-right: 8px;
 }
 .search-type-badge {
+  font-family: "Manrope", sans-serif;
   font-size: 11px;
   font-weight: 700;
   padding: 2px 10px;
-  border-radius: 50px;
+  border-radius: 999px;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.08em;
 }
-.search-type-badge.type-vaccine { background: rgba(16,127,160,0.12); color: #107fa0; }
-.search-type-badge.type-disease { background: rgba(218,114,21,0.12); color: #da7215; }
-.search-type-badge.type-brand   { background: rgba(123,177,79,0.12); color: #7bb14f; }
-.search-type-badge.type-city    { background: rgba(31,41,55,0.08);   color: #1f2937; }
-.search-type-badge.type-article { background: rgba(16,127,160,0.12); color: #107fa0; }
+.search-type-badge.type-vaccine { background: var(--color-blue-tint); color: var(--color-blue); }
+.search-type-badge.type-disease { background: rgba(201,162,75,0.16); color: #8a6d2f; }
+.search-type-badge.type-brand   { background: var(--color-green-tint); color: var(--color-green); }
+.search-type-badge.type-city    { background: rgba(10,42,56,0.08);   color: var(--color-navy); }
+.search-type-badge.type-article { background: var(--color-blue-tint); color: var(--color-blue); }
 
 .no-results {
   text-align: center;
@@ -810,7 +821,7 @@ footer {
 }
 .no-results-icon {
   font-size: 48px;
-  color: #ddd;
+  color: var(--color-sand);
   margin-bottom: 15px;
 }
 .contact-options {
@@ -821,6 +832,7 @@ footer {
   flex-wrap: wrap;
 }
 .contact-btn {
+  font-family: "Manrope", sans-serif;
   padding: 10px 20px;
   border-radius: 8px;
   text-decoration: none;
@@ -832,7 +844,7 @@ footer {
 }
 .contact-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-sm);
 }
-.btn-phone { background: var(--primary-gradient-start); color: white; }
-.btn-whatsapp { background: #25D366; color: white; }
+.btn-phone { background: var(--color-blue); color: white; }
+.btn-whatsapp { background: var(--color-green); color: white; }

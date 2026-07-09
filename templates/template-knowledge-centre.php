@@ -19,11 +19,11 @@ $articles_query = new WP_Query( [
 
 <style>
 .knowledge-hero {
-    background: linear-gradient(135deg, #fff5eb 0%, #ffe8d5 100%);
+    background: linear-gradient(135deg, #f6f3ec 0%, #efe9db 100%);
     padding: 80px 0 60px;
 }
 .kc-card {
-    background: white; border: 1px solid #eef0f2; border-radius: 18px; overflow: hidden;
+    background: white; border: 1px solid var(--color-sand); border-radius: 18px; overflow: hidden;
     height: 100%; transition: var(--transition);
 }
 .kc-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
@@ -34,7 +34,7 @@ $articles_query = new WP_Query( [
 .kc-card-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px; }
 .kc-reviewed-badge {
     display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 700;
-    color: #107fa0; background: rgba(16,127,160,0.1); padding: 4px 10px; border-radius: 50px;
+    color: var(--color-blue); background: var(--color-blue-tint); padding: 4px 10px; border-radius: 50px;
 }
 </style>
 
@@ -42,12 +42,12 @@ $articles_query = new WP_Query( [
     <div class="container">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb" style="background: transparent;">
-                <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color:#da7215;text-decoration:none;"><i class="bi bi-house-fill"></i> Home</a></li>
+                <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color:#0b5c87;text-decoration:none;"><i class="bi bi-house-fill"></i> Home</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Knowledge Centre</li>
             </ol>
         </nav>
-        <h1 class="display-4 fw-bold mb-3" style="color:#107fa0;">Vaccine Knowledge Centre</h1>
-        <p class="lead" style="color:#6b7280;max-width:680px;">Evidence-based, doctor-reviewed guidance on vaccines, diseases, and immunization — Pakistan's largest vaccine knowledge resource.</p>
+        <h1 class="display-4 fw-bold mb-3" style="color:#0b5c87;">Vaccine Knowledge Centre</h1>
+        <p class="lead" style="color:#4a575e;max-width:680px;">Evidence-based, doctor-reviewed guidance on vaccines, diseases, and immunization — Pakistan's largest vaccine knowledge resource.</p>
     </div>
 </section>
 
@@ -73,7 +73,7 @@ $articles_query = new WP_Query( [
                                     <span><i class="bi bi-calendar3"></i> Updated <?php echo get_the_modified_date( 'M j, Y' ); ?></span>
                                 </div>
                                 <span class="kc-reviewed-badge mb-2 d-inline-flex"><i class="bi bi-patch-check-fill"></i> Doctor Reviewed</span>
-                                <h3><a href="<?php the_permalink(); ?>" style="color:#1f2937;text-decoration:none;"><?php the_title(); ?></a></h3>
+                                <h3><a href="<?php the_permalink(); ?>" style="color:#16232b;text-decoration:none;"><?php the_title(); ?></a></h3>
                                 <p class="text-muted small mb-0"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 16 ) ); ?></p>
                             </div>
                         </div>
@@ -81,7 +81,7 @@ $articles_query = new WP_Query( [
                 <?php endwhile; wp_reset_postdata(); ?>
             <?php else : ?>
                 <div class="col-12 text-center py-5">
-                    <i class="bi bi-inbox" style="font-size: 64px; color: #e5e7eb;"></i>
+                    <i class="bi bi-inbox" style="font-size: 64px; color: var(--color-sand);"></i>
                     <p class="text-muted mt-3 mb-0">Articles are being added. Please check back soon.</p>
                 </div>
             <?php endif; ?>

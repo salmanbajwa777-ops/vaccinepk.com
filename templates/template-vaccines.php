@@ -8,21 +8,21 @@ get_header();
 ?>
 
 <!-- ================= PAGE HEADER ================= -->
-<section class="page-header" style="background: linear-gradient(135deg, #fff5eb 0%, #ffe8d5 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
-    <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(218, 114, 21, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-    <div style="position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(123, 177, 79, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+<section class="page-header" style="background: linear-gradient(135deg, #f6f3ec 0%, #efe9db 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(201, 162, 75, 0.12) 0%, transparent 70%); border-radius: 50%;"></div>
+    <div style="position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(11, 92, 135, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
     
     <div class="container" style="position: relative; z-index: 1;">
         <div class="row">
             <div class="col-lg-10 mx-auto text-center">
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb justify-content-center" style="background: transparent;">
-                        <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: #da7215; text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: #0b5c87; text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Our Vaccines</li>
                     </ol>
                 </nav>
-                <h1 class="display-4 fw-bold mb-3" style="color: #107fa0;">Available Vaccines</h1>
-                <p class="lead" style="color: #6b7280;">Browse our comprehensive range of WHO-approved vaccines</p>
+                <h1 class="display-4 fw-bold mb-3" style="color: #0b5c87;">Available Vaccines</h1>
+                <p class="lead" style="color: #4a575e;">Browse our comprehensive range of WHO-approved vaccines</p>
             </div>
         </div>
     </div>
@@ -78,7 +78,7 @@ get_header();
                 
                 <div class="table-responsive">
                     <table class="table table-hover align-middle" style="border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                        <thead style="background: linear-gradient(135deg, #da7215, #d35324); color: white;">
+                        <thead style="background: #0a2a38; color: white;">
                             <tr>
                                 <th class="py-3"><i class="bi bi-heart-pulse"></i> Vaccine</th>
                                 <th class="py-3"><i class="bi bi-shield-check"></i> Brand</th>
@@ -152,7 +152,7 @@ get_header();
                             ?>
                             <tr>
                                 <td colspan="<?php echo $empty_colspan; ?>" class="text-center py-5">
-                                    <i class="bi bi-inbox" style="font-size: 64px; color: #e5e7eb;"></i>
+                                    <i class="bi bi-inbox" style="font-size: 64px; color: #e7e0d3;"></i>
                                     <p class="text-muted mt-3 mb-0">No vaccines found in this category yet.</p>
                                     <p class="text-muted small">Please check back soon or contact us for more information.</p>
                                 </td>
@@ -170,7 +170,7 @@ get_header();
 
         <!-- DIRECT BOOKING BUTTON -->
         <div class="text-center mt-5">
-            <a href="<?php echo home_url('/booking'); ?>" class="btn btn-lg px-5 py-3" style="background: linear-gradient(135deg, #107fa0 0%, #7bb14f 100%); color: white; border: none; border-radius: 50px; font-weight: 700; font-size: 18px; text-decoration: none; display: inline-block; transition: all 0.3s;">
+            <a href="<?php echo home_url('/booking'); ?>" class="btn btn-lg px-5 py-3" style="background: #c9a24b; color: #0a2a38; border: none; border-radius: 50px; font-weight: 700; font-size: 18px; text-decoration: none; display: inline-block; transition: all 0.3s;">
                 <i class="bi bi-calendar-check-fill me-2"></i> Book Your Vaccination Now
             </a>
         </div>
@@ -184,7 +184,7 @@ get_header();
         <div class="modal-content" style="border: none; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
             
             <!-- Modal Header -->
-            <div class="modal-header" style="background: linear-gradient(135deg, #107fa0 0%, #7bb14f 100%); color: white; border: none; padding: 30px;">
+            <div class="modal-header" style="background: #0a2a38; color: white; border: none; padding: 30px;">
                 <div class="d-flex align-items-center">
                     <div class="me-3" style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
                         <i class="bi bi-virus2" style="font-size: 32px;"></i>
@@ -198,18 +198,18 @@ get_header();
             </div>
             
             <!-- Modal Body -->
-            <div class="modal-body" style="padding: 40px; background: #f9fafb;">
+            <div class="modal-body" style="padding: 40px; background: #f6f3ec;">
                 <div id="vaccineContentContainer" class="vaccine-content-wrapper">
                     <!-- Content will be inserted here via JavaScript -->
                 </div>
             </div>
             
             <!-- Modal Footer -->
-            <div class="modal-footer" style="border: none; background: #f9fafb; padding: 20px 40px;">
+            <div class="modal-footer" style="border: none; background: #f6f3ec; padding: 20px 40px;">
                 <!-- <a href="<?php echo home_url('/booking'); ?>" class="btn btn-lg px-4 py-2 me-2" style="background: linear-gradient(135deg, #da7215, #d35324); color: white; border: none; border-radius: 50px; font-weight: 600;">
                     <i class="bi bi-calendar-check-fill me-2"></i> Book This Vaccine
                 </a> -->
-                <button type="button" class="btn btn-lg px-4 py-2" data-bs-dismiss="modal" style="background: #e5e7eb; color: #374151; border: none; border-radius: 50px; font-weight: 600;">
+                <button type="button" class="btn btn-lg px-4 py-2" data-bs-dismiss="modal" style="background: #e7e0d3; color: #16232b; border: none; border-radius: 50px; font-weight: 600;">
                     <i class="bi bi-x-circle me-2"></i> Close
                 </button>
             </div>
@@ -219,7 +219,7 @@ get_header();
 </div>
 
 <!-- ================= INFO SECTION ================= -->
-<section class="py-5" style="background: linear-gradient(135deg, #f0ffe0 0%, #e5ffcc 100%);">
+<section class="py-5" style="background: linear-gradient(135deg, #f6f3ec 0%, #eef3ea 100%);">
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-3 col-md-6 text-center">
@@ -231,21 +231,21 @@ get_header();
             </div>
             <div class="col-lg-3 col-md-6 text-center">
                 <div class="bg-white p-4 rounded-4 shadow-sm">
-                    <i class="bi bi-thermometer-snow" style="font-size: 48px; color: #107fa0;"></i>
+                    <i class="bi bi-thermometer-snow" style="font-size: 48px; color: #0b5c87;"></i>
                     <h6 class="fw-bold mt-3 mb-2">Cold Chain</h6>
                     <p class="text-muted small mb-0">Proper storage maintained</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 text-center">
                 <div class="bg-white p-4 rounded-4 shadow-sm">
-                    <i class="bi bi-house-heart" style="font-size: 48px; color: #da7215;"></i>
+                    <i class="bi bi-house-heart" style="font-size: 48px; color: #0b5c87;"></i>
                     <h6 class="fw-bold mt-3 mb-2">Home Service</h6>
                     <p class="text-muted small mb-0">Vaccination at your doorstep</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 text-center">
                 <div class="bg-white p-4 rounded-4 shadow-sm">
-                    <i class="bi bi-people" style="font-size: 48px; color: #7bb14f;"></i>
+                    <i class="bi bi-people" style="font-size: 48px; color: #0b5c87;"></i>
                     <h6 class="fw-bold mt-3 mb-2">Expert Team</h6>
                     <p class="text-muted small mb-0">Qualified medical professionals</p>
                 </div>
@@ -257,22 +257,22 @@ get_header();
 <style>
 /* Tab Navigation Styling */
 .nav-pills .nav-link {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: #e7e0d3;
+    color: #4a575e;
     border: 2px solid transparent;
     font-weight: 600;
     transition: all 0.3s;
 }
 
 .nav-pills .nav-link:hover {
-    background: #e5e7eb;
+    background: #e7e0d3;
     transform: translateY(-2px);
 }
 
 .nav-pills .nav-link.active {
-    background: linear-gradient(135deg, #da7215, #d35324);
+    background: #0b5c87;
     color: white;
-    border-color: #da7215;
+    border-color: #0b5c87;
 }
 
 /* Table Row Hover Effect */
@@ -281,27 +281,27 @@ get_header();
 }
 
 .table tbody tr.vaccine-row:hover {
-    background: linear-gradient(90deg, #fff5eb 0%, #ffe8d5 100%) !important;
+    background: #eaf2f6 !important;
     transform: scale(1.01);
-    box-shadow: 0 4px 12px rgba(218, 114, 21, 0.15);
+    box-shadow: 0 4px 12px rgba(11, 92, 135, 0.15);
 }
 
 /* Clickable Row Indicator */
 .vaccine-row:hover td {
-    color: #da7215;
+    color: #0b5c87;
 }
 
 /* Book Now Button Hover */
 a.btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(16, 127, 160, 0.4);
+    box-shadow: 0 15px 40px rgba(10, 42, 56, 0.35);
 }
 
 /* Modal Content Styling */
 .vaccine-content-wrapper {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.8;
-    color: #1f2937;
+    color: #16232b;
 }
 
 .vaccine-content-wrapper h1,
@@ -310,7 +310,7 @@ a.btn:hover {
 .vaccine-content-wrapper h4,
 .vaccine-content-wrapper h5,
 .vaccine-content-wrapper h6 {
-    color: #107fa0;
+    color: #0b5c87;
     font-weight: 700;
     margin-top: 24px;
     margin-bottom: 16px;
@@ -319,24 +319,24 @@ a.btn:hover {
 
 .vaccine-content-wrapper h1 {
     font-size: 32px;
-    border-bottom: 3px solid #7bb14f;
+    border-bottom: 3px solid #c9a24b;
     padding-bottom: 12px;
 }
 
 .vaccine-content-wrapper h2 {
     font-size: 28px;
-    border-left: 4px solid #da7215;
+    border-left: 4px solid #0b5c87;
     padding-left: 16px;
 }
 
 .vaccine-content-wrapper h3 {
     font-size: 24px;
-    color: #da7215;
+    color: #0b5c87;
 }
 
 .vaccine-content-wrapper h4 {
     font-size: 20px;
-    color: #7bb14f;
+    color: #0a2a38;
 }
 
 .vaccine-content-wrapper p {
@@ -359,12 +359,12 @@ a.btn:hover {
 }
 
 .vaccine-content-wrapper ul li::marker {
-    color: #7bb14f;
+    color: #0b5c87;
     font-size: 20px;
 }
 
 .vaccine-content-wrapper ol li::marker {
-    color: #107fa0;
+    color: #0b5c87;
     font-weight: 700;
 }
 
@@ -382,13 +382,13 @@ a.btn:hover {
 }
 
 .vaccine-content-wrapper blockquote {
-    background: linear-gradient(135deg, #fff5eb 0%, #ffe8d5 100%);
-    border-left: 5px solid #da7215;
+    background: linear-gradient(135deg, #f6f3ec 0%, #efe9db 100%);
+    border-left: 5px solid #0b5c87;
     padding: 20px 24px;
     margin: 24px 0;
     border-radius: 8px;
     font-style: italic;
-    color: #374151;
+    color: #16232b;
 }
 
 .vaccine-content-wrapper table {
@@ -402,7 +402,7 @@ a.btn:hover {
 }
 
 .vaccine-content-wrapper table th {
-    background: linear-gradient(135deg, #107fa0, #7bb14f);
+    background: #0a2a38;
     color: white;
     padding: 16px;
     text-align: left;
@@ -411,7 +411,7 @@ a.btn:hover {
 
 .vaccine-content-wrapper table td {
     padding: 14px 16px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e7e0d3;
 }
 
 .vaccine-content-wrapper table tr:last-child td {
@@ -419,41 +419,41 @@ a.btn:hover {
 }
 
 .vaccine-content-wrapper table tr:hover {
-    background: #f9fafb;
+    background: #f6f3ec;
 }
 
 .vaccine-content-wrapper strong,
 .vaccine-content-wrapper b {
-    color: #107fa0;
+    color: #0b5c87;
     font-weight: 700;
 }
 
 .vaccine-content-wrapper em,
 .vaccine-content-wrapper i {
-    color: #da7215;
+    color: #0b5c87;
 }
 
 .vaccine-content-wrapper a {
-    color: #107fa0;
+    color: #0b5c87;
     text-decoration: underline;
     transition: color 0.3s;
 }
 
 .vaccine-content-wrapper a:hover {
-    color: #7bb14f;
+    color: #c9a24b;
 }
 
 .vaccine-content-wrapper code {
-    background: #f3f4f6;
+    background: #e7e0d3;
     padding: 2px 8px;
     border-radius: 4px;
     font-family: 'Courier New', monospace;
-    color: #da7215;
+    color: #0b5c87;
 }
 
 .vaccine-content-wrapper pre {
-    background: #1f2937;
-    color: #f3f4f6;
+    background: #16232b;
+    color: #e7e0d3;
     padding: 20px;
     border-radius: 12px;
     overflow-x: auto;

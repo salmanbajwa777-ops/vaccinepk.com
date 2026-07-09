@@ -14,7 +14,7 @@ $pod = pods('service', get_the_ID());
 .single-service-header {
     position: relative;
     padding: 100px 0 60px;
-    background: linear-gradient(135deg, #107fa0 0%, #0d6580 100%);
+    background: #0a2a38;
     color: white;
     overflow: hidden;
 }
@@ -60,7 +60,7 @@ $pod = pods('service', get_the_ID());
     margin: 0 auto;
     font-size: 18px;
     line-height: 1.8;
-    color: #333;
+    color: #16232b;
 }
 
 .service-content h1,
@@ -69,7 +69,7 @@ $pod = pods('service', get_the_ID());
 .service-content h4,
 .service-content h5,
 .service-content h6 {
-    color: #107fa0;
+    color: #0b5c87;
     margin-top: 40px;
     margin-bottom: 20px;
     font-weight: 700;
@@ -77,14 +77,14 @@ $pod = pods('service', get_the_ID());
 
 .service-content h2 {
     font-size: 32px;
-    border-bottom: 3px solid #107fa0;
+    border-bottom: 3px solid #0b5c87;
     padding-bottom: 10px;
     margin-bottom: 25px;
 }
 
 .service-content h3 {
     font-size: 26px;
-    color: #7bb14f;
+    color: #0b5c87;
 }
 
 .service-content p {
@@ -103,12 +103,12 @@ $pod = pods('service', get_the_ID());
 }
 
 .service-content ul li::marker {
-    color: #107fa0;
+    color: #0b5c87;
     font-size: 1.2em;
 }
 
 .service-content ol li::marker {
-    color: #107fa0;
+    color: #0b5c87;
     font-weight: bold;
 }
 
@@ -121,24 +121,24 @@ $pod = pods('service', get_the_ID());
 }
 
 .service-content blockquote {
-    background: #f0ffe0;
-    border-left: 5px solid #107fa0;
+    background: #f6f3ec;
+    border-left: 5px solid #0b5c87;
     padding: 20px 30px;
     margin: 30px 0;
     font-style: italic;
-    color: #555;
+    color: #4a575e;
     border-radius: 0 10px 10px 0;
 }
 
 .service-content a {
-    color: #107fa0;
+    color: #0b5c87;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
 .service-content a:hover {
-    color: #7bb14f;
+    color: #0b5c87;
     text-decoration: underline;
 }
 
@@ -151,18 +151,18 @@ $pod = pods('service', get_the_ID());
 .service-content table th,
 .service-content table td {
     padding: 12px 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #e7e0d3;
     text-align: left;
 }
 
 .service-content table th {
-    background: #107fa0;
+    background: #0b5c87;
     color: white;
     font-weight: 600;
 }
 
 .service-content table tr:nth-child(even) {
-    background: #f8f9fa;
+    background: #f6f3ec;
 }
 
 .back-to-home {
@@ -170,7 +170,7 @@ $pod = pods('service', get_the_ID());
     align-items: center;
     gap: 8px;
     background: white;
-    color: #107fa0;
+    color: #0b5c87;
     padding: 12px 30px;
     border-radius: 50px;
     text-decoration: none;
@@ -181,14 +181,14 @@ $pod = pods('service', get_the_ID());
 }
 
 .back-to-home:hover {
-    background: #107fa0;
+    background: #0b5c87;
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .cta-box {
-    background: linear-gradient(135deg, #7bb14f 0%, #6a9f3e 100%);
+    background: #0a2a38;
     color: white;
     padding: 40px;
     border-radius: 20px;
@@ -204,7 +204,7 @@ $pod = pods('service', get_the_ID());
 
 .cta-box .btn {
     background: white;
-    color: #7bb14f;
+    color: #0b5c87;
     padding: 12px 35px;
     border-radius: 50px;
     text-decoration: none;
@@ -220,13 +220,13 @@ $pod = pods('service', get_the_ID());
 }
 
 .related-services {
-    background: #f8f9fa;
+    background: #f6f3ec;
     padding: 60px 0;
 }
 
 .related-services h3 {
     text-align: center;
-    color: #107fa0;
+    color: #0b5c87;
     margin-bottom: 40px;
     font-weight: 700;
 }

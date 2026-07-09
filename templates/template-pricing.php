@@ -15,12 +15,12 @@ get_header(); ?>
 .vc-pricing-wrap h1.page-title {
   text-align: center;
   font-size: 2.5rem;
-  color: #1a3c5e;
+  color: #0a2a38;
   margin-bottom: 10px;
 }
 .vc-pricing-wrap .subtitle {
   text-align: center;
-  color: #666;
+  color: #4a575e;
   margin-bottom: 50px;
   font-size: 1.1rem;
 }
@@ -29,7 +29,7 @@ get_header(); ?>
 .vaccine-group-title {
   font-size: 1.7rem;
   color: #fff;
-  background: linear-gradient(135deg, #1a3c5e, #2980b9);
+  background: linear-gradient(135deg, #0a2a38, #0b5c87);
   padding: 12px 25px;
   border-radius: 10px;
   margin: 50px 0 20px;
@@ -69,7 +69,7 @@ get_header(); ?>
 .vc-card-img-placeholder {
   width: 100%;
   height: 160px;
-  background: linear-gradient(135deg, #e8f4fd, #b8d9f0);
+  background: linear-gradient(135deg, #eaf2f6, #cfe0e8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,7 +80,7 @@ get_header(); ?>
 }
 .vc-card-body h3 {
   font-size: 1.1rem;
-  color: #1a3c5e;
+  color: #0a2a38;
   margin: 0 0 10px;
   font-weight: 700;
 }
@@ -89,23 +89,23 @@ get_header(); ?>
   padding: 0;
   margin: 0 0 12px;
   font-size: 0.85rem;
-  color: #555;
+  color: #4a575e;
 }
 .vc-card-meta li {
   padding: 3px 0;
-  border-bottom: 1px dashed #eee;
+  border-bottom: 1px dashed #e7e0d3;
 }
 .vc-card-meta li:last-child { border: none; }
 .vc-card-meta li span.label {
   font-weight: 600;
-  color: #2980b9;
+  color: #0b5c87;
   min-width: 90px;
   display: inline-block;
 }
 .vc-price-tag {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #27ae60;
+  color: #c9a24b;
   margin-top: 10px;
 }
 .vc-price-tag .currency { font-size: 0.9rem; font-weight: 500; }
@@ -120,7 +120,7 @@ get_header(); ?>
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.avail-yes { background: #d4efdf; color: #1e8449; }
+.avail-yes { background: #eaf3e4; color: #5a9c34; }
 .avail-no  { background: #fde8e8; color: #c0392b; }
 
 /* ===== MODAL ===== */
@@ -149,7 +149,7 @@ get_header(); ?>
   /* Custom scrollbar — theme colors */
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #2980b9 #e8f4fd;
+  scrollbar-color: #0b5c87 #eaf2f6;
 }
 
 /* Webkit custom scrollbar (Chrome, Safari, Edge) */
@@ -157,16 +157,16 @@ get_header(); ?>
   width: 7px;
 }
 .vc-modal-box::-webkit-scrollbar-track {
-  background: #e8f4fd;
+  background: #eaf2f6;
   border-radius: 0 20px 20px 0;
 }
 .vc-modal-box::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #1a3c5e, #2980b9);
+  background: linear-gradient(180deg, #0a2a38, #0b5c87);
   border-radius: 10px;
-  border: 1px solid #e8f4fd;
+  border: 1px solid #eaf2f6;
 }
 .vc-modal-box::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #2980b9, #27ae60);
+  background: linear-gradient(180deg, #0b5c87, #6bb63f);
 }
 
 @keyframes modalSlide {
@@ -184,7 +184,7 @@ get_header(); ?>
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  color: #555;
+  color: #4a575e;
   font-size: 1.4rem;
   line-height: 1;
   display: flex;
@@ -208,7 +208,7 @@ get_header(); ?>
 .vc-modal-image-placeholder {
   width: 100%;
   height: 220px;
-  background: linear-gradient(135deg, #e8f4fd, #b8d9f0);
+  background: linear-gradient(135deg, #eaf2f6, #cfe0e8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -220,13 +220,13 @@ get_header(); ?>
 }
 .vc-modal-content h2 {
   font-size: 1.7rem;
-  color: #1a3c5e;
+  color: #0a2a38;
   margin: 0 0 6px;
 }
 .vc-modal-vaccine-badge {
   display: inline-block;
-  background: #eaf4fb;
-  color: #2980b9;
+  background: #eaf2f6;
+  color: #0b5c87;
   padding: 4px 14px;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -243,11 +243,11 @@ get_header(); ?>
   background: #f8fafc;
   border-radius: 10px;
   padding: 12px 15px;
-  border-left: 4px solid #2980b9;
+  border-left: 4px solid #0b5c87;
 }
 .vc-modal-detail-item .d-label {
   font-size: 0.78rem;
-  color: #888;
+  color: #8a959a;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
@@ -255,44 +255,44 @@ get_header(); ?>
 .vc-modal-detail-item .d-value {
   font-size: 1rem;
   font-weight: 700;
-  color: #1a3c5e;
+  color: #0a2a38;
 }
 .vc-modal-price-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #f0fff4, #d5f5e3);
+  background: linear-gradient(135deg, #eaf3e4, #dcedd0);
   border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 20px;
 }
-.vc-modal-price-row .mp-label { font-size: 0.95rem; color: #555; }
-.vc-modal-price-row .mp-price { font-size: 2rem; font-weight: 800; color: #27ae60; }
+.vc-modal-price-row .mp-label { font-size: 0.95rem; color: #4a575e; }
+.vc-modal-price-row .mp-price { font-size: 2rem; font-weight: 800; color: #c9a24b; }
 .vc-modal-description {
-  color: #666;
+  color: #4a575e;
   line-height: 1.7;
   font-size: 0.95rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #e7e0d3;
   padding-top: 18px;
 }
 </style>
 
 <!-- ================= PAGE HEADER ================= -->
-<section class="page-header" style="background: linear-gradient(135deg, #fff5eb 0%, #ffe8d5 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
-    <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(218, 114, 21, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-    <div style="position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(123, 177, 79, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-    
+<section class="page-header" style="background: linear-gradient(135deg, #f6f3ec 0%, #efe9db 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(201, 162, 75, 0.12) 0%, transparent 70%); border-radius: 50%;"></div>
+    <div style="position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(11, 92, 135, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
+
     <div class="container" style="position: relative; z-index: 1;">
         <div class="row">
             <div class="col-lg-10 mx-auto text-center">
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb justify-content-center" style="background: transparent;">
-                        <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: #da7215; text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: #0b5c87; text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Pricing</li>
                     </ol>
                 </nav>
-                <h1 class="display-4 fw-bold mb-3" style="color: #107fa0;">Vaccine Pricing & Availability</h1>
-                <p class="lead" style="color: #6b7280;">Transparent pricing with no hidden charges. Select vaccines to calculate total cost.</p>
+                <h1 class="display-4 fw-bold mb-3" style="color: #0b5c87;">Vaccine Pricing &amp; Availability</h1>
+                <p class="lead" style="color: #4a575e;">Transparent pricing with no hidden charges. Select vaccines to calculate total cost.</p>
             </div>
         </div>
     </div>
@@ -313,7 +313,7 @@ get_header(); ?>
   ]);
 
   if ( ! $brands ) {
-    echo '<p style="text-align:center;color:#888;">No vaccine data found. Please add brands from the dashboard.</p>';
+    echo '<p style="text-align:center;color:#8a959a;">No vaccine data found. Please add brands from the dashboard.</p>';
   } else {
     $grouped = [];
     foreach ( $brands as $brand ) {
@@ -431,13 +431,13 @@ function vcOpenModal(el) {
   }
 
   var availHtml = avail === 'yes'
-    ? '<span style="color:#1e8449;font-weight:700;">✓ Available</span>'
+    ? '<span style="color:#5a9c34;font-weight:700;">✓ Available</span>'
     : '<span style="color:#c0392b;font-weight:700;">✗ Not Available</span>';
 
   document.getElementById('vcModalDetails').innerHTML =
     '<div class="vc-modal-detail-item"><div class="d-label">Disease</div><div class="d-value">' + (disease||'—') + '</div></div>' +
     '<div class="vc-modal-detail-item"><div class="d-label">Manufacturer</div><div class="d-value">' + (manufacturer||'—') + '</div></div>' +
-    '<div class="vc-modal-detail-item" style="border-left-color:#27ae60"><div class="d-label">Availability</div><div class="d-value">' + availHtml + '</div></div>' +
+    '<div class="vc-modal-detail-item" style="border-left-color:#6bb63f"><div class="d-label">Availability</div><div class="d-value">' + availHtml + '</div></div>' +
     '<div class="vc-modal-detail-item"><div class="d-label">Vaccine</div><div class="d-value">' + vaccine + '</div></div>';
 
   var priceNum = parseFloat(price);

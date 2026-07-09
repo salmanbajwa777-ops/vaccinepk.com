@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 function vaccination_centre_assets() {
 
     wp_enqueue_style( 'google-fonts',
-        'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Ubuntu:wght@500;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap',
         [], null );
 
     wp_enqueue_style( 'bootstrap',
@@ -303,32 +303,32 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
         .dv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:6px}
         .dv-item{position:relative}
         .dv-item input[type="checkbox"]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
-        .dv-label{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:2px solid #e5e7eb;
+        .dv-label{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:2px solid #e7e0d3;
             border-radius:12px;cursor:pointer;background:#fff;transition:all .2s ease;user-select:none}
-        .dv-label:hover{border-color:#107fa0;background:#f0f9ff;box-shadow:0 2px 10px rgba(16,127,160,.12);transform:translateY(-1px)}
-        .dv-item input[type="checkbox"]:checked+.dv-label{border-color:#107fa0;
-            background:linear-gradient(135deg,#e0f4f9 0%,#e8f5e0 100%);box-shadow:0 3px 16px rgba(16,127,160,.18)}
+        .dv-label:hover{border-color:#0b5c87;background:#eaf2f6;box-shadow:0 2px 10px rgba(11,92,135,.12);transform:translateY(-1px)}
+        .dv-item input[type="checkbox"]:checked+.dv-label{border-color:#0b5c87;
+            background:#eaf2f6;box-shadow:0 3px 16px rgba(11,92,135,.18)}
         .dv-checkbox-box{width:22px;height:22px;min-width:22px;border:2px solid #d1d5db;border-radius:6px;
             background:#fff;display:flex;align-items:center;justify-content:center;margin-top:1px;
             transition:all .2s ease;font-size:13px;color:transparent;font-weight:700}
-        .dv-item input[type="checkbox"]:checked+.dv-label .dv-checkbox-box{background:#107fa0;border-color:#107fa0;color:#fff}
+        .dv-item input[type="checkbox"]:checked+.dv-label .dv-checkbox-box{background:#0b5c87;border-color:#0b5c87;color:#fff}
         .dv-info{flex:1}
-        .dv-vaccine-name{font-weight:600;color:#1f2937;font-size:14px;line-height:1.4;display:block;margin-bottom:5px}
-        .dv-item input[type="checkbox"]:checked+.dv-label .dv-vaccine-name{color:#0a5f7a}
+        .dv-vaccine-name{font-weight:600;color:#16232b;font-size:14px;line-height:1.4;display:block;margin-bottom:5px}
+        .dv-item input[type="checkbox"]:checked+.dv-label .dv-vaccine-name{color:#0a2a38}
         .dv-vaccine-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-        .dv-price{font-size:13px;font-weight:700;color:#107fa0}
-        .dv-age{font-size:11px;color:#6b7280;background:#f3f4f6;padding:2px 8px;border-radius:20px}
-        .dv-hint{font-size:12px;color:#9ca3af;margin-bottom:10px;display:block}
+        .dv-price{font-size:13px;font-weight:700;color:#c9a24b}
+        .dv-age{font-size:11px;color:#4a575e;background:#e7e0d3;padding:2px 8px;border-radius:20px}
+        .dv-hint{font-size:12px;color:#8a959a;margin-bottom:10px;display:block}
         .dv-other-input-wrap{display:none;margin-top:10px}
-        .dv-other-input-wrap input[type="text"]{width:100%;padding:12px 15px;border:2px solid #107fa0;
-            border-radius:8px;font-size:14px;background:#f0f9ff;box-sizing:border-box;font-family:inherit}
+        .dv-other-input-wrap input[type="text"]{width:100%;padding:12px 15px;border:2px solid #0b5c87;
+            border-radius:8px;font-size:14px;background:#eaf2f6;box-sizing:border-box;font-family:inherit}
         @keyframes fadeInDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
         </style>';
     }
 
     if ( empty( $vaccines ) ) {
         $html .= '<span class="wpcf7-form-control-wrap" data-name="' . $field_name . '">';
-        $html .= '<p style="color:#6b7280;font-size:14px;">No vaccines found (slug: ' . esc_html( $tax_slug ) . ')</p>';
+        $html .= '<p style="color:#4a575e;font-size:14px;">No vaccines found (slug: ' . esc_html( $tax_slug ) . ')</p>';
         $html .= '</span>';
         return $html;
     }
@@ -363,15 +363,15 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
     $html .= '<div class="dv-other-wrap" style="margin-top:10px;">';
     $html .= '<div class="dv-item">';
     $html .= '<input type="checkbox" name="' . $field_name . '[]" id="' . $other_cb_id . '" value="Other" class="dv-other-trigger" data-target="' . $other_wrap_id . '">';
-    $html .= '<label class="dv-label" for="' . $other_cb_id . '" style="border-style:dashed;border-color:#9ca3af;background:#fafafa;">';
-    $html .= '<span class="dv-checkbox-box" style="border-color:#9ca3af;">&#10003;</span>';
-    $html .= '<span class="dv-info"><span class="dv-vaccine-name" style="color:#6b7280;">&#43; Other Vaccine</span>';
-    $html .= '<span style="font-size:12px;color:#9ca3af;display:block;">Not in the list? Specify here</span></span>';
+    $html .= '<label class="dv-label" for="' . $other_cb_id . '" style="border-style:dashed;border-color:#8a959a;background:#fafafa;">';
+    $html .= '<span class="dv-checkbox-box" style="border-color:#8a959a;">&#10003;</span>';
+    $html .= '<span class="dv-info"><span class="dv-vaccine-name" style="color:#4a575e;">&#43; Other Vaccine</span>';
+    $html .= '<span style="font-size:12px;color:#8a959a;display:block;">Not in the list? Specify here</span></span>';
     $html .= '</label></div>';
 
     $html .= '<div id="' . $other_wrap_id . '" class="dv-other-input-wrap">';
     $html .= '<input type="text" name="' . $field_name . '_other_text" placeholder="e.g. Rabies, Yellow Fever, Meningitis...">';
-    $html .= '<p style="font-size:12px;color:#6b7280;margin-top:5px;">&#9432; Write the vaccine name — we will confirm availability</p>';
+    $html .= '<p style="font-size:12px;color:#4a575e;margin-top:5px;">&#9432; Write the vaccine name — we will confirm availability</p>';
     $html .= '</div>';
     $html .= '</div>'; // end dv-other-wrap
 
@@ -401,15 +401,15 @@ add_action( 'wp_footer', function () { ?>
 /* Home address conditional wrap */
 .home-address-wrap{display:none;margin-top:14px;animation:fadeInDown .3s ease}
 .home-address-wrap.visible{display:block}
-.home-address-wrap label{display:block;font-weight:600;color:#374151;margin-bottom:8px}
-.home-address-wrap .address-box{width:100%;padding:12px 15px;border:2px solid #107fa0;border-radius:8px;
-    font-size:15px;font-family:inherit;resize:vertical;background:#f0f9ff;transition:all .3s;box-sizing:border-box}
+.home-address-wrap label{display:block;font-weight:600;color:#16232b;margin-bottom:8px}
+.home-address-wrap .address-box{width:100%;padding:12px 15px;border:2px solid #0b5c87;border-radius:8px;
+    font-size:15px;font-family:inherit;resize:vertical;background:#eaf2f6;transition:all .3s;box-sizing:border-box}
 .home-address-wrap .address-box:focus{outline:none;box-shadow:0 0 0 3px rgba(16,127,160,.15)}
-.home-address-hint{font-size:12px;color:#6b7280;margin-top:5px}
+.home-address-hint{font-size:12px;color:#4a575e;margin-top:5px}
 /* File upload */
 .wpcf7 input[type="file"]{width:100%;padding:10px 14px;border:2px dashed #d1d5db;border-radius:8px;
     background:#fafafa;cursor:pointer;font-size:14px;transition:all .3s;box-sizing:border-box}
-.wpcf7 input[type="file"]:hover{border-color:#107fa0;background:#f0f9ff}
+.wpcf7 input[type="file"]:hover{border-color:#0b5c87;background:#eaf2f6}
 </style>
 
 <script>

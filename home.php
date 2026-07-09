@@ -428,7 +428,7 @@ $homepage_faqs = [
 <section class="stats-section py-5">
     <div class="container">
         <div class="text-center mb-5">
-            <span class="badge-custom" style="background:rgba(123,177,79,0.15);color:#7bb14f;">Why VaccinePk</span>
+            <span class="badge-custom" style="background:rgba(107,182,63,0.15);color:var(--color-green);">Why VaccinePk</span>
             <h2 style="color:#fff;">Trusted at a National Scale</h2>
         </div>
         <div class="row g-3">
@@ -526,15 +526,15 @@ $homepage_faqs = [
 </section>
 
 <!-- ================= SECTION 13: FINAL CTA ================= -->
-<section class="py-5" id="appointment" style="background: linear-gradient(135deg, #7bb14f, #6a9f3e);">
+<section class="py-5" id="appointment" style="background: var(--color-navy);">
     <div class="container text-center">
-        <h2 class="fw-bold mb-3 text-white">Book Your Vaccination</h2>
-        <p class="mb-4 text-white" style="font-size: 18px; opacity: 0.95;">Or speak with our vaccination team — we'll help you find the right vaccines for your family.</p>
+        <h2 class="fw-bold mb-3" style="color: var(--color-ivory);">Book Your Vaccination</h2>
+        <p class="mb-4" style="font-size: 18px; opacity: 0.95; color: var(--color-ink-on-navy);">Or speak with our vaccination team — we'll help you find the right vaccines for your family.</p>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="btn btn-light btn-lg px-5">
+            <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="btn btn-lg px-5" style="background: var(--color-gold); color: var(--color-navy); border-radius: 999px; font-weight: 700; text-decoration: none;">
                 <i class="bi bi-calendar-check-fill"></i> Book Your Vaccination
             </a>
-            <a href="tel:<?php echo esc_attr( $phone ); ?>" class="btn btn-outline-light btn-lg px-5">
+            <a href="tel:<?php echo esc_attr( $phone ); ?>" class="btn btn-outline-light btn-lg px-5" style="border-radius: 999px;">
                 <i class="bi bi-telephone-fill"></i> Speak With Our Team
             </a>
         </div>
@@ -562,35 +562,35 @@ $homepage_faqs = [
 .home-search-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .home-chip {
     font-size: 0.82rem; font-weight: 700; padding: 7px 16px; border-radius: 50px;
-    background: white; border: 1.5px solid #eef0f2; color: var(--text-dark); text-decoration: none;
+    background: white; border: 1.5px solid var(--color-sand); color: var(--text-dark); text-decoration: none;
 }
 .home-chip:hover { border-color: var(--primary-gradient-start); color: var(--primary-gradient-start); }
 
 .hero-stats-grid { border-radius: 20px; overflow: hidden; background: white; box-shadow: var(--shadow-md); }
-.hero-stat-cell { padding: 24px 16px; text-align: center; border: 1px solid #f3f4f6; }
+.hero-stat-cell { padding: 24px 16px; text-align: center; border: 1px solid var(--color-sand); }
 .hero-stat-num { font-size: 1.8rem; font-weight: 800; color: var(--accent-blue); line-height: 1; margin-bottom: 6px; }
 .hero-stat-lbl { font-size: 0.82rem; color: var(--text-light); font-weight: 600; }
 
 /* ---- knowledge categories ---- */
 .knowledge-cat-card {
-    display: block; text-align: center; background: white; border: 1px solid #eef0f2; border-radius: 16px;
+    display: block; text-align: center; background: white; border: 1px solid var(--color-sand); border-radius: 16px;
     padding: 22px 12px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition);
 }
 .knowledge-cat-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; border-color: transparent; }
 .knowledge-cat-icon {
-    width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 12px; background: rgba(218,114,21,0.1);
-    color: var(--primary-gradient-start); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 12px; background: var(--color-blue-tint);
+    color: var(--color-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
 }
 .knowledge-cat-card h6 { font-weight: 700; font-size: 0.85rem; margin: 0; }
 
 /* ---- most searched vaccines ---- */
-.vsv-card { background: white; border: 1px solid #eef0f2; border-radius: 16px; overflow: hidden; height: 100%; transition: var(--transition); }
+.vsv-card { background: white; border: 1px solid var(--color-sand); border-radius: 16px; overflow: hidden; height: 100%; transition: var(--transition); }
 .vsv-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
 .vsv-card-img { position: relative; height: 140px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; }
 .vsv-card-img img { width: 100%; height: 100%; object-fit: cover; }
 .vsv-card-img i { font-size: 2rem; color: var(--accent-blue); }
 .vsv-badge { position: absolute; top: 10px; right: 10px; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 50px; }
-.vsv-badge-in { background: #7bb14f; color: white; }
+.vsv-badge-in { background: var(--color-green); color: white; }
 .vsv-badge-out { background: #dc3545; color: white; }
 .vsv-badge-soon { background: #ffc107; color: #000; }
 .vsv-card-body { padding: 18px; }
@@ -601,42 +601,42 @@ $homepage_faqs = [
 .vsv-actions a { flex: 1; text-align: center; font-size: 0.78rem; font-weight: 700; padding: 9px 10px; border-radius: 50px; text-decoration: none; }
 .vsv-learn { background: var(--primary-gradient-start); color: white; }
 .vsv-learn:hover { background: var(--primary-gradient-end); color: white; }
-.vsv-book { border: 1.5px solid #eef0f2; color: var(--text-light); }
+.vsv-book { border: 1.5px solid var(--color-sand); color: var(--text-light); }
 .vsv-book:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 
 /* ---- featured knowledge ---- */
-.fk-card { display: block; background: white; border: 1px solid #eef0f2; border-radius: 16px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition); }
+.fk-card { display: block; background: white; border: 1px solid var(--color-sand); border-radius: 16px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition); }
 .fk-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; }
 .fk-card-soon { opacity: 0.7; }
 .fk-card-body { padding: 20px; }
-.fk-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 700; color: #107fa0; background: rgba(16,127,160,0.1); padding: 4px 10px; border-radius: 50px; margin-bottom: 12px; }
+.fk-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 700; color: var(--color-blue); background: var(--color-blue-tint); padding: 4px 10px; border-radius: 50px; margin-bottom: 12px; }
 .fk-card-body h6 { font-weight: 700; margin-bottom: 10px; }
 .fk-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.74rem; color: var(--text-light); }
-.fk-soon { color: #da7215; font-weight: 700; }
+.fk-soon { color: var(--color-label-muted); font-weight: 700; }
 
 /* ---- interactive tools ---- */
-.tool-card { background: white; border: 1px solid #eef0f2; border-radius: 16px; padding: 24px 16px; text-align: center; height: 100%; }
-.tool-icon { width: 50px; height: 50px; margin: 0 auto 14px; border-radius: 12px; background: rgba(123,177,79,0.12); color: #7bb14f; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.tool-card { background: white; border: 1px solid var(--color-sand); border-radius: 16px; padding: 24px 16px; text-align: center; height: 100%; }
+.tool-icon { width: 50px; height: 50px; margin: 0 auto 14px; border-radius: 12px; background: var(--color-blue-tint); color: var(--color-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
 .tool-card h6 { font-weight: 700; font-size: 0.88rem; margin-bottom: 8px; }
 .tool-card p { font-size: 0.76rem; color: var(--text-light); min-height: 50px; }
-.tool-soon { display: inline-block; font-size: 0.7rem; font-weight: 700; color: #da7215; background: rgba(218,114,21,0.1); padding: 4px 10px; border-radius: 50px; }
+.tool-soon { display: inline-block; font-size: 0.7rem; font-weight: 700; color: var(--color-label-muted); background: var(--color-sand); padding: 4px 10px; border-radius: 50px; }
 
 /* ---- schedule strip ---- */
 .schedule-strip { display: flex; gap: 14px; overflow-x: auto; padding: 10px 4px 20px; }
 .schedule-strip-item { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; min-width: 90px; }
-.schedule-strip-dot { width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #107fa0, #7bb14f); }
+.schedule-strip-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--color-blue); }
 .schedule-strip-label { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); text-align: center; }
 .schedule-strip-item:hover .schedule-strip-label { color: var(--accent-blue); }
 
 /* ---- disease library ---- */
-.disease-lib-card { display: block; background: white; border: 1px solid #eef0f2; border-radius: 16px; padding: 26px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition); }
+.disease-lib-card { display: block; background: white; border: 1px solid var(--color-sand); border-radius: 16px; padding: 26px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition); }
 .disease-lib-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; }
-.disease-lib-icon { width: 50px; height: 50px; border-radius: 12px; background: rgba(218,114,21,0.12); color: var(--primary-gradient-start); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 14px; }
+.disease-lib-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--color-blue-tint); color: var(--color-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 14px; }
 .disease-lib-card h6 { font-weight: 700; margin-bottom: 8px; }
 .disease-lib-card p { font-size: 0.82rem; color: var(--text-light); margin: 0; }
 
 /* ---- brand cards ---- */
-.brand-home-card { display: block; text-align: center; background: white; border: 1px solid #eef0f2; border-radius: 16px; padding: 20px; text-decoration: none; color: inherit; transition: var(--transition); }
+.brand-home-card { display: block; text-align: center; background: white; border: 1px solid var(--color-sand); border-radius: 16px; padding: 20px; text-decoration: none; color: inherit; transition: var(--transition); }
 .brand-home-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; }
 .brand-home-img { height: 90px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
 .brand-home-img img { max-height: 90px; max-width: 100%; object-fit: contain; }
@@ -645,11 +645,11 @@ $homepage_faqs = [
 
 /* ---- why vaccinepk ---- */
 .why-card { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; height: 100%; }
-.why-card i { font-size: 1.3rem; color: #7bb14f; }
+.why-card i { font-size: 1.3rem; color: var(--color-sub-on-blue); }
 .why-card span { font-weight: 700; color: white; font-size: 0.86rem; }
 
 /* ---- cities ---- */
-.city-home-chip { display: flex; align-items: center; gap: 8px; justify-content: center; background: white; border: 1px solid #eef0f2; border-radius: 12px; padding: 16px; font-weight: 700; text-decoration: none; color: var(--text-dark); transition: var(--transition); }
+.city-home-chip { display: flex; align-items: center; gap: 8px; justify-content: center; background: white; border: 1px solid var(--color-sand); border-radius: 12px; padding: 16px; font-weight: 700; text-decoration: none; color: var(--text-dark); transition: var(--transition); }
 .city-home-chip:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 .city-home-chip-static { color: var(--text-light); cursor: default; }
 .city-home-chip i { color: var(--accent-blue); }
@@ -657,7 +657,7 @@ $homepage_faqs = [
 /* ---- faq accordion ---- */
 .accordion-item { border: none; margin-bottom: 14px; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow-sm); }
 .accordion-button { font-weight: 700; color: var(--text-dark); }
-.accordion-button:not(.collapsed) { background: rgba(123,177,79,0.08); color: var(--accent-green); box-shadow: none; }
+.accordion-button:not(.collapsed) { background: var(--color-blue-tint); color: var(--color-blue); box-shadow: none; }
 .accordion-button:focus { box-shadow: none; }
 
 @media (max-width: 991px) {

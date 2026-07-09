@@ -7,11 +7,11 @@ get_header();
 
 <style>
 .cities-hero {
-    background: linear-gradient(135deg, #f0ffe0 0%, #e5ffcc 100%);
+    background: linear-gradient(135deg, #f6f3ec 0%, #efe9db 100%);
     padding: 80px 0 60px;
 }
 .city-hub-card {
-    background: #fff; border: 1px solid #eef0f2; border-radius: 18px;
+    background: #fff; border: 1px solid var(--color-sand); border-radius: 18px;
     padding: 28px; height: 100%; transition: var(--transition);
     text-decoration: none; display: block; color: inherit;
 }
@@ -19,7 +19,7 @@ get_header();
 .city-hub-icon {
     width: 54px; height: 54px; border-radius: 14px; display: flex; align-items: center;
     justify-content: center; font-size: 1.4rem; margin-bottom: 14px;
-    background: rgba(123,177,79,0.12); color: #7bb14f;
+    background: var(--color-blue-tint); color: var(--color-blue);
 }
 .city-hub-card h3 { font-weight: 700; font-size: 1.15rem; margin-bottom: 8px; }
 .city-hub-card p { color: var(--text-light); font-size: 0.88rem; margin-bottom: 0; }
@@ -29,12 +29,12 @@ get_header();
     <div class="container">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb" style="background: transparent;">
-                <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color:#da7215;text-decoration:none;"><i class="bi bi-house-fill"></i> Home</a></li>
+                <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color:#0b5c87;text-decoration:none;"><i class="bi bi-house-fill"></i> Home</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Cities</li>
             </ol>
         </nav>
-        <h1 class="display-4 fw-bold mb-3" style="color:#7bb14f;">Cities We Serve</h1>
-        <p class="lead" style="color:#6b7280;max-width:640px;">Home and clinic vaccination across Pakistan's major cities.</p>
+        <h1 class="display-4 fw-bold mb-3" style="color:#0b5c87;">Cities We Serve</h1>
+        <p class="lead" style="color:#4a575e;max-width:640px;">Home and clinic vaccination across Pakistan's major cities.</p>
     </div>
 </section>
 
@@ -57,7 +57,7 @@ get_header();
                 <?php endwhile; ?>
             <?php else : ?>
                 <div class="col-12 text-center py-5">
-                    <i class="bi bi-inbox" style="font-size: 64px; color: #e5e7eb;"></i>
+                    <i class="bi bi-inbox" style="font-size: 64px; color: var(--color-sand);"></i>
                     <p class="text-muted mt-3 mb-0">City pages are being added. Please check back soon or <a href="<?php echo home_url('/contact'); ?>">contact us</a>.</p>
                 </div>
             <?php endif; ?>

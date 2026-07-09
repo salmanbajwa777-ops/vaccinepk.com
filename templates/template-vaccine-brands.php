@@ -15,11 +15,11 @@ $brands = get_posts( [
 
 <style>
 .brands-hero {
-    background: linear-gradient(135deg, #e0f4ff 0%, #cceeff 100%);
+    background: linear-gradient(135deg, #f6f3ec 0%, #efe9db 100%);
     padding: 80px 0 60px;
 }
 .brand-card {
-    background: white; border: 1px solid #eef0f2; border-radius: 18px; overflow: hidden;
+    background: white; border: 1px solid var(--color-sand); border-radius: 18px; overflow: hidden;
     height: 100%; transition: var(--transition); text-decoration: none; color: inherit; display: block;
 }
 .brand-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; }
@@ -34,12 +34,12 @@ $brands = get_posts( [
     <div class="container">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb" style="background: transparent;">
-                <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color:#da7215;text-decoration:none;"><i class="bi bi-house-fill"></i> Home</a></li>
+                <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color:#0b5c87;text-decoration:none;"><i class="bi bi-house-fill"></i> Home</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Vaccine Brands</li>
             </ol>
         </nav>
-        <h1 class="display-4 fw-bold mb-3" style="color:#107fa0;">Vaccine Brands</h1>
-        <p class="lead" style="color:#6b7280;max-width:640px;">Genuine, imported vaccines from trusted multinational manufacturers, cold-chain protected from arrival to administration.</p>
+        <h1 class="display-4 fw-bold mb-3" style="color:#0b5c87;">Vaccine Brands</h1>
+        <p class="lead" style="color:#4a575e;max-width:640px;">Genuine, imported vaccines from trusted multinational manufacturers, cold-chain protected from arrival to administration.</p>
     </div>
 </section>
 
@@ -75,7 +75,7 @@ $brands = get_posts( [
                 <?php endforeach; ?>
             <?php else : ?>
                 <div class="col-12 text-center py-5">
-                    <i class="bi bi-inbox" style="font-size: 64px; color: #e5e7eb;"></i>
+                    <i class="bi bi-inbox" style="font-size: 64px; color: var(--color-sand);"></i>
                     <p class="text-muted mt-3 mb-0">Brand information is being added. Please check back soon.</p>
                 </div>
             <?php endif; ?>

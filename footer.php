@@ -21,7 +21,7 @@ $youtube = $site_settings->field( 'youtube_url' );
 <?php endif; ?>
 
 
-<footer style="background: linear-gradient(135deg, #da7215, #d35324); color: white;">
+<footer style="background: var(--color-navy); color: var(--color-ivory);">
     <div class="container">
         
         <!-- Main Footer Content -->
@@ -189,7 +189,7 @@ $youtube = $site_settings->field( 'youtube_url' );
 </footer>
 
 <!-- Back to Top Button -->
-<a href="#" id="backToTop" style="position: fixed; bottom: 30px; left: 30px; background: linear-gradient(135deg, #da7215, #d35324); color: white; width: 50px; height: 50px; border-radius: 50%; display: none; align-items: center; justify-content: center; text-decoration: none; font-size: 24px; box-shadow: 0 5px 20px rgba(218, 114, 21, 0.4); z-index: 999; transition: all 0.3s;">
+<a href="#" id="backToTop" style="position: fixed; bottom: 30px; left: 30px; background: var(--color-gold); color: var(--color-navy); width: 50px; height: 50px; border-radius: 50%; display: none; align-items: center; justify-content: center; text-decoration: none; font-size: 24px; box-shadow: 0 10px 24px -8px rgba(201,162,75,0.55); z-index: 999; transition: all 0.3s;">
     <i class="bi bi-arrow-up"></i>
 </a>
 

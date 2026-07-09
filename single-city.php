@@ -15,14 +15,14 @@ $whatsapp      = $site_settings->field( 'whatsapp_number' );
 
 <style>
 .city-hero {
-    background: linear-gradient(135deg, #7bb14f 0%, #6a9f3e 100%);
+    background: var(--color-navy);
     color: white; padding: 60px 0; margin-bottom: 50px;
 }
 .city-detail-card {
-    background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(10,42,56,0.08);
     padding: 40px; margin-bottom: 30px;
 }
-.city-detail-card h2 { color: #107fa0; font-weight: 700; margin-bottom: 16px; }
+.city-detail-card h2 { color: var(--color-blue); font-weight: 700; margin-bottom: 16px; }
 </style>
 
 <section class="city-hero">

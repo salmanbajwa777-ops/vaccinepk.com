@@ -23,21 +23,21 @@ get_header();
 ?>
 
 <!-- ================= PAGE HEADER ================= -->
-<section class="page-header" style="background: linear-gradient(135deg, #fff5eb 0%, #ffe8d5 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
-    <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(218, 114, 21, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-    <div style="position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(123, 177, 79, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-    
+<section class="page-header" style="background: linear-gradient(160deg, var(--color-navy) 0%, #0e3446 55%, var(--color-navy) 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(201, 162, 75, 0.14) 0%, transparent 70%); border-radius: 50%;"></div>
+    <div style="position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(107, 182, 63, 0.12) 0%, transparent 70%); border-radius: 50%;"></div>
+
     <div class="container" style="position: relative; z-index: 1;">
         <div class="row">
             <div class="col-lg-8 mx-auto text-center">
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb justify-content-center" style="background: transparent;">
-                        <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: #da7215; text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Blog</li>
+                        <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: var(--color-sub-on-blue); text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" style="color: var(--color-ivory);">Blog</li>
                     </ol>
                 </nav>
-                <h1 class="display-4 fw-bold mb-3" style="color: #107fa0;">Health & Vaccination Blog</h1>
-                <p class="lead" style="color: #6b7280;">Expert insights, tips, and updates on child health and vaccination</p>
+                <h1 class="display-4 fw-bold mb-3" style="color: var(--color-ivory);">Health & Vaccination Blog</h1>
+                <p class="lead" style="color: var(--color-sub-on-blue);">Expert insights, tips, and updates on child health and vaccination</p>
             </div>
         </div>
     </div>
@@ -64,7 +64,7 @@ if ($featured_query->have_posts()) :
 <section class="py-5" style="background: white;">
     <div class="container">
         <div class="mb-4">
-            <span class="badge" style="background: linear-gradient(135deg, #da7215, #d35324); color: white; padding: 8px 16px; border-radius: 50px;">
+            <span class="badge" style="background: var(--color-gold); color: var(--color-navy); padding: 8px 16px; border-radius: 50px;">
                 <i class="bi bi-star-fill"></i> Featured Post
             </span>
         </div>
@@ -83,7 +83,7 @@ if ($featured_query->have_posts()) :
                     <?php
                     $categories = get_the_category();
                     if (!empty($categories)) {
-                        echo '<span class="badge me-2" style="background: #7bb14f; color: white;">' . esc_html($categories[0]->name) . '</span>';
+                        echo '<span class="badge me-2" style="background: var(--color-blue); color: white;">' . esc_html($categories[0]->name) . '</span>';
                     }
                     ?>
                     <span class="text-muted small">
@@ -91,7 +91,7 @@ if ($featured_query->have_posts()) :
                     </span>
                 </div>
                 <h2 class="fw-bold mb-3">
-                    <a href="<?php the_permalink(); ?>" style="color: #1f2937; text-decoration: none;">
+                    <a href="<?php the_permalink(); ?>" style="color: var(--color-ink-strong); text-decoration: none;">
                         <?php the_title(); ?>
                     </a>
                 </h2>
@@ -184,7 +184,7 @@ endif;
                             <?php
                             $categories = get_the_category();
                             if (!empty($categories)) {
-                                echo '<span class="badge" style="background: #7bb14f; color: white;">' . esc_html($categories[0]->name) . '</span>';
+                                echo '<span class="badge" style="background: var(--color-blue); color: white;">' . esc_html($categories[0]->name) . '</span>';
                             }
                             ?>
                         </div>
@@ -204,7 +204,7 @@ endif;
                         
                         <!-- Title -->
                         <h5 class="fw-bold mb-3">
-                            <a href="<?php the_permalink(); ?>" style="color: #1f2937; text-decoration: none;">
+                            <a href="<?php the_permalink(); ?>" style="color: var(--color-ink-strong); text-decoration: none;">
                                 <?php the_title(); ?>
                             </a>
                         </h5>
@@ -220,7 +220,7 @@ endif;
                                 <?php echo get_avatar(get_the_author_meta('ID'), 32, '', '', array('class' => 'rounded-circle me-2')); ?>
                                 <span class="small text-muted"><?php the_author(); ?></span>
                             </div>
-                            <a href="<?php the_permalink(); ?>" class="text-decoration-none small fw-bold" style="color: #da7215;">
+                            <a href="<?php the_permalink(); ?>" class="text-decoration-none small fw-bold" style="color: var(--color-blue);">
                                 Read More <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
@@ -275,14 +275,14 @@ endif;
 </section>
 
 <!-- ================= NEWSLETTER SECTION ================= -->
-<section class="py-5" style="background: linear-gradient(135deg, #e0f4ff 0%, #cceeff 100%);">
+<section class="py-5" style="background: var(--color-blue-tint);">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
                 <div class="mb-4">
-                    <i class="bi bi-envelope-heart-fill" style="font-size: 64px; color: #107fa0;"></i>
+                    <i class="bi bi-envelope-heart-fill" style="font-size: 64px; color: var(--color-blue);"></i>
                 </div>
-                <h2 class="fw-bold mb-3" style="color: #107fa0;">Stay Updated with Health Tips</h2>
+                <h2 class="fw-bold mb-3" style="color: var(--color-navy);">Stay Updated with Health Tips</h2>
                 <p class="text-muted mb-4">Subscribe to our newsletter for the latest vaccination updates, health tips, and expert advice.</p>
                 
                 <form class="row g-3 justify-content-center" action="#" method="post">
@@ -305,7 +305,7 @@ endif;
 </section>
 
 <!-- ================= CTA SECTION ================= -->
-<section class="py-5" style="background: linear-gradient(135deg, #7bb14f, #6a9f3e);">
+<section class="py-5" style="background: linear-gradient(135deg, var(--color-blue), var(--color-navy));">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8 text-white mb-4 mb-lg-0">
@@ -313,7 +313,7 @@ endif;
                 <p class="mb-0" style="font-size: 18px;">Book your home vaccination appointment and protect your family's health today.</p>
             </div>
             <div class="col-lg-4 text-lg-end">
-                <a href="<?php echo home_url('/contact'); ?>" class="btn btn-light btn-lg px-5">
+                <a href="<?php echo home_url('/contact'); ?>" class="btn px-5" style="background: var(--color-gold); color: var(--color-navy); border-radius: 999px; font-weight: 600; padding: 12px 28px; text-decoration: none; display: inline-block;">
                     Book Now <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
@@ -337,18 +337,18 @@ endif;
     padding: 10px 16px;
     margin: 0 4px;
     border-radius: 8px;
-    color: #6b7280;
+    color: var(--color-ink);
     text-decoration: none;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--color-sand);
     background: white;
     transition: all 0.3s;
 }
 
 .pagination .page-numbers:hover,
 .pagination .page-numbers.current {
-    background: linear-gradient(135deg, #da7215, #d35324);
+    background: var(--color-blue);
     color: white;
-    border-color: #da7215;
+    border-color: var(--color-blue);
 }
 
 .pagination .prev,

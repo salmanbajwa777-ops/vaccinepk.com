@@ -1,6 +1,6 @@
 <?php
 /**
- * Single Post Template - BabyMedics
+ * Single Post Template
  */
 get_header();
 
@@ -9,42 +9,42 @@ while (have_posts()) : the_post();
 
 <!-- ================= POST HEADER ================= -->
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-    <section class="post-header" style="background: linear-gradient(135deg, #fff5eb 0%, #ffe8d5 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(218, 114, 21, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-        
+    <section class="post-header" style="background: linear-gradient(160deg, var(--color-navy) 0%, #0e3446 55%, var(--color-navy) 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(201, 162, 75, 0.14) 0%, transparent 70%); border-radius: 50%;"></div>
+
         <div class="container" style="position: relative; z-index: 1;">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <!-- Breadcrumb -->
                     <nav aria-label="breadcrumb" class="mb-4">
                         <ol class="breadcrumb" style="background: transparent;">
-                            <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: #da7215; text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
-                            <li class="breadcrumb-item"><a href="<?php echo get_permalink(get_option('page_for_posts')); ?>" style="color: #da7215; text-decoration: none;">Blog</a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><?php the_title(); ?></li>
+                            <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: var(--color-sub-on-blue); text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo get_permalink(get_option('page_for_posts')); ?>" style="color: var(--color-sub-on-blue); text-decoration: none;">Blog</a></li>
+                            <li class="breadcrumb-item active" aria-current="page" style="color: var(--color-ivory);"><?php the_title(); ?></li>
                         </ol>
                     </nav>
-                    
+
                     <!-- Categories -->
                     <div class="mb-3">
                         <?php
                         $categories = get_the_category();
                         if (!empty($categories)) {
                             foreach ($categories as $category) {
-                                echo '<span class="badge me-2" style="background: #7bb14f; color: white;">' . esc_html($category->name) . '</span>';
+                                echo '<span class="badge me-2" style="background: var(--color-blue); color: white;">' . esc_html($category->name) . '</span>';
                             }
                         }
                         ?>
                     </div>
-                    
+
                     <!-- Post Title -->
-                    <h1 class="display-5 fw-bold mb-4" style="color: #1f2937;"><?php the_title(); ?></h1>
-                    
+                    <h1 class="display-5 fw-bold mb-4" style="color: var(--color-ivory);"><?php the_title(); ?></h1>
+
                     <!-- Meta Info -->
-                    <div class="d-flex flex-wrap align-items-center gap-4 text-muted">
+                    <div class="d-flex flex-wrap align-items-center gap-4" style="color: var(--color-sub-on-blue);">
                         <div class="d-flex align-items-center">
                             <?php echo get_avatar(get_the_author_meta('ID'), 48, '', '', array('class' => 'rounded-circle me-3')); ?>
                             <div>
-                                <p class="mb-0 fw-bold" style="color: #1f2937;"><?php the_author(); ?></p>
+                                <p class="mb-0 fw-bold" style="color: var(--color-ivory);"><?php the_author(); ?></p>
                                 <p class="mb-0 small"><?php the_author_meta('description') ? wp_trim_words(get_the_author_meta('description'), 8) : 'Author'; ?></p>
                             </div>
                         </div>
@@ -83,7 +83,7 @@ while (have_posts()) : the_post();
                 
                 <!-- Main Content -->
                 <div class="col-lg-8">
-                    <div class="bg-white p-5 rounded-4 shadow-sm" style="line-height: 1.8; font-size: 18px; color: #374151;">
+                    <div class="bg-white p-5 rounded-4 shadow-sm" style="line-height: 1.8; font-size: 18px; color: var(--color-ink);">
                         <?php the_content(); ?>
                         
                         <?php
@@ -102,7 +102,7 @@ while (have_posts()) : the_post();
                     if ($tags) :
                     ?>
                     <div class="mt-4 p-4 bg-white rounded-4 shadow-sm">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-tags-fill" style="color: #da7215;"></i> Tags:</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-tags-fill" style="color: var(--color-blue);"></i> Tags:</h6>
                         <div class="d-flex flex-wrap gap-2">
                             <?php foreach ($tags as $tag) : ?>
                                 <a href="<?php echo get_tag_link($tag->term_id); ?>" class="badge" style="background: #f3f4f6; color: #6b7280; text-decoration: none; padding: 8px 16px; border-radius: 50px; font-weight: 500;">
@@ -115,7 +115,7 @@ while (have_posts()) : the_post();
                     
                     <!-- Share Buttons -->
                     <div class="mt-4 p-4 bg-white rounded-4 shadow-sm">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-share-fill" style="color: #107fa0;"></i> Share this article:</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-share-fill" style="color: var(--color-blue);"></i> Share this article:</h6>
                         <div class="d-flex gap-3">
                             <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode(get_permalink()); ?>" target="_blank" class="btn btn-outline-primary" style="border-radius: 50px;">
                                 <i class="bi bi-facebook"></i> Facebook
@@ -146,7 +146,7 @@ while (have_posts()) : the_post();
                                     echo $author_bio ? $author_bio : 'Healthcare professional and writer passionate about child health and vaccination awareness.';
                                     ?>
                                 </p>
-                                <a href="<?php echo get_author_posts_url(get_the_author_meta('ID')); ?>" class="text-decoration-none fw-bold" style="color: #da7215;">
+                                <a href="<?php echo get_author_posts_url(get_the_author_meta('ID')); ?>" class="text-decoration-none fw-bold" style="color: var(--color-blue);">
                                     View all posts by <?php the_author(); ?> <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
@@ -182,7 +182,7 @@ while (have_posts()) : the_post();
                     
                     <!-- Categories Widget -->
                     <div class="bg-white p-4 rounded-4 shadow-sm mb-4">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-folder-fill" style="color: #7bb14f;"></i> Categories</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-folder-fill" style="color: var(--color-blue);"></i> Categories</h6>
                         <ul class="list-unstyled mb-0">
                             <?php
                             $categories = get_categories(array('hide_empty' => true));
@@ -200,7 +200,7 @@ while (have_posts()) : the_post();
                     
                     <!-- Recent Posts Widget -->
                     <div class="bg-white p-4 rounded-4 shadow-sm mb-4">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-clock-history" style="color: #107fa0;"></i> Recent Posts</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-clock-history" style="color: var(--color-blue);"></i> Recent Posts</h6>
                         <?php
                         $recent_posts = new WP_Query(array(
                             'posts_per_page' => 5,
@@ -213,7 +213,7 @@ while (have_posts()) : the_post();
                         ?>
                             <li class="mb-3 pb-3 border-bottom">
                                 <a href="<?php the_permalink(); ?>" class="text-decoration-none">
-                                    <h6 class="fw-bold mb-1 small" style="color: #1f2937;"><?php the_title(); ?></h6>
+                                    <h6 class="fw-bold mb-1 small" style="color: var(--color-ink-strong);"><?php the_title(); ?></h6>
                                     <p class="text-muted small mb-0">
                                         <i class="bi bi-calendar3"></i> <?php echo get_the_date('M j, Y'); ?>
                                     </p>
@@ -229,7 +229,7 @@ while (have_posts()) : the_post();
                     
                     <!-- Tags Widget -->
                     <div class="bg-white p-4 rounded-4 shadow-sm mb-4">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-tags-fill" style="color: #da7215;"></i> Popular Tags</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-tags-fill" style="color: var(--color-blue);"></i> Popular Tags</h6>
                         <div class="d-flex flex-wrap gap-2">
                             <?php
                             $tags = get_tags(array('orderby' => 'count', 'order' => 'DESC', 'number' => 15));
@@ -241,7 +241,7 @@ while (have_posts()) : the_post();
                     </div>
                     
                     <!-- CTA Widget -->
-                    <div class="rounded-4 shadow-sm overflow-hidden" style="background: linear-gradient(135deg, #7bb14f, #6a9f3e);">
+                    <div class="rounded-4 shadow-sm overflow-hidden" style="background: linear-gradient(135deg, var(--color-blue), var(--color-navy));">
                         <div class="p-4 text-white text-center">
                             <i class="bi bi-heart-pulse-fill" style="font-size: 48px; opacity: 0.9;"></i>
                             <h6 class="fw-bold mt-3 mb-2">Need Vaccination?</h6>
@@ -280,7 +280,7 @@ while (have_posts()) : the_post();
     ?>
     <section class="py-5" style="background: white;">
         <div class="container">
-            <h3 class="fw-bold mb-4 text-center" style="color: #107fa0;">Related Articles</h3>
+            <h3 class="fw-bold mb-4 text-center" style="color: var(--color-navy);">Related Articles</h3>
             <div class="row g-4">
                 <?php while ($related_posts->have_posts()) : $related_posts->the_post(); ?>
                 <div class="col-lg-4 col-md-6">
@@ -292,12 +292,12 @@ while (have_posts()) : the_post();
                         <?php endif; ?>
                         <div class="p-4">
                             <h6 class="fw-bold mb-2">
-                                <a href="<?php the_permalink(); ?>" style="color: #1f2937; text-decoration: none;">
+                                <a href="<?php the_permalink(); ?>" style="color: var(--color-ink-strong); text-decoration: none;">
                                     <?php the_title(); ?>
                                 </a>
                             </h6>
                             <p class="text-muted small mb-3"><?php echo wp_trim_words(get_the_excerpt(), 12); ?></p>
-                            <a href="<?php the_permalink(); ?>" class="text-decoration-none small fw-bold" style="color: #da7215;">
+                            <a href="<?php the_permalink(); ?>" class="text-decoration-none small fw-bold" style="color: var(--color-blue);">
                                 Read More <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>

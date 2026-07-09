@@ -1,27 +1,27 @@
 <?php
 /**
  * Template Name: About Page
- * Description: About Us page template for Vaccination Centre
+ * Description: About Us page template for Vaccine.Pk
  */
 get_header();
 ?>
 
 <!-- ================= PAGE HEADER ================= -->
-<section class="page-header" style="background: linear-gradient(135deg, #fff5eb 0%, #ffe8d5 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
-    <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(218, 114, 21, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-    <div style="position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(123, 177, 79, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-    
+<section class="page-header" style="background: linear-gradient(160deg, var(--color-navy) 0%, #0e3446 55%, var(--color-navy) 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(201, 162, 75, 0.14) 0%, transparent 70%); border-radius: 50%;"></div>
+    <div style="position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(107, 182, 63, 0.12) 0%, transparent 70%); border-radius: 50%;"></div>
+
     <div class="container" style="position: relative; z-index: 1;">
         <div class="row">
             <div class="col-lg-8 mx-auto text-center">
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb justify-content-center" style="background: transparent;">
-                        <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: #da7215; text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">About Us</li>
+                        <li class="breadcrumb-item"><a href="<?php echo home_url(); ?>" style="color: var(--color-sub-on-blue); text-decoration: none;"><i class="bi bi-house-fill"></i> Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" style="color: var(--color-ivory);">About Us</li>
                     </ol>
                 </nav>
-                <h1 class="display-4 fw-bold mb-3" style="color: #107fa0;">About Vaccination Centre</h1>
-                <p class="lead" style="color: #6b7280;">Your trusted partner in home vaccination services</p>
+                <h1 class="display-4 fw-bold mb-3" style="color: var(--color-ivory);">About Vaccine.Pk</h1>
+                <p class="lead" style="color: var(--color-sub-on-blue);">Your trusted partner in home vaccination services</p>
             </div>
         </div>
     </div>
@@ -33,9 +33,9 @@ get_header();
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
                 <span class="badge-custom"><i class="bi bi-heart-pulse-fill"></i> Our Story</span>
-                <h2 class="fw-bold mb-4" style="color: #107fa0;">Bringing Healthcare to Your Doorstep</h2>
+                <h2 class="fw-bold mb-4" style="color: var(--color-navy);">Bringing Healthcare to Your Doorstep</h2>
                 <p class="text-muted mb-4" style="line-height: 1.8;">
-                    Vaccination Centre was founded with a simple yet powerful mission: to make vaccination accessible, 
+                    Vaccine.Pk was founded with a simple yet powerful mission: to make vaccination accessible,
                     convenient, and stress-free for families across Pakistan. We understand that visiting hospitals 
                     or clinics with young children can be challenging, especially in today's fast-paced world.
                 </p>
@@ -46,15 +46,15 @@ get_header();
                 </p>
                 <div class="d-flex gap-4 mt-4">
                     <div>
-                        <h3 class="fw-bold mb-0" style="color: #da7215;">800K+</h3>
+                        <h3 class="fw-bold mb-0" style="color: var(--color-gold);">800K+</h3>
                         <p class="text-muted mb-0">Happy Families</p>
                     </div>
                     <div>
-                        <h3 class="fw-bold mb-0" style="color: #7bb14f;">800,000+</h3>
+                        <h3 class="fw-bold mb-0" style="color: var(--color-blue);">800,000+</h3>
                         <p class="text-muted mb-0">Vaccines Administered</p>
                     </div>
                     <div>
-                        <h3 class="fw-bold mb-0" style="color: #107fa0;">100%</h3>
+                        <h3 class="fw-bold mb-0" style="color: var(--color-green);">100%</h3>
                         <p class="text-muted mb-0">Safety Record</p>
                     </div>
                 </div>
@@ -72,48 +72,48 @@ get_header();
 </section>
 
 <!-- ================= OUR MISSION & VISION ================= -->
-<section class="py-5" style="background: linear-gradient(135deg, #e0f4ff 0%, #cceeff 100%);">
+<section class="py-5" style="background: var(--color-blue-tint);">
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-6">
                 <div class="bg-white p-5 rounded-4 shadow h-100">
                     <div class="mb-4">
-                        <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #da7215, #d35324); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">
+                        <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--color-blue), var(--color-navy)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">
                             <i class="bi bi-bullseye"></i>
                         </div>
                     </div>
-                    <h3 class="fw-bold mb-4" style="color: #107fa0;">Our Mission</h3>
+                    <h3 class="fw-bold mb-4" style="color: var(--color-navy);">Our Mission</h3>
                     <p class="text-muted mb-3" style="line-height: 1.8;">
-                        To provide accessible, reliable, and high-quality home vaccination services that protect 
-                        children and adults from preventable diseases, while ensuring convenience and peace of mind 
+                        To provide accessible, reliable, and high-quality home vaccination services that protect
+                        children and adults from preventable diseases, while ensuring convenience and peace of mind
                         for families.
                     </p>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><i class="bi bi-check-circle-fill" style="color: #7bb14f;"></i> Deliver WHO-standard vaccines</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill" style="color: #7bb14f;"></i> Maintain highest safety protocols</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill" style="color: #7bb14f;"></i> Provide expert medical guidance</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill" style="color: #7bb14f;"></i> Ensure convenient home service</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill" style="color: var(--color-green);"></i> Deliver WHO-standard vaccines</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill" style="color: var(--color-green);"></i> Maintain highest safety protocols</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill" style="color: var(--color-green);"></i> Provide expert medical guidance</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill" style="color: var(--color-green);"></i> Ensure convenient home service</li>
                     </ul>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="bg-white p-5 rounded-4 shadow h-100">
                     <div class="mb-4">
-                        <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #7bb14f, #6a9f3e); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">
+                        <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--color-navy), var(--color-ink-strong)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">
                             <i class="bi bi-eye-fill"></i>
                         </div>
                     </div>
-                    <h3 class="fw-bold mb-4" style="color: #7bb14f;">Our Vision</h3>
+                    <h3 class="fw-bold mb-4" style="color: var(--color-navy);">Our Vision</h3>
                     <p class="text-muted mb-3" style="line-height: 1.8;">
-                        To become Pakistan's leading home healthcare service provider, ensuring every child and 
-                        adult has access to timely, safe, and professional vaccination services, contributing to 
+                        To become Pakistan's leading home healthcare service provider, ensuring every child and
+                        adult has access to timely, safe, and professional vaccination services, contributing to
                         a healthier nation.
                     </p>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><i class="bi bi-star-fill" style="color: #da7215;"></i> Expand services nationwide</li>
-                        <li class="mb-2"><i class="bi bi-star-fill" style="color: #da7215;"></i> Partner with healthcare organizations</li>
-                        <li class="mb-2"><i class="bi bi-star-fill" style="color: #da7215;"></i> Innovate healthcare delivery</li>
-                        <li class="mb-2"><i class="bi bi-star-fill" style="color: #da7215;"></i> Raise vaccination awareness</li>
+                        <li class="mb-2"><i class="bi bi-star-fill" style="color: var(--color-blue);"></i> Expand services nationwide</li>
+                        <li class="mb-2"><i class="bi bi-star-fill" style="color: var(--color-blue);"></i> Partner with healthcare organizations</li>
+                        <li class="mb-2"><i class="bi bi-star-fill" style="color: var(--color-blue);"></i> Innovate healthcare delivery</li>
+                        <li class="mb-2"><i class="bi bi-star-fill" style="color: var(--color-blue);"></i> Raise vaccination awareness</li>
                     </ul>
                 </div>
             </div>
@@ -125,15 +125,15 @@ get_header();
 <section class="py-5" style="background: white;">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold" style="color: #107fa0;">Our Core Values</h2>
+            <h2 class="fw-bold" style="color: var(--color-navy);">Our Core Values</h2>
             <p class="text-muted">The principles that guide everything we do</p>
         </div>
-        
+
         <div class="row g-4">
             <div class="col-lg-3 col-md-6">
                 <div class="text-center p-4">
                     <div class="mb-3">
-                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #fff5eb, #ffe8d5); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: #da7215; font-size: 36px;">
+                        <div style="width: 80px; height: 80px; background: var(--color-green-tint); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--color-green); font-size: 36px;">
                             <i class="bi bi-shield-fill-check"></i>
                         </div>
                     </div>
@@ -141,11 +141,11 @@ get_header();
                     <p class="text-muted small">Strict adherence to international safety standards and WHO guidelines</p>
                 </div>
             </div>
-            
+
             <div class="col-lg-3 col-md-6">
                 <div class="text-center p-4">
                     <div class="mb-3">
-                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f0ffe0, #e5ffcc); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: #7bb14f; font-size: 36px;">
+                        <div style="width: 80px; height: 80px; background: var(--color-blue-tint); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--color-blue); font-size: 36px;">
                             <i class="bi bi-hand-thumbs-up-fill"></i>
                         </div>
                     </div>
@@ -153,11 +153,11 @@ get_header();
                     <p class="text-muted small">Building lasting relationships through honest and transparent service</p>
                 </div>
             </div>
-            
+
             <div class="col-lg-3 col-md-6">
                 <div class="text-center p-4">
                     <div class="mb-3">
-                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #e0f4ff, #cceeff); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: #107fa0; font-size: 36px;">
+                        <div style="width: 80px; height: 80px; background: var(--color-blue-tint); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--color-navy); font-size: 36px;">
                             <i class="bi bi-award-fill"></i>
                         </div>
                     </div>
@@ -165,11 +165,11 @@ get_header();
                     <p class="text-muted small">Committed to delivering the highest quality of care and service</p>
                 </div>
             </div>
-            
+
             <div class="col-lg-3 col-md-6">
                 <div class="text-center p-4">
                     <div class="mb-3">
-                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #fff5eb, #ffe8d5); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: #da7215; font-size: 36px;">
+                        <div style="width: 80px; height: 80px; background: var(--color-green-tint); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: var(--color-green); font-size: 36px;">
                             <i class="bi bi-heart-fill"></i>
                         </div>
                     </div>
@@ -182,18 +182,18 @@ get_header();
 </section>
 
 <!-- ================= WHY CHOOSE US ================= -->
-<section class="py-5" style="background: linear-gradient(135deg, #f0ffe0 0%, #e5ffcc 100%);">
+<section class="py-5" style="background: var(--color-ivory);">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold" style="color: #7bb14f;">Why Families Trust Vaccination Centre</h2>
+            <h2 class="fw-bold" style="color: var(--color-navy);">Why Families Trust Vaccine.Pk</h2>
             <p class="text-muted">What makes us different from traditional vaccination services</p>
         </div>
-        
+
         <div class="row g-4">
             <div class="col-lg-4 col-md-6">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100">
                     <div class="d-flex align-items-start mb-3">
-                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #da7215, #d35324); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--color-blue), var(--color-navy)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
                             <i class="bi bi-house-heart-fill"></i>
                         </div>
                         <div class="ms-3">
@@ -203,11 +203,11 @@ get_header();
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-4 col-md-6">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100">
                     <div class="d-flex align-items-start mb-3">
-                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #7bb14f, #6a9f3e); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--color-navy), var(--color-ink-strong)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
                             <i class="bi bi-people-fill"></i>
                         </div>
                         <div class="ms-3">
@@ -217,11 +217,11 @@ get_header();
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-4 col-md-6">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100">
                     <div class="d-flex align-items-start mb-3">
-                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #107fa0, #0d6680); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--color-green), #57a02e); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
                             <i class="bi bi-shield-check"></i>
                         </div>
                         <div class="ms-3">
@@ -231,11 +231,11 @@ get_header();
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-4 col-md-6">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100">
                     <div class="d-flex align-items-start mb-3">
-                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #da7215, #d35324); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--color-blue), var(--color-navy)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
                             <i class="bi bi-clock-history"></i>
                         </div>
                         <div class="ms-3">
@@ -245,11 +245,11 @@ get_header();
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-4 col-md-6">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100">
                     <div class="d-flex align-items-start mb-3">
-                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #7bb14f, #6a9f3e); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--color-navy), var(--color-ink-strong)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
                             <i class="bi bi-bell-fill"></i>
                         </div>
                         <div class="ms-3">
@@ -259,11 +259,11 @@ get_header();
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-4 col-md-6">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100">
                     <div class="d-flex align-items-start mb-3">
-                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #107fa0, #0d6680); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--color-blue), var(--color-navy)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0;">
                             <i class="bi bi-cash-stack"></i>
                         </div>
                         <div class="ms-3">
@@ -281,21 +281,21 @@ get_header();
 <section class="py-5" style="background: white;">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold" style="color: #107fa0;">Meet Our Team</h2>
+            <h2 class="fw-bold" style="color: var(--color-navy);">Meet Our Team</h2>
             <p class="text-muted">Dedicated healthcare professionals committed to your family's health</p>
         </div>
 
         <?php
         // ── Badge colour cycle (matches site palette) ─────────────────────
         $badge_gradients = [
-            'linear-gradient(135deg, #da7215, #d35324)',
-            'linear-gradient(135deg, #7bb14f, #6a9f3e)',
-            'linear-gradient(135deg, #107fa0, #0d6680)',
-            'linear-gradient(135deg, #da7215, #d35324)',
+            'linear-gradient(135deg, #0B5C87, #0A2A38)',
+            'linear-gradient(135deg, #0A2A38, #16232B)',
+            'linear-gradient(135deg, #0B5C87, #0A2A38)',
+            'linear-gradient(135deg, #0A2A38, #16232B)',
         ];
 
         // ── Placeholder avatar (shown when no featured image is set) ──────
-        $placeholder = 'https://ui-avatars.com/api/?background=e0f4ff&color=107fa0&size=400&bold=true&name=';
+        $placeholder = 'https://ui-avatars.com/api/?background=EAF2F6&color=0B5C87&size=400&bold=true&name=';
 
         // ── Query the 'team' custom post type ─────────────────────────────
         $team_query = new WP_Query( [
@@ -362,7 +362,7 @@ get_header();
                             right: 12px;
                             width: 16px;
                             height: 16px;
-                            background: #7bb14f;
+                            background: var(--color-green);
                             border: 3px solid #fff;
                             border-radius: 50%;
                             display: block;
@@ -370,7 +370,7 @@ get_header();
                     </div>
 
                     <!-- Name -->
-                    <h5 class="fw-bold mb-1" style="color: #107fa0;">
+                    <h5 class="fw-bold mb-1" style="color: var(--color-navy);">
                         <?php echo esc_html( $doctor_name ); ?>
                     </h5>
 
@@ -427,40 +427,40 @@ get_header();
     transition: box-shadow .25s ease;
 }
 .vc-team-card:hover .vc-team-img-wrap img {
-    box-shadow: 0 18px 42px rgba(16,127,160,.18) !important;
+    box-shadow: 0 18px 42px rgba(10,42,56,.22) !important;
 }
 </style>
 
 <!-- ================= CERTIFICATIONS ================= -->
-<section class="py-5" style="background: linear-gradient(135deg, #e0f4ff 0%, #cceeff 100%);">
+<section class="py-5" style="background: var(--color-blue-tint);">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold" style="color: #107fa0;">Certifications & Compliance</h2>
+            <h2 class="fw-bold" style="color: var(--color-navy);">Certifications & Compliance</h2>
             <p class="text-muted">Recognized and approved by leading health authorities</p>
         </div>
-        
+
         <div class="row g-4 align-items-center justify-content-center">
             <div class="col-lg-3 col-md-4 col-6 text-center">
                 <div class="bg-white p-4 rounded-4 shadow-sm">
-                    <i class="bi bi-shield-fill-check" style="font-size: 48px; color: #7bb14f;"></i>
+                    <i class="bi bi-shield-fill-check" style="font-size: 48px; color: var(--color-green);"></i>
                     <h6 class="fw-bold mt-3 mb-0">WHO Approved</h6>
                 </div>
             </div>
             <div class="col-lg-3 col-md-4 col-6 text-center">
                 <div class="bg-white p-4 rounded-4 shadow-sm">
-                    <i class="bi bi-hospital" style="font-size: 48px; color: #107fa0;"></i>
+                    <i class="bi bi-hospital" style="font-size: 48px; color: var(--color-blue);"></i>
                     <h6 class="fw-bold mt-3 mb-0">Ministry of Health</h6>
                 </div>
             </div>
             <div class="col-lg-3 col-md-4 col-6 text-center">
                 <div class="bg-white p-4 rounded-4 shadow-sm">
-                    <i class="bi bi-award-fill" style="font-size: 48px; color: #da7215;"></i>
+                    <i class="bi bi-award-fill" style="font-size: 48px; color: var(--color-navy);"></i>
                     <h6 class="fw-bold mt-3 mb-0">ISO Certified</h6>
                 </div>
             </div>
             <div class="col-lg-3 col-md-4 col-6 text-center">
                 <div class="bg-white p-4 rounded-4 shadow-sm">
-                    <i class="bi bi-patch-check-fill" style="font-size: 48px; color: #7bb14f;"></i>
+                    <i class="bi bi-patch-check-fill" style="font-size: 48px; color: var(--color-green);"></i>
                     <h6 class="fw-bold mt-3 mb-0">EPI Compliant</h6>
                 </div>
             </div>
@@ -469,15 +469,15 @@ get_header();
 </section>
 
 <!-- ================= CTA SECTION ================= -->
-<section class="py-5" style="background: linear-gradient(135deg, #7bb14f, #6a9f3e);">
+<section class="py-5" style="background: linear-gradient(135deg, var(--color-blue), var(--color-navy));">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8 text-white mb-4 mb-lg-0">
-                <h2 class="fw-bold mb-3">Ready to Experience Vaccination Centre?</h2>
+                <h2 class="fw-bold mb-3">Ready to Experience Vaccine.Pk?</h2>
                 <p class="mb-0" style="font-size: 18px;">Join thousands of families who trust us for their vaccination needs. Book your first appointment today!</p>
             </div>
             <div class="col-lg-4 text-lg-end">
-                <a href="<?php echo home_url('/contact'); ?>" class="btn btn-light btn-lg px-5">
+                <a href="<?php echo home_url('/contact'); ?>" class="btn px-5" style="background: var(--color-gold); color: var(--color-navy); border-radius: 999px; font-weight: 600; padding: 12px 28px; text-decoration: none; display: inline-block;">
                     Get Started <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
