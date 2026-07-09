@@ -640,6 +640,15 @@ footer {
   color: var(--color-ivory);
 }
 
+/* ==================== STATS SECTION (Why VaccinePk) ==================== */
+.stats-section {
+  background: var(--color-navy);
+}
+
+.stats-section h2 {
+  color: var(--color-ivory);
+}
+
 /* ==================== RESPONSIVE DESIGN ==================== */
 @media (max-width: 992px) {
   .hero-section h1 {
