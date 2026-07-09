@@ -70,7 +70,12 @@ $instagram = $site_settings->field( 'instagram_url' );
                 <button type="button" class="btn btn-outline-primary" id="searchToggleBtn" aria-label="Search">
                     <i class="bi bi-search"></i>
                 </button>
-                
+
+                <!-- Login Button -->
+                <button type="button" class="btn btn-outline-primary" id="loginToggleBtn" data-bs-toggle="modal" data-bs-target="#loginModal">
+                    <i class="bi bi-person-circle"></i> Login
+                </button>
+
                 <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="btn btn-primary">
                     Book Vaccination
                 </a>
@@ -110,13 +115,38 @@ $instagram = $site_settings->field( 'instagram_url' );
     </div>
 </header>
 
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2 pb-4">
+                <p class="text-muted mb-4">Choose how you'd like to log in.</p>
+                <div class="d-grid gap-3">
+                    <a href="#" class="login-option-btn" data-login-type="doctor">
+                        <i class="bi bi-file-medical"></i>
+                        <span>Doctor Login</span>
+                    </a>
+                    <a href="#" class="login-option-btn" data-login-type="client">
+                        <i class="bi bi-person"></i>
+                        <span>Client Login</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Search Styles -->
 <style>
 .search-dropdown {
     background: white;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--color-sand);
     padding: 20px 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 24px -10px rgba(10,42,56,0.25);
     animation: slideDown 0.3s ease-out;
 }
 
@@ -139,12 +169,12 @@ $instagram = $site_settings->field( 'instagram_url' );
 #vaccineSearchInput {
     font-size: 16px;
     padding: 12px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--color-sand);
 }
 
 #vaccineSearchInput:focus {
-    border-color: #da7215;
-    box-shadow: 0 0 0 0.2rem rgba(218, 114, 21, 0.25);
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 0.2rem rgba(11, 92, 135, 0.18);
     outline: none;
 }
 
@@ -158,7 +188,31 @@ $instagram = $site_settings->field( 'instagram_url' );
    markup (rendered by assets/js/main.js). */
 
 header.scrolled {
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px -6px rgba(10,42,56,0.28);
+}
+
+/* Login Modal */
+.login-option-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border: 1px solid var(--color-sand);
+    border-radius: 10px;
+    color: var(--color-blue, #0b5c87);
+    text-decoration: none;
+    font-weight: 600;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.login-option-btn i {
+    font-size: 1.25rem;
+}
+
+.login-option-btn:hover {
+    border-color: var(--color-blue, #0b5c87);
+    background: rgba(11, 92, 135, 0.06);
+    color: var(--color-blue, #0b5c87);
 }
 </style>
 
@@ -194,6 +248,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     searchCloseBtn.addEventListener('click', closeSearch);
+
+    // Login modal option clicks - destinations TBD
+    document.querySelectorAll('.login-option-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Login clicked:', btn.dataset.loginType);
+        });
+    });
 
     document.addEventListener('keyup', function(e) {
         if (e.key === 'Escape' && searchDropdown.style.display === 'block') {
