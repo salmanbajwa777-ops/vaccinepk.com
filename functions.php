@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 function vaccination_centre_assets() {
 
     wp_enqueue_style( 'google-fonts',
-        'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Ubuntu:wght@400;500;700&display=swap',
         [], null );
 
     wp_enqueue_style( 'bootstrap',
