@@ -154,6 +154,12 @@ header .nav a:hover::after {
 }
 
 
+.site-brand-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .site-logo img {
     max-height: 48px;   /* yahan aap apni desired height set karein */
     width: auto;        /* ratio maintain kare */
@@ -164,8 +170,9 @@ header .nav a:hover::after {
     font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-weight: 700;
     font-size: 1.3rem;
-    color: var(--text-dark);
+    color: #0b2540;
     text-decoration: none;
+    line-height: 1;
 }
 
 @media (max-width: 768px) {

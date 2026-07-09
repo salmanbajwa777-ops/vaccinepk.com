@@ -23,18 +23,15 @@ $instagram = $site_settings->field( 'instagram_url' );
     <div class="container">
         <div class="d-flex justify-content-between align-items-center py-3">
             
-            <div class="site-logo">
-                <?php
-                if ( has_custom_logo() ) {
-                    the_custom_logo();
-                } else {
-                    ?>
-                    <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="site-title">
-                        <?php bloginfo( 'name' ); ?>
-                    </a>
+            <div class="site-brand-link">
+                <div class="site-logo">
                     <?php
-                }
-                ?>
+                    if ( has_custom_logo() ) {
+                        the_custom_logo();
+                    }
+                    ?>
+                </div>
+                <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="site-title">Vaccine.Pk</a>
             </div>
 
 
