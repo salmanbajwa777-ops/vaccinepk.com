@@ -135,15 +135,6 @@ $homepage_faqs = [
                         <a href="<?php echo esc_url( home_url( '/vaccines?s=' . urlencode( $chip ) ) ); ?>" class="home-chip"><?php echo esc_html( $chip ); ?></a>
                     <?php endforeach; ?>
                 </div>
-
-                <div class="d-flex gap-3 flex-wrap mb-4">
-                    <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="btn btn-primary">
-                        <i class="bi bi-house-heart-fill"></i> Book Home Visit
-                    </a>
-                    <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="btn btn-outline-primary">
-                        <i class="bi bi-hospital"></i> Book Clinic Visit
-                    </a>
-                </div>
             </div>
 
             <div class="col-lg-6 col-md-12 text-center mt-5 mt-lg-0">
