@@ -52,10 +52,10 @@ while (have_posts()) : the_post();
                             <i class="bi bi-calendar3"></i> <?php echo get_the_date('F j, Y'); ?>
                         </div>
                         <div>
-                            <i class="bi bi-clock"></i> <?php echo babymedics_reading_time(); ?> min read
+                            <i class="bi bi-clock"></i> <?php echo vaccination_centre_reading_time(); ?> min read
                         </div>
                         <div>
-                            <i class="bi bi-eye"></i> <?php echo babymedics_get_post_views(get_the_ID()); ?> views
+                            <i class="bi bi-eye"></i> <?php echo vaccination_centre_get_post_views(get_the_ID()); ?> views
                         </div>
                     </div>
                 </div>

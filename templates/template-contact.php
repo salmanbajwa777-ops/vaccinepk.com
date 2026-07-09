@@ -10,9 +10,9 @@ $site_settings = pods( 'site_contact_settings' );
 $phone     = $site_settings->field( 'phone_number' ) ?: '+92 333 5196658';
 $whatsapp  = $site_settings->field( 'whatsapp_number' ) ?: '+92 333 5196658';
 $email     = $site_settings->field( 'email_address' ) ?: 'info@vaccinepk.com';
-$address   = $site_settings->field( 'address' ) ?: 'Rawalpindi, Punjab, Pakistan';
-$facebook  = $site_settings->field( 'facebook_url' ) ?: 'https://facebook.com';
-$instagram = $site_settings->field( 'instagram_url' ) ?: 'https://instagram.com';
+$address   = $site_settings->field( 'address' ) ?: '2165-F, National Police Foundation, Islamabad';
+$facebook  = $site_settings->field( 'facebook_url' );
+$instagram = $site_settings->field( 'instagram_url' );
 
 // Format phone numbers for links (remove spaces and dashes)
 $phone_link = preg_replace('/[^0-9+]/', '', $phone);
@@ -218,13 +218,18 @@ get_header();
                             <i class="bi bi-instagram"></i>
                         </a>
                         <?php endif; ?>
-                        
-                        <a href="https://twitter.com" target="_blank" class="social-icon" style="width: 45px; height: 45px; background: linear-gradient(135deg, #1da1f2, #0d8bd9); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 20px; transition: all 0.3s;">
-                            <i class="bi bi-twitter"></i>
+
+                        <?php $tiktok = $site_settings->field( 'tiktok_url' ); if ($tiktok) : ?>
+                        <a href="<?php echo esc_url($tiktok); ?>" target="_blank" class="social-icon" style="width: 45px; height: 45px; background: linear-gradient(135deg, #000000, #333333); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 20px; transition: all 0.3s;">
+                            <i class="bi bi-tiktok"></i>
                         </a>
-                        <a href="https://linkedin.com" target="_blank" class="social-icon" style="width: 45px; height: 45px; background: linear-gradient(135deg, #0077b5, #005885); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 20px; transition: all 0.3s;">
-                            <i class="bi bi-linkedin"></i>
+                        <?php endif; ?>
+
+                        <?php $youtube = $site_settings->field( 'youtube_url' ); if ($youtube) : ?>
+                        <a href="<?php echo esc_url($youtube); ?>" target="_blank" class="social-icon" style="width: 45px; height: 45px; background: linear-gradient(135deg, #ff0000, #cc0000); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 20px; transition: all 0.3s;">
+                            <i class="bi bi-youtube"></i>
                         </a>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
@@ -244,13 +249,12 @@ get_header();
         
         <!-- Google Map Embed -->
         <div class="map-container rounded-4 overflow-hidden shadow-lg" style="height: 450px;">
-            <!-- Replace with your actual Google Maps embed -->
-            <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d212270.5254842714!2d72.8004448!3d33.6156283!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfbfd07891722f%3A0x6059515c3bdb02b6!2sIslamabad%2C%20Pakistan!5e0!3m2!1sen!2s!4v1234567890"
-                width="100%" 
-                height="100%" 
-                style="border:0;" 
-                allowfullscreen="" 
+            <iframe
+                src="https://www.google.com/maps?q=<?php echo rawurlencode( $address ); ?>&output=embed"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
                 loading="lazy">
             </iframe>
         </div>

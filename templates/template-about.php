@@ -46,11 +46,11 @@ get_header();
                 </p>
                 <div class="d-flex gap-4 mt-4">
                     <div>
-                        <h3 class="fw-bold mb-0" style="color: #da7215;">5000+</h3>
+                        <h3 class="fw-bold mb-0" style="color: #da7215;">800K+</h3>
                         <p class="text-muted mb-0">Happy Families</p>
                     </div>
                     <div>
-                        <h3 class="fw-bold mb-0" style="color: #7bb14f;">15000+</h3>
+                        <h3 class="fw-bold mb-0" style="color: #7bb14f;">800,000+</h3>
                         <p class="text-muted mb-0">Vaccines Administered</p>
                     </div>
                     <div>

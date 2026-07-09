@@ -30,27 +30,37 @@ $youtube = $site_settings->field( 'youtube_url' );
                 
                 <!-- About Section -->
                 <div class="col-lg-4 col-md-6">
-                   <h4 class="fw-bold mb-4"><i class="bi bi-heart-pulse-fill"></i> Vaccination Centre</h4>
+                   <h4 class="fw-bold mb-4"><i class="bi bi-heart-pulse-fill"></i> Vaccine.Pk</h4>
                     <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8;">
                         Professional home vaccination services providing safe and convenient immunization 
                         for children and adults. WHO-compliant standards, expert care.
                     </p>
                     <div class="mt-4">
-                        <a href="<?php echo esc_html($facebook); ?>" target="_blank" class="text-white me-3" style="font-size: 24px; text-decoration: none;">
+                        <?php if ($facebook): ?>
+                        <a href="<?php echo esc_url($facebook); ?>" target="_blank" class="text-white me-3" style="font-size: 24px; text-decoration: none;">
                             <i class="bi bi-facebook"></i>
                         </a>
-                        <a href="<?php echo esc_html($instagram); ?>" target="_blank" class="text-white me-3" style="font-size: 24px; text-decoration: none;">
+                        <?php endif; ?>
+                        <?php if ($instagram): ?>
+                        <a href="<?php echo esc_url($instagram); ?>" target="_blank" class="text-white me-3" style="font-size: 24px; text-decoration: none;">
                             <i class="bi bi-instagram"></i>
                         </a>
-                        <a href="<?php echo esc_html($tiktok); ?>" target="_blank" class="text-white me-3" style="font-size: 24px; text-decoration: none;">
+                        <?php endif; ?>
+                        <?php if ($tiktok): ?>
+                        <a href="<?php echo esc_url($tiktok); ?>" target="_blank" class="text-white me-3" style="font-size: 24px; text-decoration: none;">
                             <i class="bi bi-tiktok"></i>
                         </a>
-                        <a href="<?php echo esc_html($youtube); ?>" target="_blank" class="text-white me-3" style="font-size: 24px; text-decoration: none;">
+                        <?php endif; ?>
+                        <?php if ($youtube): ?>
+                        <a href="<?php echo esc_url($youtube); ?>" target="_blank" class="text-white me-3" style="font-size: 24px; text-decoration: none;">
                             <i class="bi bi-youtube"></i>
                         </a>
+                        <?php endif; ?>
+                        <?php if ($whatsapp): ?>
                         <a href="https://wa.me/<?php echo esc_attr($whatsapp); ?>" target="_blank" class="text-white" style="font-size: 24px; text-decoration: none;">
                             <i class="bi bi-whatsapp"></i>
                         </a>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
@@ -74,6 +84,16 @@ $youtube = $site_settings->field( 'youtube_url' );
                             </a>
                         </li>
                         <li class="mb-2">
+                            <a href="<?php echo home_url('/diseases'); ?>" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
+                                <i class="bi bi-virus2"></i> Disease Library
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="<?php echo home_url('/knowledge-centre'); ?>" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
+                                <i class="bi bi-book-half"></i> Knowledge Centre
+                            </a>
+                        </li>
+                        <li class="mb-2">
                             <a href="<?php echo home_url('/pricing'); ?>" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
                                 <i class="bi bi-currency-dollar"></i> Pricing
                             </a>
@@ -91,27 +111,27 @@ $youtube = $site_settings->field( 'youtube_url' );
                     <h4 class="fw-bold mb-4">Our Services</h4>
                     <ul class="list-unstyled">
                         <li class="mb-2">
-                            <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
+                            <a href="<?php echo home_url('/vaccines#child-vaccines'); ?>" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
                                 <i class="bi bi-heart-fill"></i> Child Vaccination
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
+                            <a href="<?php echo home_url('/vaccines#adult-vaccines'); ?>" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
                                 <i class="bi bi-person-fill"></i> Adult Immunization
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
+                            <a href="<?php echo home_url('/travel-vaccines'); ?>" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
                                 <i class="bi bi-airplane-fill"></i> Travel Vaccines
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
+                            <a href="<?php echo home_url('/vaccines#flu-vaccines'); ?>" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
                                 <i class="bi bi-shield-fill-plus"></i> Flu Vaccination
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
+                            <a href="<?php echo home_url('/contact'); ?>" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">
                                 <i class="bi bi-chat-dots-fill"></i> Free Consultation
                             </a>
                         </li>
@@ -151,7 +171,7 @@ $youtube = $site_settings->field( 'youtube_url' );
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                     <p class="mb-0" style="color: rgba(255, 255, 255, 0.8);">
-                        &copy; <?php echo date('Y'); ?> Vaccination Centre. All rights reserved.
+                        &copy; <?php echo date('Y'); ?> Vaccine.Pk. All rights reserved.
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">

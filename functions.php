@@ -30,7 +30,7 @@ function vaccination_centre_assets() {
     if ( file_exists( get_template_directory() . '/assets/js/main.js' ) ) {
         wp_enqueue_script( 'babymedics-main-js',
             get_template_directory_uri() . '/assets/js/main.js',
-            [ 'jquery' ],
+            [ 'bootstrap-js' ],
             filemtime( get_template_directory() . '/assets/js/main.js' ),
             true );
     }
@@ -115,7 +115,9 @@ add_action( 'wp_ajax_nopriv_load_booking_form', 'load_booking_form_ajax' );
 
 
 /* ==========================================================================
-   3. AJAX: VACCINE SEARCH (for search bar if used)
+   3. AJAX: SITE-WIDE SEARCH (vaccines, diseases, brands, cities, articles)
+      Used by both the header search dropdown and the homepage hero search box.
+      Response shape: { results: [ { type, title, url, meta: {...} }, ... ] }
    ========================================================================== */
 function vaccine_search_ajax() {
 
@@ -127,24 +129,100 @@ function vaccine_search_ajax() {
         return;
     }
 
-    $params = [
-        'limit'   => 10,
-        'where'   => "post_title LIKE '%" . esc_sql( $query ) . "%'",
-        'orderby' => 'post_title ASC',
-    ];
+    $results = [];
+    $like    = esc_sql( $query );
 
-    $vaccines = pods( 'vaccine', $params );
-    $results  = [];
+    // ---- Vaccines (Pods) — match title, disease name, or brand ----
+    $vaccines = pods( 'vaccine', [
+        'limit'   => 8,
+        'where'   => "
+            post_title LIKE '%{$like}%' OR
+            disease_name.meta_value LIKE '%{$like}%' OR
+            vaccine_brand.meta_value LIKE '%{$like}%'
+        ",
+        'orderby' => 'post_title ASC',
+    ] );
 
     if ( $vaccines->total() > 0 ) {
         while ( $vaccines->fetch() ) {
             $results[] = [
-                'id'    => $vaccines->id(),
+                'type'  => 'vaccine',
                 'title' => $vaccines->field( 'post_title' ),
                 'url'   => get_permalink( $vaccines->id() ),
-                'price' => $vaccines->field( 'price' ),
+                'meta'  => [
+                    'disease'      => $vaccines->field( 'disease_name' ),
+                    'brand'        => $vaccines->field( 'vaccine_brand' ),
+                    'availability' => $vaccines->field( 'availability' ),
+                    'price'        => $vaccines->field( 'price' ),
+                ],
             ];
         }
+    }
+
+    // ---- Diseases ----
+    $diseases = get_posts( [
+        'post_type'      => 'disease',
+        'post_status'    => 'publish',
+        's'              => $query,
+        'posts_per_page' => 5,
+    ] );
+    foreach ( $diseases as $d ) {
+        $results[] = [
+            'type'  => 'disease',
+            'title' => $d->post_title,
+            'url'   => get_permalink( $d->ID ),
+            'meta'  => [],
+        ];
+    }
+
+    // ---- Vaccine Brands ----
+    $brands = get_posts( [
+        'post_type'      => 'brand',
+        'post_status'    => 'publish',
+        's'              => $query,
+        'posts_per_page' => 5,
+    ] );
+    foreach ( $brands as $b ) {
+        $results[] = [
+            'type'  => 'brand',
+            'title' => $b->post_title,
+            'url'   => get_permalink( $b->ID ),
+            'meta'  => [
+                'disease' => get_post_meta( $b->ID, 'disease', true ),
+            ],
+        ];
+    }
+
+    // ---- Cities ----
+    $cities = get_posts( [
+        'post_type'      => 'city',
+        'post_status'    => 'publish',
+        's'              => $query,
+        'posts_per_page' => 5,
+    ] );
+    foreach ( $cities as $c ) {
+        $results[] = [
+            'type'  => 'city',
+            'title' => $c->post_title,
+            'url'   => get_permalink( $c->ID ),
+            'meta'  => [],
+        ];
+    }
+
+    // ---- Articles (WP posts / Knowledge Centre) ----
+    $articles = get_posts( [
+        'post_type'      => 'post',
+        'post_status'    => 'publish',
+        's'              => $query,
+        'posts_per_page' => 5,
+    ] );
+    foreach ( $articles as $a ) {
+        $results[] = [
+            'type'  => 'article',
+            'title' => $a->post_title,
+            'url'   => get_permalink( $a->ID ),
+            'meta'  => [],
+        ];
     }
 
     wp_send_json_success( [ 'results' => $results ] );
@@ -530,6 +608,197 @@ add_action( 'save_post_vaccine', function ( $post_id ) {
 
 
 /* ==========================================================================
+   9a. REGISTER DISEASE CUSTOM POST TYPE
+   ========================================================================== */
+function vaccination_centre_register_disease() {
+    register_post_type( 'disease', [
+        'label'    => __( 'Diseases', 'vaccination-centre' ),
+        'labels'   => [
+            'name'          => _x( 'Diseases', 'Post Type General Name', 'vaccination-centre' ),
+            'singular_name' => _x( 'Disease', 'Post Type Singular Name', 'vaccination-centre' ),
+            'menu_name'     => __( 'Diseases', 'vaccination-centre' ),
+            'add_new_item'  => __( 'Add New Disease', 'vaccination-centre' ),
+            'edit_item'     => __( 'Edit Disease', 'vaccination-centre' ),
+            'not_found'     => __( 'No diseases found.', 'vaccination-centre' ),
+        ],
+        'supports'            => [ 'title', 'editor', 'thumbnail', 'excerpt' ],
+        'public'              => true,
+        'show_ui'             => true,
+        'show_in_menu'        => true,
+        'menu_position'       => 6,
+        'menu_icon'           => 'dashicons-shield',
+        'has_archive'         => true,
+        'publicly_queryable'  => true,
+        'capability_type'     => 'post',
+        'show_in_rest'        => true,
+        'rewrite'             => [ 'slug' => 'diseases' ],
+    ] );
+}
+add_action( 'init', 'vaccination_centre_register_disease' );
+
+add_action( 'add_meta_boxes', function () {
+    add_meta_box( 'disease_details', __( 'Disease Details', 'vaccination-centre' ),
+        'vaccination_centre_disease_details_callback', 'disease', 'normal', 'high' );
+} );
+
+function vaccination_centre_disease_details_callback( $post ) {
+    wp_nonce_field( 'disease_details_nonce', 'disease_details_nonce_field' );
+    $symptoms      = get_post_meta( $post->ID, 'disease_symptoms', true );
+    $complications = get_post_meta( $post->ID, 'disease_complications', true );
+    $prevention    = get_post_meta( $post->ID, 'disease_prevention', true );
+    $transmission  = get_post_meta( $post->ID, 'disease_transmission', true );
+    ?>
+    <table class="form-table">
+        <tr>
+            <th><label for="disease_symptoms"><?php _e( 'Symptoms', 'vaccination-centre' ); ?></label></th>
+            <td><textarea id="disease_symptoms" name="disease_symptoms" rows="4" class="large-text"><?php echo esc_textarea( $symptoms ); ?></textarea></td>
+        </tr>
+        <tr>
+            <th><label for="disease_complications"><?php _e( 'Complications', 'vaccination-centre' ); ?></label></th>
+            <td><textarea id="disease_complications" name="disease_complications" rows="4" class="large-text"><?php echo esc_textarea( $complications ); ?></textarea></td>
+        </tr>
+        <tr>
+            <th><label for="disease_prevention"><?php _e( 'Prevention', 'vaccination-centre' ); ?></label></th>
+            <td><textarea id="disease_prevention" name="disease_prevention" rows="4" class="large-text"><?php echo esc_textarea( $prevention ); ?></textarea></td>
+        </tr>
+        <tr>
+            <th><label for="disease_transmission"><?php _e( 'Transmission (optional)', 'vaccination-centre' ); ?></label></th>
+            <td><input type="text" id="disease_transmission" name="disease_transmission" value="<?php echo esc_attr( $transmission ); ?>" class="regular-text"></td>
+        </tr>
+    </table>
+    <?php
+}
+
+add_action( 'save_post_disease', function ( $post_id ) {
+    if ( ! isset( $_POST['disease_details_nonce_field'] ) ||
+         ! wp_verify_nonce( $_POST['disease_details_nonce_field'], 'disease_details_nonce' ) ) return;
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
+    if ( ! current_user_can( 'edit_post', $post_id ) ) return;
+
+    $fields = [ 'disease_symptoms', 'disease_complications', 'disease_prevention', 'disease_transmission' ];
+    foreach ( $fields as $field ) {
+        if ( isset( $_POST[ $field ] ) ) {
+            update_post_meta( $post_id, $field, sanitize_textarea_field( $_POST[ $field ] ) );
+        }
+    }
+} );
+
+
+/* ==========================================================================
+   9b. REGISTER CITY CUSTOM POST TYPE
+   ========================================================================== */
+function vaccination_centre_register_city() {
+    register_post_type( 'city', [
+        'label'    => __( 'Cities', 'vaccination-centre' ),
+        'labels'   => [
+            'name'          => _x( 'Cities', 'Post Type General Name', 'vaccination-centre' ),
+            'singular_name' => _x( 'City', 'Post Type Singular Name', 'vaccination-centre' ),
+            'menu_name'     => __( 'Cities', 'vaccination-centre' ),
+            'add_new_item'  => __( 'Add New City', 'vaccination-centre' ),
+            'edit_item'     => __( 'Edit City', 'vaccination-centre' ),
+            'not_found'     => __( 'No cities found.', 'vaccination-centre' ),
+        ],
+        'supports'            => [ 'title', 'editor', 'thumbnail', 'excerpt' ],
+        'public'              => true,
+        'show_ui'             => true,
+        'show_in_menu'        => true,
+        'menu_position'       => 7,
+        'menu_icon'           => 'dashicons-location',
+        'has_archive'         => true,
+        'publicly_queryable'  => true,
+        'capability_type'     => 'post',
+        'show_in_rest'        => true,
+        'rewrite'             => [ 'slug' => 'cities' ],
+    ] );
+}
+add_action( 'init', 'vaccination_centre_register_city' );
+
+add_action( 'add_meta_boxes', function () {
+    add_meta_box( 'city_details', __( 'City Details', 'vaccination-centre' ),
+        'vaccination_centre_city_details_callback', 'city', 'normal', 'high' );
+} );
+
+function vaccination_centre_city_details_callback( $post ) {
+    wp_nonce_field( 'city_details_nonce', 'city_details_nonce_field' );
+    $areas         = get_post_meta( $post->ID, 'city_areas_covered', true );
+    $response_time = get_post_meta( $post->ID, 'city_response_time', true );
+    $address       = get_post_meta( $post->ID, 'city_clinic_address', true );
+    ?>
+    <table class="form-table">
+        <tr>
+            <th><label for="city_areas_covered"><?php _e( 'Areas Covered', 'vaccination-centre' ); ?></label></th>
+            <td>
+                <textarea id="city_areas_covered" name="city_areas_covered" rows="3" class="large-text"><?php echo esc_textarea( $areas ); ?></textarea>
+                <p class="description"><?php _e( 'Comma-separated list, e.g. DHA, Gulberg, Model Town', 'vaccination-centre' ); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="city_response_time"><?php _e( 'Response Time', 'vaccination-centre' ); ?></label></th>
+            <td><input type="text" id="city_response_time" name="city_response_time" value="<?php echo esc_attr( $response_time ); ?>" class="regular-text" placeholder="e.g. Same day"></td>
+        </tr>
+        <tr>
+            <th><label for="city_clinic_address"><?php _e( 'Clinic Address (optional)', 'vaccination-centre' ); ?></label></th>
+            <td><input type="text" id="city_clinic_address" name="city_clinic_address" value="<?php echo esc_attr( $address ); ?>" class="regular-text"></td>
+        </tr>
+    </table>
+    <?php
+}
+
+add_action( 'save_post_city', function ( $post_id ) {
+    if ( ! isset( $_POST['city_details_nonce_field'] ) ||
+         ! wp_verify_nonce( $_POST['city_details_nonce_field'], 'city_details_nonce' ) ) return;
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
+    if ( ! current_user_can( 'edit_post', $post_id ) ) return;
+
+    if ( isset( $_POST['city_areas_covered'] ) )
+        update_post_meta( $post_id, 'city_areas_covered', sanitize_textarea_field( $_POST['city_areas_covered'] ) );
+    if ( isset( $_POST['city_response_time'] ) )
+        update_post_meta( $post_id, 'city_response_time', sanitize_text_field( $_POST['city_response_time'] ) );
+    if ( isset( $_POST['city_clinic_address'] ) )
+        update_post_meta( $post_id, 'city_clinic_address', sanitize_text_field( $_POST['city_clinic_address'] ) );
+} );
+
+
+/* ==========================================================================
+   9c. PAKISTAN VACCINATION SCHEDULE — static stage data
+       9 fixed EPI stages; not a CPT since this content rarely changes.
+       Each vaccine name is matched against the `vaccine` CPT by title
+       (see vaccination_centre_find_vaccine_url()) so links point to a
+       real single-vaccine page when one exists.
+   ========================================================================== */
+function vaccination_centre_schedule_stages() {
+    return [
+        [ 'slug' => 'birth',     'label' => 'Birth',     'vaccines' => [ 'BCG', 'Hepatitis B', 'OPV' ] ],
+        [ 'slug' => '6-weeks',   'label' => '6 Weeks',   'vaccines' => [ 'Pentavalent', 'OPV', 'PCV', 'Rotavirus' ] ],
+        [ 'slug' => '10-weeks',  'label' => '10 Weeks',  'vaccines' => [ 'Pentavalent', 'OPV', 'PCV', 'Rotavirus' ] ],
+        [ 'slug' => '14-weeks',  'label' => '14 Weeks',  'vaccines' => [ 'Pentavalent', 'OPV', 'IPV', 'PCV', 'Rotavirus' ] ],
+        [ 'slug' => '6-months',  'label' => '6 Months',  'vaccines' => [ 'Flu' ] ],
+        [ 'slug' => '9-months',  'label' => '9 Months',  'vaccines' => [ 'Measles' ] ],
+        [ 'slug' => '12-months', 'label' => '12 Months', 'vaccines' => [ 'MMR', 'PCV Booster' ] ],
+        [ 'slug' => '15-months', 'label' => '15 Months', 'vaccines' => [ 'Chickenpox' ] ],
+        [ 'slug' => '18-months', 'label' => '18 Months', 'vaccines' => [ 'DPT Booster', 'OPV Booster' ] ],
+    ];
+}
+
+// Resolve a vaccine name (from the schedule array or any static list) to a
+// real single-vaccine URL if a matching `vaccine` post exists, else null.
+function vaccination_centre_find_vaccine_url( $vaccine_name ) {
+    static $cache = [];
+    if ( isset( $cache[ $vaccine_name ] ) ) return $cache[ $vaccine_name ];
+
+    $posts = get_posts( [
+        'post_type'      => 'vaccine',
+        'post_status'    => 'publish',
+        'title'          => $vaccine_name,
+        'posts_per_page' => 1,
+    ] );
+
+    $cache[ $vaccine_name ] = $posts ? get_permalink( $posts[0]->ID ) : null;
+    return $cache[ $vaccine_name ];
+}
+
+
+/* ==========================================================================
    10. THEME SETUP
    ========================================================================== */
 add_action( 'after_setup_theme', function () {
@@ -585,7 +854,14 @@ if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) define( 'DISALLOW_FILE_EDIT', true );
 
 // Reading time helper
 function vaccination_centre_reading_time() {
-    return ceil( str_word_count( strip_tags( get_post_field( 'post_content', get_the_ID() ) ) ) / 200 );
+    return vaccination_centre_reading_time_for( get_the_ID() );
+}
+
+// Same as above but takes an explicit post ID, for use outside the loop
+// (e.g. the homepage's Featured Knowledge section, which resolves posts
+// by title match rather than iterating a WP_Query loop).
+function vaccination_centre_reading_time_for( $post_id ) {
+    return ceil( str_word_count( strip_tags( get_post_field( 'post_content', $post_id ) ) ) / 200 );
 }
 
 // Post views counter
@@ -646,3 +922,43 @@ function vaccination_centre_pagination() {
         'type'      => 'list',
     ] );
 }
+
+/* ==========================================================================
+   13. SCHEMA.ORG STRUCTURED DATA (MedicalOrganization / MedicalClinic)
+   ========================================================================== */
+add_action( 'wp_head', function () {
+    $site_settings = pods( 'site_contact_settings' );
+    $phone         = $site_settings->field( 'phone_number' );
+    $email         = $site_settings->field( 'email_address' );
+    $address       = $site_settings->field( 'address' ) ?: '2165-F, National Police Foundation, Islamabad';
+    $facebook      = $site_settings->field( 'facebook_url' );
+    $instagram     = $site_settings->field( 'instagram_url' );
+    $tiktok        = $site_settings->field( 'tiktok_url' );
+    $youtube       = $site_settings->field( 'youtube_url' );
+
+    $same_as = array_values( array_filter( [ $facebook, $instagram, $tiktok, $youtube ] ) );
+
+    $schema = [
+        '@context'   => 'https://schema.org',
+        '@type'      => 'MedicalClinic',
+        'name'       => 'Vaccine.Pk',
+        'url'        => home_url( '/' ),
+        'address'    => [
+            '@type'           => 'PostalAddress',
+            'streetAddress'   => $address,
+            'addressCountry'  => 'PK',
+        ],
+        'medicalSpecialty' => 'Vaccination / Immunization',
+    ];
+
+    if ( $phone )    $schema['telephone'] = $phone;
+    if ( $email )    $schema['email']     = $email;
+    if ( $same_as )  $schema['sameAs']    = $same_as;
+    if ( has_custom_logo() ) {
+        $logo_id = get_theme_mod( 'custom_logo' );
+        $logo    = $logo_id ? wp_get_attachment_image_url( $logo_id, 'full' ) : '';
+        if ( $logo ) $schema['logo'] = $logo;
+    }
+
+    echo "\n<script type=\"application/ld+json\">" . wp_json_encode( $schema ) . "</script>\n";
+} );

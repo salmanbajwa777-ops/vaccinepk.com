@@ -198,7 +198,7 @@ endif;
                                 <i class="bi bi-calendar3"></i> <?php echo get_the_date('M j, Y'); ?>
                             </span>
                             <span>
-                                <i class="bi bi-clock"></i> <?php echo babymedics_reading_time(); ?> min read
+                                <i class="bi bi-clock"></i> <?php echo vaccination_centre_reading_time(); ?> min read
                             </span>
                         </div>
                         

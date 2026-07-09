@@ -1,757 +1,682 @@
 <?php
 /**
  * Home Page Template - VaccinePk
- * Redesigned homepage. Dynamic sections still use Pods CPT Integration.
+ * Full information-architecture redesign: knowledge-first homepage
+ * (search -> vaccines -> diseases -> schedules -> articles -> compare ->
+ * prices -> book), establishing VaccinePk as Pakistan's vaccine knowledge
+ * authority while keeping home vaccination booking as the primary conversion.
  */
 get_header();
-?>
 
-<?php
 $site_settings = pods( 'site_contact_settings' );
+$phone         = $site_settings->field( 'phone_number' );
+$whatsapp      = $site_settings->field( 'whatsapp_number' );
 
-$phone     = $site_settings->field( 'phone_number' );
-$whatsapp  = $site_settings->field( 'whatsapp_number' );
+$schedule_stages = function_exists( 'vaccination_centre_schedule_stages' ) ? vaccination_centre_schedule_stages() : [];
+
+// ---- Section 2: Knowledge Categories ----
+$knowledge_categories = [
+    [ 'icon' => 'bi-shield-fill-check',   'title' => 'Vaccines',            'url' => home_url( '/vaccines' ) ],
+    [ 'icon' => 'bi-virus2',              'title' => 'Diseases',            'url' => home_url( '/diseases' ) ],
+    [ 'icon' => 'bi-calendar2-week-fill', 'title' => 'Vaccination Schedule', 'url' => home_url( '/vaccination-schedule' ) ],
+    [ 'icon' => 'bi-emoji-smile-fill',    'title' => 'Children',            'url' => home_url( '/vaccines#child-vaccines' ) ],
+    [ 'icon' => 'bi-person-fill',         'title' => 'Adults',              'url' => home_url( '/vaccines#adult-vaccines' ) ],
+    [ 'icon' => 'bi-heart-pulse-fill',    'title' => 'Pregnancy',           'url' => home_url( '/vaccines#adult-vaccines' ) ],
+    [ 'icon' => 'bi-airplane-fill',       'title' => 'Travel',              'url' => home_url( '/travel-vaccines' ) ],
+    [ 'icon' => 'bi-award-fill',          'title' => 'Vaccine Brands',      'url' => home_url( '/vaccine-brands' ) ],
+    [ 'icon' => 'bi-patch-question-fill', 'title' => 'FAQs',                'url' => home_url( '/#homepage-faqs' ) ],
+    [ 'icon' => 'bi-book-half',           'title' => 'Knowledge Centre',    'url' => home_url( '/knowledge-centre' ) ],
+];
+
+// ---- Section 4: Featured Knowledge (evergreen topics; link only if a matching post exists) ----
+$featured_knowledge_topics = [
+    'Complete HPV Vaccine Guide',
+    'Can Vaccines Be Delayed?',
+    'Adult Vaccination Guide',
+    'Flu Vaccine Guide',
+    'Difference Between PCV10 and PCV13',
+    'Travel Vaccines Explained',
+    'Pregnancy Vaccines',
+    'Childhood Immunization Guide',
+];
+$featured_knowledge = [];
+foreach ( $featured_knowledge_topics as $topic ) {
+    $topic_posts = get_posts( [ 'post_type' => 'post', 'post_status' => 'publish', 'title' => $topic, 'posts_per_page' => 1 ] );
+    $match = $topic_posts ? $topic_posts[0] : null;
+    $featured_knowledge[] = [
+        'title' => $topic,
+        'post'  => $match,
+    ];
+}
+
+// ---- Section 5: Interactive Tools (placeholders) ----
+$interactive_tools = [
+    [ 'icon' => 'bi-calculator-fill',   'title' => 'Baby Vaccine Due Calculator', 'desc' => 'Find out which vaccines your baby is due for, by date of birth.' ],
+    [ 'icon' => 'bi-person-check-fill', 'title' => 'Adult Vaccine Finder',        'desc' => 'Discover which vaccines are recommended for your age and lifestyle.' ],
+    [ 'icon' => 'bi-airplane-fill',     'title' => 'Travel Vaccine Advisor',      'desc' => 'Get vaccine recommendations based on your destination.' ],
+    [ 'icon' => 'bi-clock-history',     'title' => 'Missed Vaccine Planner',      'desc' => 'Catch up safely on any vaccines that were missed or delayed.' ],
+    [ 'icon' => 'bi-heart-pulse-fill',  'title' => 'Pregnancy Vaccine Checker',   'desc' => 'See which vaccines are recommended during each trimester.' ],
+];
+
+// ---- Section 9: Why VaccinePk ----
+$why_vaccinepk = [
+    [ 'icon' => 'bi-mortarboard-fill',   'title' => 'Doctor Led' ],
+    [ 'icon' => 'bi-shield-check',       'title' => 'WHO Guidelines' ],
+    [ 'icon' => 'bi-thermometer-snow',   'title' => 'Cold Chain Protected' ],
+    [ 'icon' => 'bi-box-seam-fill',      'title' => 'Imported Genuine Vaccines' ],
+    [ 'icon' => 'bi-file-earmark-medical-fill', 'title' => 'Digital Records' ],
+    [ 'icon' => 'bi-house-heart-fill',   'title' => 'Home Vaccination' ],
+    [ 'icon' => 'bi-building-fill',      'title' => 'Corporate Vaccination' ],
+    [ 'icon' => 'bi-people-fill',        'title' => 'Experienced Team' ],
+];
+
+// ---- Section 10: Testimonials (static; photo/video fields left for future use) ----
+$testimonials = [
+    [ 'name' => 'Sana K.',  'loc' => 'Lahore',     'avatar' => null, 'video_url' => null,
+      'text' => "The nurse arrived on time, explained every vaccine on my son's card, and even helped us fill gaps we didn't know existed." ],
+    [ 'name' => 'Ahmed R.', 'loc' => 'Islamabad',  'avatar' => null, 'video_url' => null,
+      'text' => 'Booked our Umrah vaccines two days before travel. Got the official certificate the same visit — completely stress-free.' ],
+    [ 'name' => 'Fatima N.','loc' => 'Karachi',    'avatar' => null, 'video_url' => null,
+      'text' => 'As a working parent, home vaccination has been a lifesaver. Reminders come right on schedule via SMS.' ],
+];
+
+// ---- Section 11: Cities We Serve ----
+$fallback_cities = [ 'Islamabad', 'Rawalpindi', 'Lahore', 'Karachi', 'Faisalabad', 'Multan', 'Sialkot', 'Abbottabad' ];
+$city_posts_query = new WP_Query( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts_per_page' => 8, 'orderby' => 'title', 'order' => 'ASC' ] );
+
+// ---- Section 12: FAQs (12 to start; architecture is just a foreach, scales to hundreds via a future faq CPT) ----
+$homepage_faqs = [
+    [ 'q' => 'What vaccines do you provide?', 'a' => 'We provide all childhood vaccines as per the EPI schedule including BCG, Hepatitis B, DPT, Polio, Measles, MMR, plus Pneumococcal, Rotavirus, and Flu vaccines for adults and children.' ],
+    [ 'q' => 'Are vaccines safe for my child?', 'a' => 'Yes. All our vaccines are sourced from trusted multinational manufacturers, with proper cold chain maintained from arrival to administration.' ],
+    [ 'q' => 'How quickly can you provide home vaccination?', 'a' => 'We typically provide home vaccination within 24-48 hours of booking. Emergency appointments can be arranged the same day, subject to availability.' ],
+    [ 'q' => 'What are your service charges?', 'a' => 'Pricing varies by vaccine and brand. Visit our Prices page or contact us with your child\'s vaccination card for an exact quote.' ],
+    [ 'q' => 'Do you provide vaccination cards?', 'a' => 'Yes, we provide official vaccination cards with complete documentation, plus automated SMS and email reminders for upcoming doses.' ],
+    [ 'q' => 'Can vaccines be delayed if my child is sick?', 'a' => 'Minor illnesses like a common cold usually don\'t require delaying a vaccine — but always tell our team about any symptoms before the appointment.' ],
+    [ 'q' => 'Do you offer travel and Hajj/Umrah vaccines?', 'a' => 'Yes, including Meningococcal (ACWY), Yellow Fever, Typhoid, and other travel-specific vaccines with certified documentation.' ],
+    [ 'q' => 'Is home vaccination as safe as a clinic visit?', 'a' => 'Yes. Our certified nurses carry WHO-standard cold chain equipment and follow the same safety protocols as an in-clinic visit.' ],
+    [ 'q' => 'What age groups do you vaccinate?', 'a' => 'We serve newborns, children, adults, and seniors, with age-specific schedules for each group.' ],
+    [ 'q' => 'Do you serve corporate and school vaccination drives?', 'a' => 'Yes, we run on-site immunization drives for businesses, schools, and hospitals with bulk scheduling and reporting.' ],
+    [ 'q' => 'How do I know which vaccines my baby is due for?', 'a' => 'Use our Vaccination Schedule page or the Baby Vaccine Due Calculator to see what\'s due based on date of birth.' ],
+    [ 'q' => 'Which cities do you serve?', 'a' => 'We currently serve Islamabad, Rawalpindi, Lahore, Karachi, Faisalabad, Multan, Sialkot, Abbottabad, and more cities are being added.' ],
+];
 ?>
 
-<!-- ================= HERO SECTION ================= -->
+<!-- ================= SECTION 1: HERO + SEARCH + STATS ================= -->
 <section class="hero-section">
     <div class="container">
         <div class="row align-items-center">
 
             <div class="col-lg-6 col-md-12">
-                <span class="badge-custom">Pakistan's Vaccination Platform</span>
+                <span class="badge-custom">Pakistan's Vaccine Knowledge Platform</span>
                 <h1>
-                    Pakistan's Trusted
-                    <span>Vaccination Platform</span>
+                    Pakistan's Most Trusted
+                    <span>Vaccine &amp; Vaccination Resource</span>
                 </h1>
                 <p>
-                    Home vaccination, clinic vaccination, and evidence-based vaccine guidance — all in one trusted platform.
+                    Evidence-based vaccine guidance, vaccination schedules, disease prevention, vaccine availability, pricing, and premium home vaccination services across Pakistan.
                 </p>
 
-                <ul class="hero-trust-list list-unstyled mb-4">
-                    <li><i class="bi bi-check-circle-fill"></i> Genuine Vaccines</li>
-                    <li><i class="bi bi-check-circle-fill"></i> WHO Standard Cold Chain</li>
-                    <li><i class="bi bi-check-circle-fill"></i> Qualified Healthcare Professionals</li>
-                </ul>
+                <!-- Intelligent Search -->
+                <div class="home-search-wrap mb-3">
+                    <div class="input-group input-group-lg home-search-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" class="form-control border-start-0 ps-0" id="homeSearchInput"
+                               placeholder="Search vaccines, diseases, schedules, brands or FAQs..." autocomplete="off">
+                    </div>
+                    <div id="homeSearchLoading" class="text-center py-3" style="display:none;">
+                        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                    </div>
+                    <div id="homeSearchResults" class="search-results home-search-results"></div>
+                </div>
 
-                <!-- Main Action Buttons -->
+                <!-- Quick Chips -->
+                <div class="home-search-chips mb-4">
+                    <?php foreach ( [ 'HPV', 'Flu', 'Typhoid', 'MMR', 'Chickenpox', 'Rabies', 'RSV', 'Travel Vaccines', 'Pregnancy', 'Adults' ] as $chip ) : ?>
+                        <a href="<?php echo esc_url( home_url( '/vaccines?s=' . urlencode( $chip ) ) ); ?>" class="home-chip"><?php echo esc_html( $chip ); ?></a>
+                    <?php endforeach; ?>
+                </div>
+
                 <div class="d-flex gap-3 flex-wrap mb-4">
-                    <a href="#appointment" class="btn btn-primary">
+                    <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="btn btn-primary">
                         <i class="bi bi-house-heart-fill"></i> Book Home Visit
                     </a>
-                    <a href="#appointment" class="btn btn-outline-primary">
+                    <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="btn btn-outline-primary">
                         <i class="bi bi-hospital"></i> Book Clinic Visit
                     </a>
                 </div>
-
-                <div class="d-flex gap-4 flex-wrap mb-4">
-                    <a href="https://wa.me/<?php echo esc_attr( $whatsapp ); ?>" target="_blank" class="hero-link-secondary">
-                        <i class="bi bi-whatsapp"></i> WhatsApp
-                    </a>
-                    <a href="tel:<?php echo esc_attr( $phone ); ?>" class="hero-link-secondary">
-                        <i class="bi bi-telephone-fill"></i> Call Now
-                    </a>
-                </div>
-
-                <!-- Login Buttons Section -->
-                <div class="login-buttons-container">
-                    <p class="mb-2 fw-semibold" style="color: #6b7280; font-size: 14px;">
-                        <i class="bi bi-person-circle"></i> Quick Access Portals
-                    </p>
-                    <div class="d-flex gap-3 flex-wrap">
-                        <a href="https://doctor.vaccinepk.com" target="_blank" class="login-btn doctor-login">
-                            <i class="bi bi-heart-pulse-fill"></i>
-                            <span>Doctor Login</span>
-                            <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 12px;"></i>
-                        </a>
-                        <a href="https://client.vaccinepk.com" target="_blank" class="login-btn client-login">
-                            <i class="bi bi-person-badge-fill"></i>
-                            <span>Client Login</span>
-                            <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 12px;"></i>
-                        </a>
-                    </div>
-                </div>
-
             </div>
 
             <div class="col-lg-6 col-md-12 text-center mt-5 mt-lg-0">
                 <div class="hero-image-wrap">
                     <img
                         src="https://images.unsplash.com/photo-1612277795421-9bc7706a4a34?auto=format&fit=crop&w=1200&q=80"
-                        alt="Child Vaccination Service"
+                        alt="Premium home vaccination service"
                         class="img-fluid hero-image"
+                        loading="eager"
                     >
                     <div class="hero-trust-badge">
                         <span class="htb-num">800K+</span>
-                        <span class="htb-label">Families Trust<br>VaccinePk</span>
+                        <span class="htb-label">Vaccines Administered</span>
                     </div>
                 </div>
             </div>
 
         </div>
+
+        <!-- Credibility Metrics -->
+        <div class="row g-0 hero-stats-grid mt-5">
+            <div class="col-lg-3 col-md-3 col-6 hero-stat-cell">
+                <div class="hero-stat-num">800,000+</div><div class="hero-stat-lbl">Vaccines Administered</div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-6 hero-stat-cell">
+                <div class="hero-stat-num">1.5M+</div><div class="hero-stat-lbl">Vaccination Reminders</div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-6 hero-stat-cell">
+                <div class="hero-stat-num">9+</div><div class="hero-stat-lbl">Cities Served</div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-6 hero-stat-cell">
+                <div class="hero-stat-num">10+ yrs</div><div class="hero-stat-lbl">Years Experience</div>
+            </div>
+        </div>
     </div>
 </section>
 
-<!-- ================= QUICK SERVICE SELECTION ================= -->
+<!-- ================= SECTION 2: KNOWLEDGE CATEGORIES ================= -->
 <section class="py-5" style="background: white;">
     <div class="container">
         <div class="text-center mb-5">
-            <h2>How Can We Help Today?</h2>
-            <p class="section-subtitle">Choose the service that fits your family, your business, or your travel plans.</p>
+            <h2>Explore Vaccine Knowledge</h2>
+            <p class="section-subtitle">Pakistan's largest collection of vaccine and vaccination information — start anywhere.</p>
         </div>
         <div class="row g-4">
-
-            <div class="col-lg-3 col-md-6">
-                <div class="quick-service-card">
-                    <div class="quick-service-icon" style="background:rgba(123,177,79,0.12);color:#7bb14f;"><i class="bi bi-house-heart-fill"></i></div>
-                    <h5>Home Vaccination</h5>
-                    <p>Certified nurses bring WHO-standard vaccines to your doorstep, with cold chain maintained door to door.</p>
-                    <a href="#appointment" class="quick-service-link">Book Now <i class="bi bi-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <div class="quick-service-card">
-                    <div class="quick-service-icon" style="background:rgba(16,127,160,0.12);color:#107fa0;"><i class="bi bi-hospital"></i></div>
-                    <h5>Clinic Vaccination</h5>
-                    <p>Visit a partner clinic across major cities for walk-in and scheduled immunization.</p>
-                    <a href="#clinics" class="quick-service-link">Find Clinic <i class="bi bi-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <div class="quick-service-card">
-                    <div class="quick-service-icon" style="background:rgba(218,114,21,0.12);color:#da7215;"><i class="bi bi-airplane-fill"></i></div>
-                    <h5>Travel Vaccination</h5>
-                    <div class="quick-service-tags">
-                        <span>Yellow Fever</span><span>Hajj</span><span>Umrah</span><span>Typhoid</span>
-                    </div>
-                    <p>Meet entry requirements for pilgrimage and international travel with certified documentation.</p>
-                    <a href="<?php echo esc_url( home_url( '/vaccines' ) ); ?>#travel" class="quick-service-link">Learn More <i class="bi bi-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <div class="quick-service-card">
-                    <div class="quick-service-icon" style="background:rgba(31,41,55,0.08);color:#1f2937;"><i class="bi bi-building-fill"></i></div>
-                    <h5>Corporate Vaccination</h5>
-                    <div class="quick-service-tags">
-                        <span>Businesses</span><span>Schools</span><span>Hospitals</span>
-                    </div>
-                    <p>On-site immunization drives for organizations, with bulk scheduling and reporting.</p>
-                    <a href="<?php echo esc_url( home_url( '/contact' ) ); ?>" class="quick-service-link">Request Quote <i class="bi bi-arrow-right"></i></a>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-<!-- ================= WHY VACCINEPK / STATS ================= -->
-<section class="stats-section py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <span class="badge-custom" style="background:rgba(123,177,79,0.15);color:#7bb14f;">Why VaccinePk</span>
-            <h2 style="color:#fff;">Trusted at a National Scale</h2>
-            <p class="section-subtitle" style="color:rgba(255,255,255,0.65);">A decade of protecting Pakistani families with genuine vaccines and licensed care.</p>
-        </div>
-        <div class="row g-0 stats-grid">
-            <div class="col-lg-4 col-md-4 col-6 stat-cell"><div class="stat-num">800,000+</div><div class="stat-lbl">Vaccines Administered</div></div>
-            <div class="col-lg-4 col-md-4 col-6 stat-cell"><div class="stat-num">1.5M+</div><div class="stat-lbl">Reminders Sent</div></div>
-            <div class="col-lg-4 col-md-4 col-6 stat-cell"><div class="stat-num">10+ yrs</div><div class="stat-lbl">Years Experience</div></div>
-            <div class="col-lg-4 col-md-4 col-6 stat-cell"><div class="stat-num">WHO</div><div class="stat-lbl">Standard Cold Chain</div></div>
-            <div class="col-lg-4 col-md-4 col-6 stat-cell"><div class="stat-num">100%</div><div class="stat-lbl">Genuine Vaccines</div></div>
-            <div class="col-lg-4 col-md-4 col-6 stat-cell"><div class="stat-num">Licensed</div><div class="stat-lbl">Healthcare Professionals</div></div>
-        </div>
-    </div>
-</section>
-
-<!-- ================= FEATURES (DYNAMIC - Pods: feature) ================= -->
-<section class="py-5" style="background: white;">
-    <div class="container">
-        <div class="row text-center g-4">
-            <?php
-            $features = pods('feature', array(
-                'limit' => 3,
-                'orderby' => 'menu_order, post_title',
-                'order' => 'ASC'
-            ));
-
-            if ($features->total() > 0) {
-                while ($features->fetch()) {
-                    $icon = $features->field('feature_icon');
-                    $title = $features->field('post_title');
-                    $description = $features->field('feature_description');
-                    $permalink = $features->field('permalink');
-                    ?>
-                    <div class="col-md-4">
-                        <a href="<?php echo esc_url($permalink); ?>" class="feature-box-link">
-                            <div class="feature-box">
-                                <div class="feature-icon">
-                                    <i class="<?php echo esc_attr($icon ?: 'bi bi-star-fill'); ?>"></i>
-                                </div>
-                                <h5 class="fw-bold"><?php echo esc_html($title); ?></h5>
-                                <p class="text-muted mb-0"><?php echo esc_html($description); ?></p>
-                            </div>
-                        </a>
-                    </div>
-                    <?php
-                }
-            } else {
-                ?>
-                <div class="col-12">
-                    <p class="text-muted">No features available. Please add features from the admin panel.</p>
-                </div>
-                <?php
-            }
-            ?>
-        </div>
-    </div>
-</section>
-
-<!-- ================= SERVICES (DYNAMIC - Pods: service) ================= -->
-<section class="services-section">
-    <div class="container">
-
-        <div class="text-center mb-5">
-            <h2>Care Designed Around Your Life</h2>
-            <p class="section-subtitle">
-                From newborns to grandparents, at home or in clinic — one platform for every vaccination need.
-            </p>
-        </div>
-
-        <div class="row g-4">
-            <?php
-            $services = pods('service', array(
-                'limit' => -1,
-                'orderby' => 'menu_order, post_title',
-                'order' => 'ASC'
-            ));
-
-            if ($services->total() > 0) {
-                while ($services->fetch()) {
-                    $icon = $services->field('service_icon');
-                    $title = $services->field('post_title');
-                    $description = $services->field('service_description');
-                    $permalink = $services->field('permalink');
-                    ?>
-                    <div class="col-lg-4 col-md-6">
-                        <a href="<?php echo esc_url($permalink); ?>" class="service-card-link">
-                            <div class="service-card">
-                                <div class="icon">
-                                    <i class="<?php echo esc_attr($icon ?: 'bi bi-heart-fill'); ?>"></i>
-                                </div>
-                                <h4><?php echo esc_html($title); ?></h4>
-                                <p><?php echo esc_html($description); ?></p>
-                            </div>
-                        </a>
-                    </div>
-                    <?php
-                }
-            } else {
-                ?>
-                <div class="col-12">
-                    <p class="text-muted text-center">No services available. Please add services from the admin panel.</p>
-                </div>
-                <?php
-            }
-            ?>
-        </div>
-    </div>
-</section>
-
-<!-- ================= POPULAR VACCINES (DYNAMIC - Pods: vaccine) ================= -->
-<section class="py-5" style="background: var(--bg-light);">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2>Find Your Vaccine</h2>
-            <p class="section-subtitle">Each vaccine links to a dedicated page with dosage, eligibility, and side-effect guidance.</p>
-        </div>
-        <div class="vaccine-rail">
-            <?php
-            $popular_vaccines = pods( 'vaccine', array(
-                'limit'   => 10,
-                'orderby' => 'menu_order, post_title',
-                'order'   => 'ASC',
-            ) );
-
-            if ( $popular_vaccines->total() > 0 ) {
-                while ( $popular_vaccines->fetch() ) {
-                    $v_title       = $popular_vaccines->field( 'post_title' );
-                    $v_description = $popular_vaccines->field( 'vaccine_description' );
-                    $v_price       = $popular_vaccines->field( 'price' );
-                    $v_permalink   = $popular_vaccines->field( 'permalink' );
-                    ?>
-                    <div class="vaccine-rail-card">
-                        <div class="vaccine-rail-icon"><i class="bi bi-shield-fill-check"></i></div>
-                        <h6><?php echo esc_html( $v_title ); ?></h6>
-                        <p><?php echo esc_html( wp_trim_words( $v_description, 12 ) ); ?></p>
-                        <div class="vaccine-rail-actions">
-                            <a href="<?php echo esc_url( $v_permalink ); ?>" class="va-learn">Learn More</a>
-                            <a href="#appointment" class="va-book">Book</a>
-                        </div>
-                    </div>
-                    <?php
-                }
-            } else {
-                ?>
-                <p class="text-muted">No vaccines available yet. Please add vaccines from the admin panel.</p>
-                <?php
-            }
-            ?>
-        </div>
-    </div>
-</section>
-
-<!-- ================= FIND A CLINIC ================= -->
-<section id="clinics" class="py-5" style="background: white;">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2>Vaccination Centres Near You</h2>
-            <p class="section-subtitle">Partner clinics across Pakistan's major cities, with more locations added regularly.</p>
-        </div>
-        <div class="row align-items-center g-4">
-            <div class="col-lg-7">
-                <div class="row g-3">
-                    <?php foreach ( [ 'Islamabad', 'Rawalpindi', 'Lahore', 'Karachi', 'Multan', 'Faisalabad', 'Sialkot', 'Peshawar', 'Abbottabad' ] as $city ) : ?>
-                    <div class="col-md-4 col-6">
-                        <div class="city-chip">
-                            <span class="city-name"><?php echo esc_html( $city ); ?></span>
-                            <a href="<?php echo esc_url( home_url( '/contact' ) ); ?>" class="city-link">Find Clinic <i class="bi bi-arrow-right"></i></a>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <div class="col-lg-5">
-                <div class="map-placeholder">
-                    <i class="bi bi-geo-alt-fill map-icon"></i>
-                    <span class="map-label">Map Preview</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ================= WHY CHOOSE US ================= -->
-<section class="py-5" style="background: linear-gradient(135deg, #f0ffe0 0%, #e5ffcc 100%);">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2 class="fw-bold mb-4" style="color: #7bb14f;">Why Choose VaccinePk?</h2>
-                <div class="mb-4">
-                    <h5 class="fw-bold"><i class="bi bi-trophy-fill text-warning"></i> Multinational Vaccine Sources</h5>
-                    <p class="text-muted">All vaccines sourced from GSK, Pfizer, Sanofi, Merck, and other trusted multinational companies.</p>
-                </div>
-                <div class="mb-4">
-                    <h5 class="fw-bold"><i class="bi bi-clock-fill" style="color: #da7215;"></i> 24-48 Hour Service</h5>
-                    <p class="text-muted">Quick appointments with professional service at your preferred time and location.</p>
-                </div>
-                <div class="mb-4">
-                    <h5 class="fw-bold"><i class="bi bi-phone-fill" style="color: #107fa0;"></i> Post-Vaccination Support</h5>
-                    <p class="text-muted">Complete follow-up care with SMS and email reminders for next vaccines.</p>
-                </div>
-            </div>
-            <div class="col-lg-6 text-center">
-                <img
-                    src="https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=800&q=80"
-                    alt="Professional Medical Care"
-                    class="img-fluid rounded-4 shadow-lg"
-                    style="max-width: 450px;"
-                >
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ================= EDUCATION HUB (DYNAMIC - WP posts) ================= -->
-<section class="py-5" style="background: var(--bg-light);">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2>Learn. Stay Protected.</h2>
-            <p class="section-subtitle">Evidence-based vaccine information for the Pakistani public.</p>
-        </div>
-        <div class="row g-4">
-            <?php
-            $edu_posts = new WP_Query( [
-                'post_type'      => 'post',
-                'post_status'    => 'publish',
-                'posts_per_page' => 4,
-            ] );
-
-            if ( $edu_posts->have_posts() ) :
-                while ( $edu_posts->have_posts() ) : $edu_posts->the_post();
-                ?>
-                <div class="col-lg-3 col-md-6">
-                    <a href="<?php the_permalink(); ?>" class="article-card-link">
-                        <div class="article-card">
-                            <div class="article-card-image">
-                                <?php if ( has_post_thumbnail() ) : ?>
-                                    <?php the_post_thumbnail( 'blog-thumbnail' ); ?>
-                                <?php else : ?>
-                                    <i class="bi bi-file-earmark-medical-fill"></i>
-                                <?php endif; ?>
-                            </div>
-                            <div class="article-card-body">
-                                <h6><?php the_title(); ?></h6>
-                                <p><?php echo esc_html( wp_trim_words( get_the_excerpt(), 14 ) ); ?></p>
-                                <span class="article-meta"><?php echo vaccination_centre_reading_time(); ?> min read</span>
-                            </div>
-                        </div>
+            <?php foreach ( $knowledge_categories as $cat ) : ?>
+                <div class="col-lg-2 col-md-3 col-6">
+                    <a href="<?php echo esc_url( $cat['url'] ); ?>" class="knowledge-cat-card">
+                        <div class="knowledge-cat-icon"><i class="bi <?php echo esc_attr( $cat['icon'] ); ?>"></i></div>
+                        <h6><?php echo esc_html( $cat['title'] ); ?></h6>
                     </a>
                 </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SECTION 3: MOST SEARCHED VACCINES ================= -->
+<section class="py-5" style="background: var(--bg-light);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Most Searched Vaccines</h2>
+            <p class="section-subtitle">Each vaccine links to a dedicated page with dosage, eligibility, and side-effect guidance.</p>
+        </div>
+        <div class="row g-4">
+            <?php
+            $popular_vaccines = pods( 'vaccine', [ 'limit' => 8, 'orderby' => 'menu_order, post_title', 'order' => 'ASC' ] );
+
+            if ( $popular_vaccines->total() > 0 ) :
+                while ( $popular_vaccines->fetch() ) :
+                    $v_title       = $popular_vaccines->field( 'post_title' );
+                    $v_description = $popular_vaccines->field( 'vaccine_description' );
+                    $v_age         = $popular_vaccines->field( 'age_requirement' );
+                    $v_availability = $popular_vaccines->field( 'availability' );
+                    $v_permalink   = $popular_vaccines->field( 'permalink' );
+                    $v_thumb       = get_the_post_thumbnail_url( $popular_vaccines->id(), 'medium' );
+
+                    $avail_badge = '';
+                    if ( in_array( $v_availability, [ 'in_stock', 'yes', '1' ], true ) ) {
+                        $avail_badge = '<span class="vsv-badge vsv-badge-in">In Stock</span>';
+                    } elseif ( in_array( $v_availability, [ 'out_of_stock', 'no', '0' ], true ) ) {
+                        $avail_badge = '<span class="vsv-badge vsv-badge-out">Out of Stock</span>';
+                    } elseif ( $v_availability === 'coming_soon' ) {
+                        $avail_badge = '<span class="vsv-badge vsv-badge-soon">Coming Soon</span>';
+                    }
+                    ?>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="vsv-card">
+                            <div class="vsv-card-img">
+                                <?php if ( $v_thumb ) : ?>
+                                    <img src="<?php echo esc_url( $v_thumb ); ?>" alt="<?php echo esc_attr( $v_title ); ?>">
+                                <?php else : ?>
+                                    <i class="bi bi-shield-fill-check"></i>
+                                <?php endif; ?>
+                                <?php echo $avail_badge; ?>
+                            </div>
+                            <div class="vsv-card-body">
+                                <h6><?php echo esc_html( $v_title ); ?></h6>
+                                <p><?php echo esc_html( wp_trim_words( $v_description, 12 ) ); ?></p>
+                                <?php if ( $v_age ) : ?><p class="vsv-age"><i class="bi bi-calendar-check"></i> <?php echo esc_html( $v_age ); ?></p><?php endif; ?>
+                                <div class="vsv-actions">
+                                    <a href="<?php echo esc_url( $v_permalink ); ?>" class="vsv-learn">Learn More</a>
+                                    <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="vsv-book">Book</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                endwhile;
+            else :
+                ?>
+                <div class="col-12"><p class="text-muted text-center">Vaccine listings are being added. Please check back soon.</p></div>
                 <?php
+            endif;
+            ?>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SECTION 4: FEATURED KNOWLEDGE ================= -->
+<section class="py-5" style="background: white;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Featured Knowledge</h2>
+            <p class="section-subtitle">Evergreen, doctor-reviewed guides on vaccines and vaccination.</p>
+        </div>
+        <div class="row g-4">
+            <?php foreach ( $featured_knowledge as $fk ) :
+                $has_post = ! empty( $fk['post'] );
+                $url      = $has_post ? get_permalink( $fk['post']->ID ) : '';
+                ?>
+                <div class="col-lg-3 col-md-6">
+                    <?php if ( $has_post ) : ?>
+                        <a href="<?php echo esc_url( $url ); ?>" class="fk-card">
+                    <?php else : ?>
+                        <div class="fk-card fk-card-soon">
+                    <?php endif; ?>
+                        <div class="fk-card-body">
+                            <span class="fk-badge"><i class="bi bi-patch-check-fill"></i> Doctor Reviewed</span>
+                            <h6><?php echo esc_html( $fk['title'] ); ?></h6>
+                            <div class="fk-meta">
+                                <?php if ( $has_post ) : ?>
+                                    <span><i class="bi bi-clock"></i> <?php echo vaccination_centre_reading_time_for( $fk['post']->ID ); ?> min read</span>
+                                    <span><i class="bi bi-calendar3"></i> <?php echo esc_html( get_the_modified_date( 'M j, Y', $fk['post']->ID ) ); ?></span>
+                                <?php else : ?>
+                                    <span class="fk-soon"><i class="bi bi-hourglass-split"></i> Coming Soon</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php echo $has_post ? '</a>' : '</div>'; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="text-center mt-4">
+            <a href="<?php echo esc_url( home_url( '/knowledge-centre' ) ); ?>" class="btn btn-outline-primary">Visit Knowledge Centre</a>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SECTION 5: INTERACTIVE TOOLS ================= -->
+<section class="py-5" style="background: var(--bg-light);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Interactive Tools</h2>
+            <p class="section-subtitle">Practical tools to help you plan vaccinations for your whole family.</p>
+        </div>
+        <div class="row g-4">
+            <?php foreach ( $interactive_tools as $tool ) : ?>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="tool-card">
+                        <div class="tool-icon"><i class="bi <?php echo esc_attr( $tool['icon'] ); ?>"></i></div>
+                        <h6><?php echo esc_html( $tool['title'] ); ?></h6>
+                        <p><?php echo esc_html( $tool['desc'] ); ?></p>
+                        <span class="tool-soon">Coming Soon</span>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SECTION 6: PAKISTAN VACCINATION SCHEDULE ================= -->
+<section class="py-5" style="background: white;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Pakistan Vaccination Schedule</h2>
+            <p class="section-subtitle">The recommended childhood immunization timeline, from birth through 18 months.</p>
+        </div>
+        <div class="schedule-strip">
+            <?php foreach ( $schedule_stages as $stage ) : ?>
+                <a href="<?php echo esc_url( home_url( '/vaccination-schedule#' . $stage['slug'] ) ); ?>" class="schedule-strip-item">
+                    <span class="schedule-strip-dot"></span>
+                    <span class="schedule-strip-label"><?php echo esc_html( $stage['label'] ); ?></span>
+                </a>
+            <?php endforeach; ?>
+        </div>
+        <div class="text-center mt-4">
+            <a href="<?php echo esc_url( home_url( '/vaccination-schedule' ) ); ?>" class="btn btn-primary">View Full Schedule</a>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SECTION 7: DISEASE LIBRARY ================= -->
+<section class="py-5" style="background: var(--bg-light);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Disease Library</h2>
+            <p class="section-subtitle">Symptoms, complications, prevention, and vaccination for common diseases in Pakistan.</p>
+        </div>
+        <div class="row g-4">
+            <?php
+            $disease_query = new WP_Query( [ 'post_type' => 'disease', 'post_status' => 'publish', 'posts_per_page' => 9, 'orderby' => 'title', 'order' => 'ASC' ] );
+
+            if ( $disease_query->have_posts() ) :
+                while ( $disease_query->have_posts() ) : $disease_query->the_post();
+                    ?>
+                    <div class="col-lg-4 col-md-6">
+                        <a href="<?php the_permalink(); ?>" class="disease-lib-card">
+                            <div class="disease-lib-icon"><i class="bi bi-virus2"></i></div>
+                            <h6><?php the_title(); ?></h6>
+                            <p><?php echo esc_html( wp_trim_words( get_the_excerpt(), 14 ) ); ?></p>
+                        </a>
+                    </div>
+                    <?php
                 endwhile;
                 wp_reset_postdata();
             else :
                 ?>
-                <div class="col-12">
-                    <p class="text-muted text-center">No articles published yet.</p>
+                <div class="col-12 text-center">
+                    <p class="text-muted">Disease guides are being added. <a href="<?php echo esc_url( home_url( '/diseases' ) ); ?>">Visit the Disease Library</a> to check back soon.</p>
                 </div>
                 <?php
             endif;
             ?>
         </div>
-        <div class="text-center mt-4">
-            <a href="<?php echo esc_url( home_url( '/blog' ) ); ?>" class="btn btn-outline-primary">View All Articles</a>
-        </div>
     </div>
 </section>
 
-<!-- ================= HOW IT WORKS ================= -->
+<!-- ================= SECTION 8: VACCINE BRANDS ================= -->
 <section class="py-5" style="background: white;">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold" style="color: #107fa0;">Five Simple Steps</h2>
-            <p class="text-muted">From booking to your digital vaccination record — in one visit.</p>
+            <h2>Vaccine Brands</h2>
+            <p class="section-subtitle">Genuine, imported vaccines from trusted multinational manufacturers.</p>
         </div>
-
         <div class="row g-4">
-            <div class="col-md-3 text-center">
-                <div class="mb-3">
-                    <div class="feature-icon mx-auto">
-                        <span style="font-size: 28px; font-weight: bold;">1</span>
-                    </div>
-                </div>
-                <h5 class="fw-bold">Book Online</h5>
-                <p class="text-muted">Choose a time that works for your family</p>
-            </div>
+            <?php
+            $brand_posts = get_posts( [ 'post_type' => 'brand', 'post_status' => 'publish', 'posts_per_page' => 8, 'orderby' => 'title', 'order' => 'ASC' ] );
 
-            <div class="col-md-3 text-center">
-                <div class="mb-3">
-                    <div class="feature-icon mx-auto">
-                        <span style="font-size: 28px; font-weight: bold;">2</span>
+            if ( $brand_posts ) :
+                foreach ( $brand_posts as $brand ) :
+                    $thumb = get_the_post_thumbnail_url( $brand->ID, 'medium' );
+                    ?>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <a href="<?php echo esc_url( get_permalink( $brand->ID ) ); ?>" class="brand-home-card">
+                            <div class="brand-home-img">
+                                <?php if ( $thumb ) : ?>
+                                    <img src="<?php echo esc_url( $thumb ); ?>" alt="<?php echo esc_attr( $brand->post_title ); ?>">
+                                <?php else : ?>
+                                    <i class="bi bi-shield-fill-check"></i>
+                                <?php endif; ?>
+                            </div>
+                            <h6><?php echo esc_html( $brand->post_title ); ?></h6>
+                        </a>
                     </div>
-                </div>
-                <h5 class="fw-bold">Home or Clinic</h5>
-                <p class="text-muted">Pick the setting that's most convenient</p>
-            </div>
-
-            <div class="col-md-3 text-center">
-                <div class="mb-3">
-                    <div class="feature-icon mx-auto">
-                        <span style="font-size: 28px; font-weight: bold;">3</span>
-                    </div>
-                </div>
-                <h5 class="fw-bold">Confirmation</h5>
-                <p class="text-muted">Get a confirmed slot within the hour</p>
-            </div>
-
-            <div class="col-md-3 text-center">
-                <div class="mb-3">
-                    <div class="feature-icon mx-auto">
-                        <span style="font-size: 28px; font-weight: bold;">4</span>
-                    </div>
-                </div>
-                <h5 class="fw-bold">Vaccination</h5>
-                <p class="text-muted">Administered by licensed professionals</p>
-            </div>
+                    <?php
+                endforeach;
+            else :
+                ?>
+                <div class="col-12 text-center"><p class="text-muted">Brand information is being added.</p></div>
+                <?php
+            endif;
+            ?>
+        </div>
+        <div class="text-center mt-4">
+            <a href="<?php echo esc_url( home_url( '/vaccine-brands' ) ); ?>" class="btn btn-outline-primary">View All Brands</a>
         </div>
     </div>
 </section>
 
-<!-- ================= TRUST / TESTIMONIALS ================= -->
+<!-- ================= SECTION 9: WHY VACCINEPK ================= -->
+<section class="stats-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge-custom" style="background:rgba(123,177,79,0.15);color:#7bb14f;">Why VaccinePk</span>
+            <h2 style="color:#fff;">Trusted at a National Scale</h2>
+        </div>
+        <div class="row g-3">
+            <?php foreach ( $why_vaccinepk as $item ) : ?>
+                <div class="col-lg-3 col-md-4 col-6">
+                    <div class="why-card">
+                        <i class="bi <?php echo esc_attr( $item['icon'] ); ?>"></i>
+                        <span><?php echo esc_html( $item['title'] ); ?></span>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SECTION 10: TESTIMONIALS ================= -->
 <section class="py-5" style="background: var(--bg-light);">
     <div class="container">
         <div class="text-center mb-5">
             <h2>What Families Are Saying</h2>
-            <p class="section-subtitle">Real feedback from families we've served across Pakistan.</p>
+            <p class="section-subtitle">Real feedback from families we've served across Pakistan — see more on Google Reviews.</p>
         </div>
         <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="testimonial-card">
-                    <div class="testimonial-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-                    <p>"The nurse arrived on time, explained every vaccine on my son's card, and even helped us fill gaps we didn't know existed."</p>
-                    <div class="testimonial-who"><div class="testimonial-avatar">S.</div><div><div class="testimonial-name">Sana K.</div><div class="testimonial-loc">Lahore</div></div></div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="testimonial-card">
-                    <div class="testimonial-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-                    <p>"Booked our Umrah vaccines two days before travel. Got the official certificate the same visit — completely stress-free."</p>
-                    <div class="testimonial-who"><div class="testimonial-avatar">A.</div><div><div class="testimonial-name">Ahmed R.</div><div class="testimonial-loc">Islamabad</div></div></div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="testimonial-card">
-                    <div class="testimonial-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-                    <p>"As a working parent, home vaccination has been a lifesaver. Reminders come right on schedule via SMS."</p>
-                    <div class="testimonial-who"><div class="testimonial-avatar">F.</div><div><div class="testimonial-name">Fatima N.</div><div class="testimonial-loc">Karachi</div></div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ================= APPOINTMENT ================= -->
-<section id="appointment" class="appointment-section">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-                <h2>Book Your Appointment Today</h2>
-                <p>Schedule your child's vaccination with ease and convenience</p>
-
-                <div class="bg-white p-5 rounded-4 shadow-lg mt-4">
-                    <!-- Replace with your actual Contact Form 7 shortcode -->
-                    <!--<?php echo do_shortcode('[contact-form-7 id="4d62594" title="Appointment Booking Form"]'); ?>-->
-
-                    <div class="contact-options mt-4">
-                        <div class="d-flex justify-content-center gap-3 flex-wrap">
-                            <a href="tel:<?php echo esc_attr($phone); ?>" class="btn btn-primary">
-                                <i class="bi bi-telephone-fill"></i> Call <?php echo esc_html($phone); ?>
-                            </a>
-                            <a href="https://wa.me/<?php echo esc_attr($whatsapp); ?>" class="btn btn-outline-primary" target="_blank">
-                                <i class="bi bi-whatsapp"></i> WhatsApp
-                            </a>
+            <?php foreach ( $testimonials as $t ) : ?>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+                        <p>"<?php echo esc_html( $t['text'] ); ?>"</p>
+                        <div class="testimonial-who">
+                            <div class="testimonial-avatar"><?php echo esc_html( mb_substr( $t['name'], 0, 1 ) ); ?></div>
+                            <div><div class="testimonial-name"><?php echo esc_html( $t['name'] ); ?></div><div class="testimonial-loc"><?php echo esc_html( $t['loc'] ); ?></div></div>
                         </div>
                     </div>
                 </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
 
-<!-- ================= FAQ SECTION ================= -->
-<section class="faq-section">
+<!-- ================= SECTION 11: CITIES WE SERVE ================= -->
+<section class="py-5" style="background: white;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Cities We Serve</h2>
+            <p class="section-subtitle">Partner clinics and home-visit coverage across Pakistan's major cities.</p>
+        </div>
+        <div class="row g-3">
+            <?php if ( $city_posts_query->have_posts() ) : ?>
+                <?php while ( $city_posts_query->have_posts() ) : $city_posts_query->the_post(); ?>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <a href="<?php the_permalink(); ?>" class="city-home-chip">
+                            <i class="bi bi-geo-alt-fill"></i> <?php the_title(); ?>
+                        </a>
+                    </div>
+                <?php endwhile; wp_reset_postdata(); ?>
+            <?php else : ?>
+                <?php foreach ( $fallback_cities as $city ) : ?>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <span class="city-home-chip city-home-chip-static">
+                            <i class="bi bi-geo-alt-fill"></i> <?php echo esc_html( $city ); ?>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SECTION 12: FAQ ================= -->
+<section class="faq-section" id="homepage-faqs">
     <div class="container">
         <h2 class="text-center mb-5">Frequently Asked Questions</h2>
-
         <div class="row justify-content-center">
             <div class="col-lg-8">
-
-                <div class="faq-card">
-                    <h5><i class="bi bi-patch-question-fill" style="color: #7bb14f;"></i> What vaccines do you provide?</h5>
-                    <p>We provide all childhood vaccines as per EPI schedule including BCG, Hepatitis B, DPT, Polio, Measles, MMR, and additional vaccines like Pneumococcal, Rotavirus, and Flu vaccines.</p>
+                <div class="accordion" id="homeFaqAccordion">
+                    <?php foreach ( $homepage_faqs as $i => $faq ) : ?>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeading<?php echo $i; ?>">
+                                <button class="accordion-button <?php echo $i > 0 ? 'collapsed' : ''; ?>" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapse<?php echo $i; ?>"
+                                        aria-expanded="<?php echo $i === 0 ? 'true' : 'false'; ?>" aria-controls="faqCollapse<?php echo $i; ?>">
+                                    <?php echo esc_html( $faq['q'] ); ?>
+                                </button>
+                            </h2>
+                            <div id="faqCollapse<?php echo $i; ?>" class="accordion-collapse collapse <?php echo $i === 0 ? 'show' : ''; ?>"
+                                 aria-labelledby="faqHeading<?php echo $i; ?>" data-bs-parent="#homeFaqAccordion">
+                                <div class="accordion-body"><?php echo esc_html( $faq['a'] ); ?></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-
-                <div class="faq-card">
-                    <h5><i class="bi bi-shield-check" style="color: #7bb14f;"></i> Are vaccines safe for my child?</h5>
-                    <p>Yes, all our vaccines are sourced from WHO-approved multinational companies like GSK, Pfizer, Sanofi, and Merck. We maintain proper cold chain and follow strict safety protocols.</p>
-                </div>
-
-                <div class="faq-card">
-                    <h5><i class="bi bi-clock-history" style="color: #7bb14f;"></i> How quickly can you provide home vaccination?</h5>
-                    <p>We typically provide home vaccination services within 24-48 hours of booking. Emergency appointments can be arranged on the same day subject to availability.</p>
-                </div>
-
-                <div class="faq-card">
-                    <h5><i class="bi bi-currency-dollar" style="color: #7bb14f;"></i> What are your service charges?</h5>
-                    <p>Different vaccines have different prices. Contact us with your child's vaccination card for a free quote. We offer competitive pricing with complete transparency.</p>
-                </div>
-
-                <div class="faq-card">
-                    <h5><i class="bi bi-card-checklist" style="color: #7bb14f;"></i> Do you provide vaccination cards?</h5>
-                    <p>Yes, we provide official vaccination cards with complete documentation. We also send automated reminders for upcoming vaccines via SMS and email.</p>
-                </div>
-
             </div>
         </div>
     </div>
 </section>
 
-<!-- ================= CTA SECTION ================= -->
-<section class="py-5" style="background: linear-gradient(135deg, #7bb14f, #6a9f3e);">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8 text-white mb-4 mb-lg-0">
-                <h2 class="fw-bold mb-3">Ready to Get Vaccinated?</h2>
-                <p class="mb-0" style="font-size: 18px;">Book your appointment in less than one minute.</p>
-            </div>
-            <div class="col-lg-4 text-lg-end">
-                <a href="#appointment" class="btn btn-light btn-lg px-5">
-                    Book Now <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
+<!-- ================= SECTION 13: FINAL CTA ================= -->
+<section class="py-5" id="appointment" style="background: linear-gradient(135deg, #7bb14f, #6a9f3e);">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3 text-white">Book Your Vaccination</h2>
+        <p class="mb-4 text-white" style="font-size: 18px; opacity: 0.95;">Or speak with our vaccination team — we'll help you find the right vaccines for your family.</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="btn btn-light btn-lg px-5">
+                <i class="bi bi-calendar-check-fill"></i> Book Your Vaccination
+            </a>
+            <a href="tel:<?php echo esc_attr( $phone ); ?>" class="btn btn-outline-light btn-lg px-5">
+                <i class="bi bi-telephone-fill"></i> Speak With Our Team
+            </a>
         </div>
     </div>
 </section>
-
-
 
 <style>
-/* Login Buttons Styling */
-.login-buttons-container {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px solid rgba(123, 177, 79, 0.2);
-}
-
-.login-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 15px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.login-btn i:first-child {
-    font-size: 18px;
-}
-
-.doctor-login {
-    background: linear-gradient(135deg, #107fa0 0%, #0d6580 100%);
-    color: white;
-    border-color: #107fa0;
-}
-
-.doctor-login:hover {
-    background: linear-gradient(135deg, #0d6580 0%, #0a4f64 100%);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(16, 127, 160, 0.3);
-    color: white;
-}
-
-.client-login {
-    background: linear-gradient(135deg, #7bb14f 0%, #6a9f3e 100%);
-    color: white;
-    border-color: #7bb14f;
-}
-
-.client-login:hover {
-    background: linear-gradient(135deg, #6a9f3e 0%, #5a8d2e 100%);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(123, 177, 79, 0.3);
-    color: white;
-}
-
-@media (max-width: 768px) {
-    .login-btn {
-        padding: 10px 20px;
-        font-size: 14px;
-    }
-
-    .login-buttons-container {
-        margin-top: 15px;
-        padding-top: 15px;
-    }
-}
-
-.login-btn:hover .bi-box-arrow-up-right {
-    transform: translate(2px, -2px);
-}
-
 /* ---- hero additions ---- */
-.hero-trust-list { display: flex; flex-direction: column; gap: 10px; }
-.hero-trust-list li { font-weight: 600; color: var(--text-dark); }
-.hero-trust-list i { color: #7bb14f; margin-right: 8px; }
-.hero-link-secondary { font-weight: 600; color: var(--text-light); text-decoration: none; }
-.hero-link-secondary:hover { color: var(--primary-gradient-start); }
 .hero-image-wrap { position: relative; }
 .hero-trust-badge {
     position: absolute; bottom: -20px; left: 20px;
     background: white; border-radius: 16px; box-shadow: var(--shadow-lg);
-    padding: 16px 20px; display: inline-flex; align-items: center; gap: 12px;
-    max-width: 220px; text-align: left;
+    padding: 16px 20px; display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px;
 }
 .htb-num { font-size: 1.3rem; font-weight: 800; color: var(--accent-blue); line-height: 1; }
-.htb-label { font-size: 0.76rem; color: var(--text-light); font-weight: 600; line-height: 1.3; }
+.htb-label { font-size: 0.76rem; color: var(--text-light); font-weight: 600; }
 
-/* ---- quick service cards ---- */
-.quick-service-card {
-    background: white; border: 1px solid #eef0f2; border-radius: 18px;
-    padding: 32px 24px; height: 100%; transition: var(--transition);
+/* ---- home search ---- */
+.home-search-wrap { max-width: 560px; }
+.home-search-group { border-radius: 50px; overflow: hidden; box-shadow: var(--shadow-md); }
+.home-search-group .input-group-text, .home-search-group .form-control { border: none; padding: 16px 18px; font-size: 1rem; }
+.home-search-group .form-control:focus { box-shadow: none; }
+.home-search-results { position: relative; z-index: 5; margin-top: 8px; max-height: 360px; overflow-y: auto; }
+.home-search-results:not(:empty) { background: white; border-radius: 16px; box-shadow: var(--shadow-lg); padding: 10px; }
+.home-search-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.home-chip {
+    font-size: 0.82rem; font-weight: 700; padding: 7px 16px; border-radius: 50px;
+    background: white; border: 1.5px solid #eef0f2; color: var(--text-dark); text-decoration: none;
 }
-.quick-service-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
-.quick-service-icon {
-    width: 54px; height: 54px; border-radius: 14px; display: flex; align-items: center;
-    justify-content: center; font-size: 1.4rem; margin-bottom: 16px;
+.home-chip:hover { border-color: var(--primary-gradient-start); color: var(--primary-gradient-start); }
+
+.hero-stats-grid { border-radius: 20px; overflow: hidden; background: white; box-shadow: var(--shadow-md); }
+.hero-stat-cell { padding: 24px 16px; text-align: center; border: 1px solid #f3f4f6; }
+.hero-stat-num { font-size: 1.8rem; font-weight: 800; color: var(--accent-blue); line-height: 1; margin-bottom: 6px; }
+.hero-stat-lbl { font-size: 0.82rem; color: var(--text-light); font-weight: 600; }
+
+/* ---- knowledge categories ---- */
+.knowledge-cat-card {
+    display: block; text-align: center; background: white; border: 1px solid #eef0f2; border-radius: 16px;
+    padding: 22px 12px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition);
 }
-.quick-service-card h5 { font-weight: 700; margin-bottom: 10px; }
-.quick-service-card p { color: var(--text-light); font-size: 0.9rem; }
-.quick-service-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.quick-service-tags span {
-    font-size: 0.7rem; font-weight: 700; background: var(--bg-light); border: 1px solid #eef0f2;
-    color: var(--text-light); padding: 4px 9px; border-radius: 50px;
+.knowledge-cat-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; border-color: transparent; }
+.knowledge-cat-icon {
+    width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 12px; background: rgba(218,114,21,0.1);
+    color: var(--primary-gradient-start); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
 }
-.quick-service-link { font-weight: 700; font-size: 0.88rem; color: var(--accent-blue); text-decoration: none; }
-.quick-service-link:hover { color: var(--primary-gradient-start); }
+.knowledge-cat-card h6 { font-weight: 700; font-size: 0.85rem; margin: 0; }
 
-/* ---- stats ---- */
-.stats-section { background: linear-gradient(180deg, #1f2937 0%, #0f1620 100%); }
-.stats-grid { border-radius: 20px; overflow: hidden; background: rgba(255,255,255,0.08); }
-.stat-cell { background: rgba(255,255,255,0.03); padding: 32px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-.stat-num { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 8px; }
-.stat-lbl { font-size: 0.85rem; color: rgba(255,255,255,0.6); font-weight: 600; }
-.badge-custom { display: inline-block; padding: 6px 16px; border-radius: 50px; font-size: 0.8rem; font-weight: 700; margin-bottom: 14px; }
+/* ---- most searched vaccines ---- */
+.vsv-card { background: white; border: 1px solid #eef0f2; border-radius: 16px; overflow: hidden; height: 100%; transition: var(--transition); }
+.vsv-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.vsv-card-img { position: relative; height: 140px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; }
+.vsv-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.vsv-card-img i { font-size: 2rem; color: var(--accent-blue); }
+.vsv-badge { position: absolute; top: 10px; right: 10px; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 50px; }
+.vsv-badge-in { background: #7bb14f; color: white; }
+.vsv-badge-out { background: #dc3545; color: white; }
+.vsv-badge-soon { background: #ffc107; color: #000; }
+.vsv-card-body { padding: 18px; }
+.vsv-card-body h6 { font-weight: 700; margin-bottom: 6px; }
+.vsv-card-body p { font-size: 0.82rem; color: var(--text-light); min-height: 38px; }
+.vsv-age { font-size: 0.76rem; color: var(--text-light); margin-bottom: 10px; }
+.vsv-actions { display: flex; gap: 8px; }
+.vsv-actions a { flex: 1; text-align: center; font-size: 0.78rem; font-weight: 700; padding: 9px 10px; border-radius: 50px; text-decoration: none; }
+.vsv-learn { background: var(--primary-gradient-start); color: white; }
+.vsv-learn:hover { background: var(--primary-gradient-end); color: white; }
+.vsv-book { border: 1.5px solid #eef0f2; color: var(--text-light); }
+.vsv-book:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 
-/* ---- vaccine rail ---- */
-.vaccine-rail { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 14px; }
-.vaccine-rail-card {
-    flex: 0 0 230px; background: white; border: 1px solid #eef0f2; border-radius: 16px;
-    padding: 20px; transition: var(--transition);
-}
-.vaccine-rail-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-.vaccine-rail-icon { color: var(--accent-blue); font-size: 1.6rem; margin-bottom: 10px; }
-.vaccine-rail-card h6 { font-weight: 700; margin-bottom: 6px; }
-.vaccine-rail-card p { font-size: 0.82rem; color: var(--text-light); min-height: 40px; }
-.vaccine-rail-actions { display: flex; gap: 8px; margin-top: 10px; }
-.vaccine-rail-actions a { flex: 1; text-align: center; font-size: 0.76rem; font-weight: 700; padding: 8px 10px; border-radius: 50px; text-decoration: none; }
-.va-learn { border: 1.5px solid #eef0f2; color: var(--text-light); }
-.va-learn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
-.va-book { background: var(--accent-blue); color: white; }
-.va-book:hover { background: #0d6580; color: white; }
+/* ---- featured knowledge ---- */
+.fk-card { display: block; background: white; border: 1px solid #eef0f2; border-radius: 16px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition); }
+.fk-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; }
+.fk-card-soon { opacity: 0.7; }
+.fk-card-body { padding: 20px; }
+.fk-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 700; color: #107fa0; background: rgba(16,127,160,0.1); padding: 4px 10px; border-radius: 50px; margin-bottom: 12px; }
+.fk-card-body h6 { font-weight: 700; margin-bottom: 10px; }
+.fk-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.74rem; color: var(--text-light); }
+.fk-soon { color: #da7215; font-weight: 700; }
 
-/* ---- clinics ---- */
-.city-chip { background: white; border: 1px solid #eef0f2; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; height: 100%; }
-.city-name { font-weight: 700; }
-.city-link { font-size: 0.8rem; font-weight: 600; color: var(--accent-blue); text-decoration: none; }
-.map-placeholder {
-    height: 100%; min-height: 260px; border-radius: 18px; background: var(--bg-light);
-    border: 1px dashed #d7dde3; display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 10px; color: var(--text-light);
-}
-.map-icon { font-size: 2.2rem; color: var(--accent-blue); }
-.map-label { font-size: 0.85rem; font-weight: 600; }
+/* ---- interactive tools ---- */
+.tool-card { background: white; border: 1px solid #eef0f2; border-radius: 16px; padding: 24px 16px; text-align: center; height: 100%; }
+.tool-icon { width: 50px; height: 50px; margin: 0 auto 14px; border-radius: 12px; background: rgba(123,177,79,0.12); color: #7bb14f; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.tool-card h6 { font-weight: 700; font-size: 0.88rem; margin-bottom: 8px; }
+.tool-card p { font-size: 0.76rem; color: var(--text-light); min-height: 50px; }
+.tool-soon { display: inline-block; font-size: 0.7rem; font-weight: 700; color: #da7215; background: rgba(218,114,21,0.1); padding: 4px 10px; border-radius: 50px; }
 
-/* ---- education hub cards ---- */
-.article-card-link { text-decoration: none; color: inherit; }
-.article-card { background: white; border: 1px solid #eef0f2; border-radius: 16px; overflow: hidden; transition: var(--transition); height: 100%; }
-.article-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-.article-card-image { height: 130px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--accent-blue); overflow: hidden; }
-.article-card-image img { width: 100%; height: 100%; object-fit: cover; }
-.article-card-body { padding: 18px 20px; }
-.article-card-body h6 { font-weight: 700; margin-bottom: 8px; }
-.article-card-body p { font-size: 0.82rem; color: var(--text-light); margin-bottom: 10px; }
-.article-meta { font-size: 0.75rem; color: var(--text-light); font-weight: 600; }
+/* ---- schedule strip ---- */
+.schedule-strip { display: flex; gap: 14px; overflow-x: auto; padding: 10px 4px 20px; }
+.schedule-strip-item { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; min-width: 90px; }
+.schedule-strip-dot { width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #107fa0, #7bb14f); }
+.schedule-strip-label { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); text-align: center; }
+.schedule-strip-item:hover .schedule-strip-label { color: var(--accent-blue); }
 
-/* ---- testimonials ---- */
-.testimonial-card { background: white; border: 1px solid #eef0f2; border-radius: 16px; padding: 26px; height: 100%; }
-.testimonial-stars { color: #f0a83c; margin-bottom: 12px; }
-.testimonial-card p { font-style: italic; color: var(--text-dark); margin-bottom: 16px; }
-.testimonial-who { display: flex; align-items: center; gap: 12px; }
-.testimonial-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-light); color: var(--accent-blue); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
-.testimonial-name { font-weight: 700; font-size: 0.85rem; }
-.testimonial-loc { font-size: 0.75rem; color: var(--text-light); }
+/* ---- disease library ---- */
+.disease-lib-card { display: block; background: white; border: 1px solid #eef0f2; border-radius: 16px; padding: 26px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition); }
+.disease-lib-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; }
+.disease-lib-icon { width: 50px; height: 50px; border-radius: 12px; background: rgba(218,114,21,0.12); color: var(--primary-gradient-start); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 14px; }
+.disease-lib-card h6 { font-weight: 700; margin-bottom: 8px; }
+.disease-lib-card p { font-size: 0.82rem; color: var(--text-light); margin: 0; }
+
+/* ---- brand cards ---- */
+.brand-home-card { display: block; text-align: center; background: white; border: 1px solid #eef0f2; border-radius: 16px; padding: 20px; text-decoration: none; color: inherit; transition: var(--transition); }
+.brand-home-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; }
+.brand-home-img { height: 90px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.brand-home-img img { max-height: 90px; max-width: 100%; object-fit: contain; }
+.brand-home-img i { font-size: 2rem; color: var(--accent-blue); }
+.brand-home-card h6 { font-weight: 700; font-size: 0.88rem; margin: 0; }
+
+/* ---- why vaccinepk ---- */
+.why-card { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; height: 100%; }
+.why-card i { font-size: 1.3rem; color: #7bb14f; }
+.why-card span { font-weight: 700; color: white; font-size: 0.86rem; }
+
+/* ---- cities ---- */
+.city-home-chip { display: flex; align-items: center; gap: 8px; justify-content: center; background: white; border: 1px solid #eef0f2; border-radius: 12px; padding: 16px; font-weight: 700; text-decoration: none; color: var(--text-dark); transition: var(--transition); }
+.city-home-chip:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+.city-home-chip-static { color: var(--text-light); cursor: default; }
+.city-home-chip i { color: var(--accent-blue); }
+
+/* ---- faq accordion ---- */
+.accordion-item { border: none; margin-bottom: 14px; border-radius: 14px !important; overflow: hidden; box-shadow: var(--shadow-sm); }
+.accordion-button { font-weight: 700; color: var(--text-dark); }
+.accordion-button:not(.collapsed) { background: rgba(123,177,79,0.08); color: var(--accent-green); box-shadow: none; }
+.accordion-button:focus { box-shadow: none; }
 
 @media (max-width: 991px) {
     .hero-trust-badge { position: static; margin-top: 16px; display: inline-flex; }
 }
+@media (max-width: 768px) {
+    section.py-5 { padding: 60px 0 !important; }
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof vaccinationCentreInitSearch === 'function') {
+        vaccinationCentreInitSearch(
+            { input: 'homeSearchInput', results: 'homeSearchResults', loading: 'homeSearchLoading' },
+            { phone: '<?php echo esc_js( $phone ); ?>', whatsapp: '<?php echo esc_js( $whatsapp ); ?>' }
+        );
+    }
+});
+</script>
 
 <?php get_footer(); ?>
