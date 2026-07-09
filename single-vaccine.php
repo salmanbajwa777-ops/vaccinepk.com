@@ -40,7 +40,7 @@ switch ($availability) {
     case 'in_stock':
     case 'yes':
     case '1':
-        $availability_badge = '<span class="badge" style="background: #7bb14f; color: white; font-size: 14px;"><i class="bi bi-check-circle-fill"></i> In Stock</span>';
+        $availability_badge = '<span class="badge" style="background: var(--color-green, #6bb63f); color: white; font-size: 14px;"><i class="bi bi-check-circle-fill"></i> In Stock</span>';
         $is_available = true;
         break;
     case 'out_of_stock':
@@ -299,7 +299,7 @@ switch ($availability) {
                                     case 'in_stock':
                                     case 'yes':
                                     case '1':
-                                        echo '<span style="color: #7bb14f;">Available</span>';
+                                        echo '<span style="color: var(--color-green, #6bb63f);">Available</span>';
                                         break;
                                     case 'out_of_stock':
                                     case 'no':
