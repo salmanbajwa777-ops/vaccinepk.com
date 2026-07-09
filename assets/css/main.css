@@ -3,6 +3,9 @@
    Blue leads (navy/trust-blue = dominant); gold is rare (one premium moment
    per screen); green means verified only (never decorative). */
 :root {
+  --font-display: "Saira", system-ui, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+
   --color-navy: #0a2a38;
   --color-blue: #0b5c87;
   --color-green: #6bb63f;
@@ -43,14 +46,7 @@
 }
 
 body {
-  font-family:
-    "Manrope",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Arial,
-    sans-serif;
+  font-family: var(--font-body);
   background-color: var(--color-ivory);
   color: var(--color-ink);
   line-height: 1.7;
@@ -58,9 +54,9 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-family: var(--font-display);
   color: var(--color-ink-strong);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 /* ==================== HEADER STYLES ==================== */
@@ -106,7 +102,7 @@ header .nav {
 
 header .nav a {
   color: var(--color-ink-strong);
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-display);
   font-weight: 500;
   margin-left: 24px;
   text-decoration: none;
@@ -141,8 +137,8 @@ header .nav a:hover::after {
   padding: 12px 28px;
   border-radius: 999px;
   text-decoration: none;
-  font-family: "Manrope", sans-serif;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   transition: var(--transition);
   border: none;
   box-shadow: 0 10px 24px -10px rgba(201, 162, 75, 0.55);
@@ -161,8 +157,8 @@ header .nav a:hover::after {
   padding: 12px 28px;
   border-radius: 999px;
   text-decoration: none;
-  font-family: "Manrope", sans-serif;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   transition: var(--transition);
   border: 2px solid var(--color-blue);
   display: inline-block;
@@ -279,7 +275,7 @@ header .nav a:hover::after {
 }
 
 .hero-section p {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-body);
   font-size: 18px;
   margin-bottom: 35px;
   color: var(--color-ink-on-navy);
@@ -361,7 +357,7 @@ header .nav a:hover::after {
 
 .services-section .section-subtitle {
   text-align: center;
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-body);
   font-size: 18px;
   color: var(--color-ink);
   margin-bottom: 60px;
@@ -453,7 +449,7 @@ header .nav a:hover::after {
 
 .service-box p,
 .service-card p {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-body);
   color: var(--color-ink);
   font-size: 15px;
   line-height: 1.7;
@@ -475,7 +471,7 @@ header .nav a:hover::after {
 }
 
 .appointment-section > .container > .row > div > p {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-body);
   font-size: 18px;
   color: var(--color-ink-on-navy);
   margin-bottom: 40px;
@@ -515,7 +511,7 @@ header .nav a:hover::after {
 }
 
 .faq-card h5 {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-display);
   font-size: 17px;
   font-weight: 700;
   margin-bottom: 12px;
@@ -523,7 +519,7 @@ header .nav a:hover::after {
 }
 
 .faq-card p {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-body);
   color: var(--color-ink);
   margin-bottom: 0;
   line-height: 1.7;
@@ -560,7 +556,7 @@ footer {
 }
 
 .footer-section ul li a {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-body);
   color: var(--color-ink-on-navy);
   text-decoration: none;
   transition: var(--transition);
@@ -575,7 +571,7 @@ footer {
   border-top: 1px solid rgba(246, 243, 236, 0.15);
   padding-top: 25px;
   text-align: center;
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-body);
   color: var(--color-ink-on-navy);
 }
 
@@ -623,7 +619,7 @@ footer {
   color: var(--color-green);
   border: 1px solid rgba(107, 182, 63, 0.3);
   border-radius: 999px;
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
@@ -788,7 +784,7 @@ footer {
   border-bottom: none;
 }
 .search-result-title {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   color: var(--color-blue);
   margin-bottom: 5px;
@@ -798,7 +794,7 @@ footer {
   flex-wrap: wrap;
 }
 .search-result-meta {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
   color: var(--color-ink);
 }
@@ -810,7 +806,7 @@ footer {
   margin-right: 8px;
 }
 .search-type-badge {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-display);
   font-size: 11px;
   font-weight: 700;
   padding: 2px 10px;
@@ -841,7 +837,7 @@ footer {
   flex-wrap: wrap;
 }
 .contact-btn {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-display);
   padding: 10px 20px;
   border-radius: 8px;
   text-decoration: none;

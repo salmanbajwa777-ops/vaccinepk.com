@@ -106,8 +106,8 @@ switch ($availability) {
 
 .price-tag {
     font-size: 36px;
-    font-weight: 700;
-    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 800;
+    font-family: var(--font-display, "Saira", system-ui, sans-serif);
     color: var(--color-gold, #c9a24b);
     margin: 20px 0;
 }
