@@ -169,7 +169,7 @@ header .nav a:hover::after {
 .site-title {
     font-family: "Ubuntu", "Segoe UI", sans-serif;
     font-weight: 700;
-    font-size: 1.3rem;
+    font-size: 2rem;
     color: #0b2540;
     text-decoration: none;
     line-height: 1;
@@ -178,6 +178,9 @@ header .nav a:hover::after {
 @media (max-width: 768px) {
     .site-logo img {
         max-height: 40px;
+    }
+    .site-title {
+        font-size: 1.65rem;
     }
 }
 
