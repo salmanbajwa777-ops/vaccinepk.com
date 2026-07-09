@@ -160,6 +160,14 @@ header .nav a:hover::after {
     height: auto;
 }
 
+.site-title {
+    font-family: "Ubuntu", "Segoe UI", sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    text-decoration: none;
+}
+
 @media (max-width: 768px) {
     .site-logo img {
         max-height: 40px;
