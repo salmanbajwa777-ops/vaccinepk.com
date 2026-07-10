@@ -42,13 +42,13 @@ get_header();
                     <img src="https://images.unsplash.com/photo-1612277795421-9bc7706a4a34?auto=format&fit=crop&w=1000&q=80" 
                          alt="Child Vaccination" 
                          style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
-                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 42, 56, 0.95) 0%, rgba(10, 42, 56, 0.6) 50%, rgba(10, 42, 56, 0.2) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
+                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 24, 32, 0.92) 0%, rgba(10, 24, 32, 0.55) 35%, rgba(10, 24, 32, 0.05) 65%, rgba(10, 24, 32, 0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
                         <div class="text-white">
                             <div class="mb-4">
                                 <i class="bi bi-heart-pulse-fill" style="font-size: 64px; opacity: 0.9;"></i>
                             </div>
-                            <h2 class="fw-bold mb-3 display-6">Child Vaccination</h2>
-                            <p class="mb-4 fs-5" style="opacity: 0.95;">Complete immunization schedule for infants and children following WHO & EPI guidelines.</p>
+                            <h2 class="fw-bold mb-3 display-6" style="text-shadow: 0 2px 14px rgba(0,0,0,0.45);">Child Vaccination</h2>
+                            <p class="mb-4 fs-5" style="opacity: 0.95; text-shadow: 0 1px 8px rgba(0,0,0,0.4);">Complete immunization schedule for infants and children following WHO & EPI guidelines.</p>
                             <div class="d-flex flex-wrap gap-3 mb-4">
                                 <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-calendar-event"></i> Birth to 18 years</span>
                                 <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-house-heart"></i> Home service available</span>
@@ -69,13 +69,13 @@ get_header();
                     <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000&q=80" 
                          alt="Adult Vaccination" 
                          style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
-                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 42, 56, 0.95) 0%, rgba(10, 42, 56, 0.6) 50%, rgba(10, 42, 56, 0.2) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
+                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 24, 32, 0.92) 0%, rgba(10, 24, 32, 0.55) 35%, rgba(10, 24, 32, 0.05) 65%, rgba(10, 24, 32, 0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
                         <div class="text-white">
                             <div class="mb-4">
                                 <i class="bi bi-person-hearts" style="font-size: 64px; opacity: 0.9;"></i>
                             </div>
-                            <h2 class="fw-bold mb-3 display-6">Adult Vaccination</h2>
-                            <p class="mb-4 fs-5" style="opacity: 0.95;">Essential immunizations for adults including boosters and preventive vaccines.</p>
+                            <h2 class="fw-bold mb-3 display-6" style="text-shadow: 0 2px 14px rgba(0,0,0,0.45);">Adult Vaccination</h2>
+                            <p class="mb-4 fs-5" style="opacity: 0.95; text-shadow: 0 1px 8px rgba(0,0,0,0.4);">Essential immunizations for adults including boosters and preventive vaccines.</p>
                             <div class="d-flex flex-wrap gap-3 mb-4">
                                 <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-people"></i> 18+ years</span>
                                 <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-clipboard2-pulse"></i> Health screening</span>
@@ -96,13 +96,13 @@ get_header();
                     <img src="https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=1000&q=80" 
                          alt="Flu Vaccination" 
                          style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
-                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 42, 56, 0.95) 0%, rgba(10, 42, 56, 0.6) 50%, rgba(10, 42, 56, 0.2) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
+                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 24, 32, 0.92) 0%, rgba(10, 24, 32, 0.55) 35%, rgba(10, 24, 32, 0.05) 65%, rgba(10, 24, 32, 0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
                         <div class="text-white">
                             <div class="mb-4">
                                 <i class="bi bi-shield-fill-plus" style="font-size: 64px; opacity: 0.9;"></i>
                             </div>
-                            <h2 class="fw-bold mb-3 display-6">Flu Vaccination</h2>
-                            <p class="mb-4 fs-5" style="opacity: 0.95;">Seasonal flu protection for all ages. Protect yourself and your loved ones.</p>
+                            <h2 class="fw-bold mb-3 display-6" style="text-shadow: 0 2px 14px rgba(0,0,0,0.45);">Flu Vaccination</h2>
+                            <p class="mb-4 fs-5" style="opacity: 0.95; text-shadow: 0 1px 8px rgba(0,0,0,0.4);">Seasonal flu protection for all ages. Protect yourself and your loved ones.</p>
                             <div class="d-flex flex-wrap gap-3 mb-4">
                                 <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-circle"></i> All ages</span>
                                 <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-calendar3"></i> Annual dose</span>
@@ -123,13 +123,13 @@ get_header();
                     <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1000&q=80" 
                          alt="Travel Vaccination" 
                          style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
-                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 42, 56, 0.95) 0%, rgba(10, 42, 56, 0.6) 50%, rgba(10, 42, 56, 0.2) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
+                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 24, 32, 0.92) 0%, rgba(10, 24, 32, 0.55) 35%, rgba(10, 24, 32, 0.05) 65%, rgba(10, 24, 32, 0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
                         <div class="text-white">
                             <div class="mb-4">
                                 <i class="bi bi-airplane-fill" style="font-size: 64px; opacity: 0.9;"></i>
                             </div>
-                            <h2 class="fw-bold mb-3 display-6">Travel Vaccination</h2>
-                            <p class="mb-4 fs-5" style="opacity: 0.95;">Pre-travel immunizations for domestic and international destinations.</p>
+                            <h2 class="fw-bold mb-3 display-6" style="text-shadow: 0 2px 14px rgba(0,0,0,0.45);">Travel Vaccination</h2>
+                            <p class="mb-4 fs-5" style="opacity: 0.95; text-shadow: 0 1px 8px rgba(0,0,0,0.4);">Pre-travel immunizations for domestic and international destinations.</p>
                             <div class="d-flex flex-wrap gap-3 mb-4">
                                 <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-globe"></i> All destinations</span>
                                 <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-file-earmark-medical"></i> Verified</span>
