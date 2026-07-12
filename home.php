@@ -247,13 +247,22 @@ $homepage_faqs = [
                 $brands_by_vaccine[ $vname ][] = $b;
             }
 
+            // Known alias pairs where the pricing page's vaccine_name doesn't share
+            // any substring with the homepage display label.
+            $msv_aliases = [
+                'Meningococcal' => 'Men-ACYW135',
+            ];
+
             $msv_cards = [];
             foreach ( $msv_order as $label ) {
                 $match_key = null;
+                $aliases   = array_filter( [ $label, $msv_aliases[ $label ] ?? null ] );
                 foreach ( $brands_by_vaccine as $vname => $vbrands ) {
-                    if ( strcasecmp( $vname, $label ) === 0 || stripos( $vname, $label ) !== false || stripos( $label, $vname ) !== false ) {
-                        $match_key = $vname;
-                        break;
+                    foreach ( $aliases as $needle ) {
+                        if ( strcasecmp( $vname, $needle ) === 0 || stripos( $vname, $needle ) !== false || stripos( $needle, $vname ) !== false ) {
+                            $match_key = $vname;
+                            break 2;
+                        }
                     }
                 }
 
