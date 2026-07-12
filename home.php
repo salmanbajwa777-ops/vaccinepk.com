@@ -14,6 +14,14 @@ $whatsapp      = $site_settings->field( 'whatsapp_number' );
 
 $schedule_stages = function_exists( 'vaccination_centre_schedule_stages' ) ? vaccination_centre_schedule_stages() : [];
 
+// Site logo mark, used as the fallback image for cards with no product photo
+// (instead of a generic Bootstrap shield icon).
+$vaccinepk_logo_url = '';
+if ( has_custom_logo() ) {
+    $logo_id            = get_theme_mod( 'custom_logo' );
+    $vaccinepk_logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'medium' ) : '';
+}
+
 // ---- Section 2: Knowledge Categories ----
 $knowledge_categories = [
     [ 'icon' => 'bi-shield-fill-check',   'title' => 'Vaccines',            'url' => home_url( '/vaccines' ) ],
@@ -297,6 +305,8 @@ $homepage_faqs = [
                         <div class="vsv-card-img">
                             <?php if ( $card['thumb'] ) : ?>
                                 <img src="<?php echo esc_url( $card['thumb'] ); ?>" alt="<?php echo esc_attr( $card['label'] ); ?>">
+                            <?php elseif ( $vaccinepk_logo_url ) : ?>
+                                <img src="<?php echo esc_url( $vaccinepk_logo_url ); ?>" alt="<?php echo esc_attr( $card['label'] ); ?>" class="vsv-fallback-logo">
                             <?php else : ?>
                                 <i class="bi bi-shield-fill-check"></i>
                             <?php endif; ?>
@@ -467,6 +477,8 @@ $homepage_faqs = [
                             <div class="brand-home-img">
                                 <?php if ( $thumb ) : ?>
                                     <img src="<?php echo esc_url( $thumb ); ?>" alt="<?php echo esc_attr( $brand->post_title ); ?>">
+                                <?php elseif ( $vaccinepk_logo_url ) : ?>
+                                    <img src="<?php echo esc_url( $vaccinepk_logo_url ); ?>" alt="<?php echo esc_attr( $brand->post_title ); ?>" class="brand-home-fallback-logo">
                                 <?php else : ?>
                                     <i class="bi bi-shield-fill-check"></i>
                                 <?php endif; ?>

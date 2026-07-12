@@ -493,6 +493,13 @@ header .nav a:hover::after {
   color: var(--color-blue);
 }
 
+.vsv-card-img img.vsv-fallback-logo {
+  width: 56%;
+  height: 56%;
+  object-fit: contain;
+  opacity: 0.85;
+}
+
 .vsv-badge {
   position: absolute;
   top: 12px;
@@ -599,6 +606,14 @@ header .nav a:hover::after {
 .vsv-card-oos .vsv-card-body h6,
 .vsv-card-oos .vsv-card-body p {
   color: var(--color-label-muted);
+}
+
+/* Vaccine Brands grid fallback logo (component has no other dedicated CSS yet) */
+.brand-home-img img.brand-home-fallback-logo {
+  max-width: 56%;
+  max-height: 56%;
+  object-fit: contain;
+  opacity: 0.85;
 }
 
 .vsv-book-disabled {
