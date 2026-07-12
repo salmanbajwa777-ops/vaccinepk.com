@@ -107,7 +107,7 @@ $homepage_faqs = [
         <div class="row align-items-center">
 
             <div class="col-lg-6 col-md-12">
-                <span class="badge-custom">Pakistan's Vaccine Knowledge Platform</span>
+                <span class="badge-custom">Know Before You Go</span>
                 <h1>
                     Pakistan's Most Trusted
                     <span>Vaccine &amp; Vaccination Resource</span>
