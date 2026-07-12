@@ -129,11 +129,23 @@ $homepage_faqs = [
                     <div id="homeSearchResults" class="search-results home-search-results"></div>
                 </div>
 
-                <!-- Quick Chips -->
+                <!-- Quick Chips — ranked by real 7-day search/click volume, see vaccinepk_get_ranked_chips() -->
                 <div class="home-search-chips mb-4">
-                    <?php foreach ( [ 'HPV', 'Flu', 'Typhoid', 'MMR', 'Chickenpox', 'Rabies', 'RSV', 'Travel Vaccines', 'Pregnancy', 'Adults' ] as $chip ) : ?>
-                        <a href="<?php echo esc_url( home_url( '/vaccines?s=' . urlencode( $chip ) ) ); ?>" class="home-chip"><?php echo esc_html( $chip ); ?></a>
+                    <?php foreach ( vaccinepk_get_ranked_chips( 7 ) as $chip ) : ?>
+                        <a href="<?php echo esc_url( home_url( '/vaccines?s=' . urlencode( $chip['term'] ) ) ); ?>"
+                           class="home-chip<?php echo $chip['is_top'] ? ' home-chip-top' : ''; ?>"
+                           data-chip-term="<?php echo esc_attr( $chip['term'] ); ?>">
+                            <span class="home-chip-rank"><?php echo (int) $chip['rank']; ?></span>
+                            <?php echo esc_html( $chip['term'] ); ?>
+                            <?php if ( $chip['trending'] ) : ?>
+                                <svg class="home-chip-trend" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="3,17 10,10 14,14 21,6"/><polyline points="15,6 21,6 21,12"/></svg>
+                            <?php endif; ?>
+                        </a>
                     <?php endforeach; ?>
+                    <a href="<?php echo esc_url( home_url( '/vaccines' ) ); ?>" class="home-chip home-chip-more">
+                        More
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="9,6 15,12 9,18"/></svg>
+                    </a>
                 </div>
             </div>
 
@@ -201,54 +213,107 @@ $homepage_faqs = [
         </div>
         <div class="row g-4">
             <?php
-            $popular_vaccines = pods( 'vaccine', [ 'limit' => 8, 'orderby' => 'menu_order, post_title', 'order' => 'ASC' ] );
+            // Most Searched Vaccines: curated list, one representative brand per vaccine.
+            // Brand-selection logic (cheapest/most relevant of multiple brands) is a
+            // separate future task — for now we take the first published brand found
+            // for each vaccine name as the representative.
+            $msv_order = [
+                'BCG',
+                'Vaxapox',
+                'Prevenar',
+                'Hexaxim',
+                'Rotarix',
+                'MMR',
+                'Boostrix',
+                'Meningococcal',
+                'Typhoid',
+                'Yellow Fever',
+            ];
 
-            if ( $popular_vaccines->total() > 0 ) :
-                while ( $popular_vaccines->fetch() ) :
-                    $v_title       = $popular_vaccines->field( 'post_title' );
-                    $v_description = $popular_vaccines->field( 'vaccine_description' );
-                    $v_age         = $popular_vaccines->field( 'age_requirement' );
-                    $v_availability = $popular_vaccines->field( 'availability' );
-                    $v_permalink   = $popular_vaccines->field( 'permalink' );
-                    $v_thumb       = get_the_post_thumbnail_url( $popular_vaccines->id(), 'medium' );
+            $all_brands = get_posts( [
+                'post_type'      => 'brand',
+                'posts_per_page' => -1,
+                'post_status'    => 'publish',
+            ] );
 
-                    $avail_badge = '';
-                    if ( in_array( $v_availability, [ 'in_stock', 'yes', '1' ], true ) ) {
-                        $avail_badge = '<span class="vsv-badge vsv-badge-in">In Stock</span>';
-                    } elseif ( in_array( $v_availability, [ 'out_of_stock', 'no', '0' ], true ) ) {
-                        $avail_badge = '<span class="vsv-badge vsv-badge-out">Out of Stock</span>';
-                    } elseif ( $v_availability === 'coming_soon' ) {
-                        $avail_badge = '<span class="vsv-badge vsv-badge-soon">Coming Soon</span>';
+            // Group brand posts by their vaccine_name meta so we can match against
+            // $msv_order using a loose (case-insensitive, partial) match — the
+            // pricing page's vaccine_name values don't necessarily match these
+            // display labels exactly (e.g. "Typhoid TCV" vs "Typhoid").
+            $brands_by_vaccine = [];
+            foreach ( $all_brands as $b ) {
+                $vname = get_post_meta( $b->ID, 'vaccine_name', true );
+                if ( ! $vname ) continue;
+                $brands_by_vaccine[ $vname ][] = $b;
+            }
+
+            $msv_cards = [];
+            foreach ( $msv_order as $label ) {
+                $match_key = null;
+                foreach ( $brands_by_vaccine as $vname => $vbrands ) {
+                    if ( strcasecmp( $vname, $label ) === 0 || stripos( $vname, $label ) !== false || stripos( $label, $vname ) !== false ) {
+                        $match_key = $vname;
+                        break;
                     }
-                    ?>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="vsv-card">
-                            <div class="vsv-card-img">
-                                <?php if ( $v_thumb ) : ?>
-                                    <img src="<?php echo esc_url( $v_thumb ); ?>" alt="<?php echo esc_attr( $v_title ); ?>">
+                }
+
+                $rep          = $match_key ? $brands_by_vaccine[ $match_key ][0] : null;
+                $thumb        = $rep ? get_the_post_thumbnail_url( $rep->ID, 'medium' ) : false;
+                $avail_raw    = $rep ? get_post_meta( $rep->ID, 'availability', true ) : '';
+                $is_available = ( $avail_raw === '1' || strtolower( $avail_raw ) === 'yes' || $avail_raw === true );
+                $description  = $rep ? wp_trim_words( get_post_field( 'post_content', $rep->ID ), 12 ) : '';
+                $disease      = $rep ? get_post_meta( $rep->ID, 'disease', true ) : '';
+                $permalink    = $rep ? get_permalink( $rep->ID ) : site_url( '/pricing' );
+
+                $msv_cards[] = [
+                    'label'       => $label,
+                    'thumb'       => $thumb,
+                    'available'   => $rep ? $is_available : false,
+                    'has_data'    => (bool) $rep,
+                    'description' => $description,
+                    'age'         => $disease,
+                    'permalink'   => $permalink,
+                ];
+            }
+
+            foreach ( $msv_cards as $card ) :
+                // "Out of stock" only applies once we have real brand data saying so.
+                // A vaccine with no matched brand record is unknown, not in-stock —
+                // treat it the same as out-of-stock visually rather than claim availability.
+                $out_of_stock = ! $card['has_data'] || ! $card['available'];
+                $card_classes = 'vsv-card' . ( $out_of_stock ? ' vsv-card-oos' : '' );
+                ?>
+                <div class="col-lg-3 col-md-6">
+                    <div class="<?php echo esc_attr( $card_classes ); ?>">
+                        <div class="vsv-card-img">
+                            <?php if ( $card['thumb'] ) : ?>
+                                <img src="<?php echo esc_url( $card['thumb'] ); ?>" alt="<?php echo esc_attr( $card['label'] ); ?>">
+                            <?php else : ?>
+                                <i class="bi bi-shield-fill-check"></i>
+                            <?php endif; ?>
+                            <?php if ( $out_of_stock ) : ?>
+                                <span class="vsv-badge vsv-badge-out"><?php echo $card['has_data'] ? 'Out of Stock' : 'Coming Soon'; ?></span>
+                            <?php else : ?>
+                                <span class="vsv-badge vsv-badge-in">In Stock</span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="vsv-card-body">
+                            <h6><?php echo esc_html( $card['label'] ); ?></h6>
+                            <?php if ( $card['description'] ) : ?><p><?php echo esc_html( $card['description'] ); ?></p><?php endif; ?>
+                            <?php if ( $card['age'] ) : ?><p class="vsv-age"><i class="bi bi-calendar-check"></i> <?php echo esc_html( $card['age'] ); ?></p><?php endif; ?>
+                            <div class="vsv-actions">
+                                <a href="<?php echo esc_url( $card['permalink'] ); ?>" class="vsv-learn">Learn More</a>
+                                <?php if ( $out_of_stock ) : ?>
+                                    <span class="vsv-book vsv-book-disabled" aria-disabled="true">Book</span>
                                 <?php else : ?>
-                                    <i class="bi bi-shield-fill-check"></i>
-                                <?php endif; ?>
-                                <?php echo $avail_badge; ?>
-                            </div>
-                            <div class="vsv-card-body">
-                                <h6><?php echo esc_html( $v_title ); ?></h6>
-                                <p><?php echo esc_html( wp_trim_words( $v_description, 12 ) ); ?></p>
-                                <?php if ( $v_age ) : ?><p class="vsv-age"><i class="bi bi-calendar-check"></i> <?php echo esc_html( $v_age ); ?></p><?php endif; ?>
-                                <div class="vsv-actions">
-                                    <a href="<?php echo esc_url( $v_permalink ); ?>" class="vsv-learn">Learn More</a>
                                     <a href="<?php echo esc_url( site_url( '/booking' ) ); ?>" class="vsv-book">Book</a>
-                                </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
-                    <?php
-                endwhile;
-            else :
-                ?>
-                <div class="col-12"><p class="text-muted text-center">Vaccine listings are being added. Please check back soon.</p></div>
+                </div>
                 <?php
-            endif;
+            endforeach;
             ?>
         </div>
     </div>
