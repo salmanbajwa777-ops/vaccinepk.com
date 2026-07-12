@@ -300,7 +300,7 @@ $homepage_faqs = [
                 $out_of_stock = ! $card['has_data'] || ! $card['available'];
                 $card_classes = 'vsv-card' . ( $out_of_stock ? ' vsv-card-oos' : '' );
                 ?>
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <div class="<?php echo esc_attr( $card_classes ); ?>">
                         <div class="vsv-card-img">
                             <?php if ( $card['thumb'] ) : ?>
@@ -334,6 +334,9 @@ $homepage_faqs = [
                 <?php
             endforeach;
             ?>
+        </div>
+        <div class="text-center mt-5">
+            <a href="<?php echo esc_url( home_url( '/vaccines' ) ); ?>" class="btn-outline-primary">Browse All Vaccines</a>
         </div>
     </div>
 </section>
