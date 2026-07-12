@@ -129,6 +129,8 @@ function vaccine_search_ajax() {
         return;
     }
 
+    vaccinepk_record_chip_search( $query );
+
     $results = [];
     $like    = esc_sql( $query );
 
@@ -229,6 +231,123 @@ function vaccine_search_ajax() {
 }
 add_action( 'wp_ajax_vaccine_search',        'vaccine_search_ajax' );
 add_action( 'wp_ajax_nopriv_vaccine_search', 'vaccine_search_ajax' );
+
+
+/* ==========================================================================
+   4. HOMEPAGE SEARCH CHIPS — ranked by real search/click volume
+      Table: {$wpdb->prefix}chip_search_events (see sql/2026-07-10-chip-search-stats.sql)
+      One row per search/click event so ranking can use a genuine rolling 7-day
+      window — old spikes age out on their own instead of camping on #1 forever.
+      Falls back to the original static list if the table doesn't exist yet,
+      so this never breaks the homepage on a site where the migration hasn't run.
+   ========================================================================== */
+
+define( 'VACCINEPK_STATIC_CHIPS', [ 'HPV', 'Flu', 'Typhoid', 'MMR', 'Chickenpox', 'Rabies', 'RSV', 'Travel Vaccines', 'Pregnancy', 'Adults' ] );
+
+function vaccinepk_chip_events_table_exists() {
+    global $wpdb;
+    static $exists = null;
+    if ( $exists === null ) {
+        $table  = $wpdb->prefix . 'chip_search_events';
+        $exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table;
+    }
+    return $exists;
+}
+
+/**
+ * Log one search/click event for a chip term. Unrelated free-text searches
+ * still call this (see vaccine_search_ajax()) — it's fine for the events table
+ * to accumulate any typed term, since ranking only ever reads the top N anyway.
+ */
+function vaccinepk_record_chip_search( $term ) {
+    if ( ! vaccinepk_chip_events_table_exists() ) return;
+
+    global $wpdb;
+    $table    = $wpdb->prefix . 'chip_search_events';
+    $term     = trim( $term );
+    $term_key = strtolower( $term );
+    if ( $term_key === '' ) return;
+
+    $wpdb->insert(
+        $table,
+        [ 'term' => $term, 'term_key' => $term_key, 'searched_at' => current_time( 'mysql' ) ],
+        [ '%s', '%s', '%s' ]
+    );
+}
+
+/**
+ * Chip click is a stronger, unambiguous signal than a typed query (no partial-match
+ * guessing needed), so it's tracked separately via its own AJAX action.
+ */
+function vaccinepk_track_chip_click_ajax() {
+    check_ajax_referer( 'vaccination_booking_nonce', 'nonce' );
+    $term = isset( $_POST['term'] ) ? sanitize_text_field( $_POST['term'] ) : '';
+    vaccinepk_record_chip_search( $term );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_track_chip_click',        'vaccinepk_track_chip_click_ajax' );
+add_action( 'wp_ajax_nopriv_track_chip_click', 'vaccinepk_track_chip_click_ajax' );
+
+/**
+ * Returns up to $limit chips ranked by rolling 7-day search/click volume, each as:
+ * [ 'term' => string, 'rank' => int, 'is_top' => bool, 'trending' => bool ]
+ * 'trending' flags any non-#1 term whose 7-day count beats its prior 7-day count
+ * (days 8–14 ago) — a real week-over-week rise, not just recent activity.
+ */
+function vaccinepk_get_ranked_chips( $limit = 7 ) {
+    if ( ! vaccinepk_chip_events_table_exists() ) {
+        $chips = [];
+        foreach ( array_slice( VACCINEPK_STATIC_CHIPS, 0, $limit ) as $i => $term ) {
+            $chips[] = [ 'term' => $term, 'rank' => $i + 1, 'is_top' => $i === 0, 'trending' => false ];
+        }
+        return $chips;
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'chip_search_events';
+
+    $current_week = $wpdb->get_results( $wpdb->prepare(
+        "SELECT term, term_key, COUNT(*) AS cnt
+         FROM {$table}
+         WHERE searched_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+         GROUP BY term_key
+         ORDER BY cnt DESC, MAX(searched_at) DESC
+         LIMIT %d",
+        $limit
+    ) );
+
+    if ( ! $current_week ) {
+        $chips = [];
+        foreach ( array_slice( VACCINEPK_STATIC_CHIPS, 0, $limit ) as $i => $term ) {
+            $chips[] = [ 'term' => $term, 'rank' => $i + 1, 'is_top' => $i === 0, 'trending' => false ];
+        }
+        return $chips;
+    }
+
+    $term_keys    = wp_list_pluck( $current_week, 'term_key' );
+    $placeholders = implode( ', ', array_fill( 0, count( $term_keys ), '%s' ) );
+    $prior_week_counts = $wpdb->get_results( $wpdb->prepare(
+        "SELECT term_key, COUNT(*) AS cnt
+         FROM {$table}
+         WHERE searched_at >= DATE_SUB(NOW(), INTERVAL 14 DAY)
+           AND searched_at <  DATE_SUB(NOW(), INTERVAL 7 DAY)
+           AND term_key IN ({$placeholders})
+         GROUP BY term_key",
+        $term_keys
+    ), OBJECT_K );
+
+    $chips = [];
+    foreach ( $current_week as $i => $row ) {
+        $prior_count = isset( $prior_week_counts[ $row->term_key ] ) ? (int) $prior_week_counts[ $row->term_key ]->cnt : 0;
+        $chips[] = [
+            'term'     => $row->term,
+            'rank'     => $i + 1,
+            'is_top'   => $i === 0,
+            'trending' => $i > 0 && (int) $row->cnt > $prior_count,
+        ];
+    }
+    return $chips;
+}
 
 
 /* ==========================================================================

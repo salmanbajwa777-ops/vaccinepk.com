@@ -6,6 +6,30 @@
  * but share the same AJAX action, nonce, and result-rendering logic.
  */
 
+/**
+ * Fires a non-blocking beacon so a chip click counts toward its search-volume
+ * rank (see vaccinepk_get_ranked_chips() in functions.php). Never delays or
+ * blocks the link's own navigation.
+ */
+function vaccinationCentreInitChipTracking() {
+    document.querySelectorAll( '.home-chip[data-chip-term]' ).forEach( function ( chip ) {
+        chip.addEventListener( 'click', function () {
+            const formData = new FormData();
+            formData.append( 'action', 'track_chip_click' );
+            formData.append( 'nonce', vaccination_ajax.nonce );
+            formData.append( 'term', chip.getAttribute( 'data-chip-term' ) );
+
+            if ( navigator.sendBeacon ) {
+                navigator.sendBeacon( vaccination_ajax.ajax_url, formData );
+            } else {
+                fetch( vaccination_ajax.ajax_url, { method: 'POST', credentials: 'same-origin', body: formData, keepalive: true } );
+            }
+        } );
+    } );
+}
+
+document.addEventListener( 'DOMContentLoaded', vaccinationCentreInitChipTracking );
+
 function vaccinationCentreTypeBadge( type ) {
     const badges = {
         vaccine: '<span class="search-type-badge type-vaccine">Vaccine</span>',
