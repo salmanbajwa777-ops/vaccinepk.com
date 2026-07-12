@@ -226,7 +226,6 @@ $homepage_faqs = [
             // separate future task — for now we take the first published brand found
             // for each vaccine name as the representative.
             $msv_order = [
-                'BCG',
                 'Vaxapox',
                 'Prevenar',
                 'Hexaxim',
@@ -259,6 +258,7 @@ $homepage_faqs = [
             // any substring with the homepage display label.
             $msv_aliases = [
                 'Meningococcal' => 'Men-ACYW135',
+                'Yellow Fever'  => 'Stamaril',
             ];
 
             $msv_cards = [];
