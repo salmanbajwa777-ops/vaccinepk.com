@@ -2,28 +2,55 @@
 /**
  * Template Name: Vaccine Pricing Page
  */
-get_header(); ?>
+get_header();
+
+$site_settings = pods( 'site_contact_settings' );
+$whatsapp      = $site_settings->field( 'whatsapp_number' );
+$whatsapp_link = preg_replace( '/[^0-9]/', '', (string) $whatsapp );
+
+// Flat charge added to every quote, same figure used across the site's booking flow.
+$vaccination_charge = 1800;
+
+$category_tabs = [
+    'all'                   => 'All',
+    'child-vaccines'        => 'Child Vaccines',
+    'adult-vaccines'        => 'Adult Vaccines',
+    'travel-vaccines'       => 'Travel Vaccines',
+    'flu-vaccines'          => 'Flu Vaccines',
+    'special-circumstances' => 'Special Circumstances',
+];
+?>
 
 <style>
 /* ===== PRICING PAGE STYLES ===== */
 .vc-pricing-wrap {
   max-width: 1200px;
-  margin: 60px auto;
-  padding: 0 20px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
   font-family: 'Segoe UI', sans-serif;
 }
-.vc-pricing-wrap h1.page-title {
-  text-align: center;
-  font-size: 2.5rem;
-  color: #0a2a38;
-  margin-bottom: 10px;
+
+/* CATEGORY TABS */
+.vc-cat-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 0 40px;
 }
-.vc-pricing-wrap .subtitle {
-  text-align: center;
+.vc-cat-tab {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 50px;
+  border: 1.5px solid #e7e0d3;
+  background: #fff;
   color: #4a575e;
-  margin-bottom: 50px;
-  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all .2s ease;
 }
+.vc-cat-tab:hover { border-color: #0b5c87; color: #0b5c87; }
+.vc-cat-tab.active { background: #0a2a38; border-color: #0a2a38; color: #fff; }
 
 /* GROUP HEADING */
 .vaccine-group-title {
@@ -36,6 +63,7 @@ get_header(); ?>
   display: inline-block;
   letter-spacing: 0.5px;
 }
+.vaccine-group:first-of-type .vaccine-group-title { margin-top: 0; }
 
 /* GRID */
 .vaccine-grid {
@@ -53,7 +81,6 @@ get_header(); ?>
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   overflow: hidden;
-  cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
   position: relative;
 }
@@ -65,6 +92,7 @@ get_header(); ?>
   width: 100%;
   height: 160px;
   object-fit: cover;
+  cursor: pointer;
 }
 .vc-card-img-placeholder {
   width: 100%;
@@ -74,6 +102,7 @@ get_header(); ?>
   align-items: center;
   justify-content: center;
   font-size: 3rem;
+  cursor: pointer;
 }
 .vc-card-body {
   padding: 18px;
@@ -83,6 +112,7 @@ get_header(); ?>
   color: #0a2a38;
   margin: 0 0 10px;
   font-weight: 700;
+  cursor: pointer;
 }
 .vc-card-meta {
   list-style: none;
@@ -123,6 +153,95 @@ get_header(); ?>
 .avail-yes { background: #eaf3e4; color: #5a9c34; }
 .avail-no  { background: #fde8e8; color: #c0392b; }
 
+/* SELECT CHECKBOX ON CARD */
+.vc-select-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-top: 1px solid #e7e0d3;
+  background: #fafaf8;
+}
+.vc-select-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #0b5c87;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.vc-select-row label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #4a575e;
+  cursor: pointer;
+  user-select: none;
+}
+.vc-card.vc-card-selected {
+  box-shadow: 0 0 0 2px #0b5c87, 0 12px 35px rgba(0,0,0,0.15);
+}
+.vc-card-unavailable .vc-select-row { opacity: 0.5; }
+.vc-card-unavailable input[type="checkbox"] { cursor: not-allowed; }
+
+/* ===== STICKY QUOTE BAR ===== */
+.vc-quote-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #0a2a38;
+  color: #fff;
+  z-index: 500;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.2);
+}
+.vc-quote-bar.visible { transform: translateY(0); }
+.vc-quote-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.vc-quote-left { font-size: 0.85rem; line-height: 1.5; }
+.vc-quote-left .vc-quote-count { font-weight: 800; font-size: 0.95rem; }
+.vc-quote-left .vc-quote-charge { opacity: 0.72; font-size: 0.76rem; }
+.vc-quote-total {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #c9a24b;
+  white-space: nowrap;
+}
+.vc-quote-actions { display: flex; gap: 10px; }
+.vc-quote-btn {
+  background: #c9a24b;
+  color: #0a2a38;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 24px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.vc-quote-clear {
+  background: transparent;
+  color: rgba(255,255,255,0.75);
+  border: 1px solid rgba(255,255,255,0.3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 50px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
 /* ===== MODAL ===== */
 .vc-modal-overlay {
   display: none;
@@ -146,28 +265,15 @@ get_header(); ?>
   position: relative;
   max-height: 88vh;
 
-  /* Custom scrollbar — theme colors */
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #0b5c87 #eaf2f6;
 }
 
-/* Webkit custom scrollbar (Chrome, Safari, Edge) */
-.vc-modal-box::-webkit-scrollbar {
-  width: 7px;
-}
-.vc-modal-box::-webkit-scrollbar-track {
-  background: #eaf2f6;
-  border-radius: 0 20px 20px 0;
-}
-.vc-modal-box::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #0a2a38, #0b5c87);
-  border-radius: 10px;
-  border: 1px solid #eaf2f6;
-}
-.vc-modal-box::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #0b5c87, #6bb63f);
-}
+.vc-modal-box::-webkit-scrollbar { width: 7px; }
+.vc-modal-box::-webkit-scrollbar-track { background: #eaf2f6; border-radius: 0 20px 20px 0; }
+.vc-modal-box::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #0a2a38, #0b5c87); border-radius: 10px; border: 1px solid #eaf2f6; }
+.vc-modal-box::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #0b5c87, #6bb63f); }
 
 @keyframes modalSlide {
   from { transform: translateY(40px); opacity: 0; }
@@ -194,16 +300,13 @@ get_header(); ?>
   z-index: 10;
   transition: background 0.2s, color 0.2s;
 }
-.vc-modal-close:hover {
-  background: #e74c3c;
-  color: #fff;
-}
+.vc-modal-close:hover { background: #e74c3c; color: #fff; }
 .vc-modal-image {
   width: 100%;
   height: 250px;
   object-fit: cover;
   display: block;
-  margin-top: -46px; /* slide under the sticky close btn */
+  margin-top: -46px;
 }
 .vc-modal-image-placeholder {
   width: 100%;
@@ -215,14 +318,8 @@ get_header(); ?>
   font-size: 5rem;
   margin-top: -46px;
 }
-.vc-modal-content {
-  padding: 24px 28px 32px;
-}
-.vc-modal-content h2 {
-  font-size: 1.7rem;
-  color: #0a2a38;
-  margin: 0 0 6px;
-}
+.vc-modal-content { padding: 24px 28px 32px; }
+.vc-modal-content h2 { font-size: 1.7rem; color: #0a2a38; margin: 0 0 6px; }
 .vc-modal-vaccine-badge {
   display: inline-block;
   background: #eaf2f6;
@@ -252,11 +349,7 @@ get_header(); ?>
   letter-spacing: 0.5px;
   margin-bottom: 4px;
 }
-.vc-modal-detail-item .d-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #0a2a38;
-}
+.vc-modal-detail-item .d-value { font-size: 1rem; font-weight: 700; color: #0a2a38; }
 .vc-modal-price-row {
   display: flex;
   align-items: center;
@@ -292,99 +385,164 @@ get_header(); ?>
                     </ol>
                 </nav>
                 <h1 class="display-4 fw-bold mb-3" style="color: #0b5c87;">Vaccine Pricing &amp; Availability</h1>
-                <p class="lead" style="color: #4a575e;">Transparent pricing with no hidden charges. Select vaccines to calculate total cost.</p>
+                <p class="lead" style="color: #4a575e;">Transparent pricing with no hidden charges. Select vaccines below to calculate your total.</p>
             </div>
         </div>
     </div>
 </section>
 
 <div class="vc-pricing-wrap">
-  <!-- <h1 class="page-title">Vaccine Pricing & Availability</h1>
-  <p class="subtitle">Browse all available vaccines by name. Click any card for full details.</p> -->
+
+  <!-- ================= CATEGORY TABS ================= -->
+  <div class="vc-cat-tabs" id="vcCatTabs">
+    <?php foreach ( $category_tabs as $slug => $label ) : ?>
+      <button type="button" class="vc-cat-tab<?php echo $slug === 'all' ? ' active' : ''; ?>" data-cat="<?php echo esc_attr( $slug ); ?>">
+        <?php echo esc_html( $label ); ?>
+      </button>
+    <?php endforeach; ?>
+  </div>
 
   <?php
-  $brands = get_posts([
-    'post_type'      => 'brand',
-    'posts_per_page' => -1,
-    'post_status'    => 'publish',
-    'orderby'        => 'meta_value',
-    'meta_key'       => 'vaccine_name',
-    'order'          => 'ASC',
-  ]);
+  $brands = get_posts( [
+      'post_type'      => 'brand',
+      'posts_per_page' => -1,
+      'post_status'    => 'publish',
+      'orderby'        => 'title',
+      'order'          => 'ASC',
+  ] );
 
   if ( ! $brands ) {
-    echo '<p style="text-align:center;color:#8a959a;">No vaccine data found. Please add brands from the dashboard.</p>';
+      echo '<p style="text-align:center;color:#8a959a;">No vaccine data found. Please add brands from the dashboard.</p>';
   } else {
-    $grouped = [];
-    foreach ( $brands as $brand ) {
-      $vaccine = get_post_meta( $brand->ID, 'vaccine_name', true );
-      if ( ! $vaccine ) $vaccine = 'Other';
-      $grouped[$vaccine][] = $brand;
-    }
-    ksort($grouped);
+      // Group brands by their parent vaccine's title so cards for the same
+      // disease (e.g. two Hepatitis B doses) sit under one heading, same as
+      // the page looked before. A brand with no linked vaccine falls back to
+      // its own vaccine_name text so nothing silently disappears from the page.
+      $grouped = [];
+      foreach ( $brands as $brand ) {
+          $brand_pod = pods( 'brand', $brand->ID );
 
-    foreach ( $grouped as $vaccine_name => $cards ) :
+          // Pods relationship fields return an array of related item arrays
+          // (each with at least 'ID'), or an empty array when nothing is linked.
+          $related        = $brand_pod->field( 'parent_vaccine' );
+          $parent_vaccine_id = 0;
+          if ( is_array( $related ) && ! empty( $related ) ) {
+              $first = reset( $related );
+              $parent_vaccine_id = is_array( $first ) ? (int) ( $first['ID'] ?? 0 ) : (int) $first;
+          }
+          $parent_vaccine = $parent_vaccine_id ? get_post( $parent_vaccine_id ) : null;
+
+          $group_label = $parent_vaccine ? $parent_vaccine->post_title : get_post_meta( $brand->ID, 'vaccine_name', true );
+          if ( ! $group_label ) $group_label = 'Other';
+
+          // Category comes from the brand's own Categories field when set,
+          // else falls back to its parent vaccine's tags, else 'Other' vaccine's own taxonomy.
+          $brand_cat_terms = wp_get_post_terms( $brand->ID, 'vaccine_category', [ 'fields' => 'slugs' ] );
+          if ( is_wp_error( $brand_cat_terms ) || empty( $brand_cat_terms ) ) {
+              $brand_cat_terms = $parent_vaccine
+                  ? wp_get_post_terms( $parent_vaccine->ID, 'vaccine_category', [ 'fields' => 'slugs' ] )
+                  : [];
+              if ( is_wp_error( $brand_cat_terms ) ) $brand_cat_terms = [];
+          }
+
+          $grouped[ $group_label ][] = [
+              'post'       => $brand,
+              'categories' => $brand_cat_terms,
+          ];
+      }
+      ksort( $grouped );
+
+      foreach ( $grouped as $group_label => $cards ) :
   ?>
 
-  <div class="vaccine-group">
-    <div class="vaccine-group-title">💉 <?php echo esc_html($vaccine_name); ?></div>
+  <div class="vaccine-group" data-group="<?php echo esc_attr( sanitize_title( $group_label ) ); ?>">
+    <div class="vaccine-group-title">💉 <?php echo esc_html( $group_label ); ?></div>
     <div class="vaccine-grid">
-      <?php foreach ( $cards as $card ) :
-        $thumb        = get_the_post_thumbnail_url( $card->ID, 'medium' );
-        $disease      = get_post_meta( $card->ID, 'disease', true );
-        $manufacturer = get_post_meta( $card->ID, 'manufacturer_name', true );
-        $price        = get_post_meta( $card->ID, 'price', true );
-        $avail        = get_post_meta( $card->ID, 'availability', true );
-        $avail_bool   = ( $avail === '1' || strtolower($avail) === 'yes' || $avail === true );
-        $full_content = apply_filters('the_content', get_post_field('post_content', $card->ID));
+      <?php foreach ( $cards as $entry ) :
+          $card         = $entry['post'];
+          $cats         = $entry['categories'];
+          $thumb        = get_the_post_thumbnail_url( $card->ID, 'medium' );
+          $disease      = get_post_meta( $card->ID, 'disease', true );
+          $manufacturer = get_post_meta( $card->ID, 'manufacturer_name', true );
+          $price        = get_post_meta( $card->ID, 'price', true );
+          $avail        = get_post_meta( $card->ID, 'availability', true );
+          $avail_bool   = ( $avail === '1' || strtolower( $avail ) === 'yes' || $avail === true );
+          $full_content = apply_filters( 'the_content', get_post_field( 'post_content', $card->ID ) );
       ?>
-      <div class="vc-card"
-           data-title="<?php echo esc_attr($card->post_title); ?>"
-           data-vaccine="<?php echo esc_attr($vaccine_name); ?>"
-           data-disease="<?php echo esc_attr($disease); ?>"
-           data-manufacturer="<?php echo esc_attr($manufacturer); ?>"
-           data-price="<?php echo esc_attr($price); ?>"
+      <div class="vc-card<?php echo $avail_bool ? '' : ' vc-card-unavailable'; ?>"
+           data-categories="<?php echo esc_attr( implode( ',', $cats ) ); ?>"
+           data-id="<?php echo esc_attr( $card->ID ); ?>"
+           data-title="<?php echo esc_attr( $card->post_title ); ?>"
+           data-vaccine="<?php echo esc_attr( $group_label ); ?>"
+           data-disease="<?php echo esc_attr( $disease ); ?>"
+           data-manufacturer="<?php echo esc_attr( $manufacturer ); ?>"
+           data-price="<?php echo esc_attr( $price ); ?>"
            data-avail="<?php echo $avail_bool ? 'yes' : 'no'; ?>"
-           data-thumb="<?php echo esc_attr($thumb); ?>"
-           data-content="<?php echo esc_attr($full_content); ?>"
-           onclick="vcOpenModal(this)"
+           data-thumb="<?php echo esc_attr( $thumb ); ?>"
+           data-content="<?php echo esc_attr( $full_content ); ?>"
       >
         <span class="vc-availability <?php echo $avail_bool ? 'avail-yes' : 'avail-no'; ?>">
           <?php echo $avail_bool ? '✓ Available' : '✗ Unavailable'; ?>
         </span>
 
         <?php if ( $thumb ) : ?>
-          <img class="vc-card-img" src="<?php echo esc_url($thumb); ?>" alt="<?php echo esc_attr($card->post_title); ?>">
+          <img class="vc-card-img" src="<?php echo esc_url( $thumb ); ?>" alt="<?php echo esc_attr( $card->post_title ); ?>" onclick="vcOpenModal(this.closest('.vc-card'))">
         <?php else : ?>
-          <div class="vc-card-img-placeholder">💉</div>
+          <div class="vc-card-img-placeholder" onclick="vcOpenModal(this.closest('.vc-card'))">💉</div>
         <?php endif; ?>
 
         <div class="vc-card-body">
-          <h3><?php echo esc_html($card->post_title); ?></h3>
+          <h3 onclick="vcOpenModal(this.closest('.vc-card'))"><?php echo esc_html( $card->post_title ); ?></h3>
           <ul class="vc-card-meta">
-            <?php if ($disease) : ?>
-            <li><span class="label">Disease:</span> <?php echo esc_html($disease); ?></li>
+            <?php if ( $disease ) : ?>
+            <li><span class="label">Disease:</span> <?php echo esc_html( $disease ); ?></li>
             <?php endif; ?>
-            <?php if ($manufacturer) : ?>
-            <li><span class="label">Manufacturer:</span> <?php echo esc_html($manufacturer); ?></li>
+            <?php if ( $manufacturer ) : ?>
+            <li><span class="label">Manufacturer:</span> <?php echo esc_html( $manufacturer ); ?></li>
             <?php endif; ?>
           </ul>
-          <?php if ($price) : ?>
+          <?php if ( $price ) : ?>
           <div class="vc-price-tag">
-            <span class="currency">PKR </span><?php echo esc_html(number_format((float)$price)); ?>
+            <span class="currency">PKR </span><?php echo esc_html( number_format( (float) $price ) ); ?>
           </div>
           <?php endif; ?>
+        </div>
+
+        <div class="vc-select-row">
+          <input type="checkbox" id="vc-select-<?php echo esc_attr( $card->ID ); ?>" class="vc-select-checkbox"
+                 <?php disabled( ! $avail_bool ); ?>>
+          <label for="vc-select-<?php echo esc_attr( $card->ID ); ?>">
+            <?php echo $avail_bool ? 'Add to quote' : 'Currently unavailable'; ?>
+          </label>
         </div>
       </div>
       <?php endforeach; ?>
     </div>
   </div>
 
-  <?php endforeach;
+  <?php
+      endforeach;
   }
   ?>
 
 </div><!-- .vc-pricing-wrap -->
+
+<!-- ===== STICKY QUOTE BAR ===== -->
+<div class="vc-quote-bar" id="vcQuoteBar">
+  <div class="vc-quote-bar-inner">
+    <div class="vc-quote-left">
+      <div class="vc-quote-count"><span id="vcQuoteCount">0</span> vaccine<span id="vcQuotePlural">s</span> selected</div>
+      <div class="vc-quote-charge">+ PKR <?php echo esc_html( number_format( $vaccination_charge ) ); ?> home vaccination charge</div>
+    </div>
+    <div class="vc-quote-total">PKR <span id="vcQuoteTotal">0</span></div>
+    <div class="vc-quote-actions">
+      <button type="button" class="vc-quote-clear" id="vcQuoteClear">Clear</button>
+      <a href="#" target="_blank" class="vc-quote-btn" id="vcQuoteBookBtn">
+        <i class="bi bi-whatsapp"></i> Book Selected Vaccines
+      </a>
+    </div>
+  </div>
+</div>
 
 <!-- ===== MODAL ===== -->
 <div class="vc-modal-overlay" id="vcModal" onclick="vcCloseModal(event)">
@@ -403,13 +561,15 @@ get_header(); ?>
         <span class="mp-price" id="vcModalPrice"></span>
       </div>
       <div class="vc-modal-description" id="vcModalDesc"></div>
-      <!-- Book Now button removed as requested -->
     </div>
 
   </div>
 </div>
 
 <script>
+var VC_VACCINATION_CHARGE = <?php echo (int) $vaccination_charge; ?>;
+var VC_WHATSAPP           = '<?php echo esc_js( $whatsapp_link ); ?>';
+
 function vcOpenModal(el) {
   var title        = el.getAttribute('data-title');
   var vaccine      = el.getAttribute('data-vaccine');
@@ -447,7 +607,6 @@ function vcOpenModal(el) {
 
   document.getElementById('vcModalDesc').innerHTML = content || '';
 
-  // Reset scroll to top on open
   document.querySelector('.vc-modal-box').scrollTop = 0;
 
   document.getElementById('vcModal').classList.add('active');
@@ -463,6 +622,98 @@ function vcCloseModalDirect() {
 }
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') vcCloseModalDirect();
+});
+
+/* ================= CATEGORY FILTER ================= */
+document.addEventListener('DOMContentLoaded', function () {
+  var tabs  = document.querySelectorAll('.vc-cat-tab');
+  var cards = document.querySelectorAll('.vc-card');
+  var groups = document.querySelectorAll('.vaccine-group');
+
+  function applyFilter(cat) {
+    cards.forEach(function (card) {
+      if (cat === 'all') { card.style.display = ''; return; }
+      var cardCats = (card.getAttribute('data-categories') || '').split(',');
+      card.style.display = cardCats.indexOf(cat) !== -1 ? '' : 'none';
+    });
+
+    // Hide a whole group heading if every card inside it is filtered out.
+    groups.forEach(function (group) {
+      var visibleCards = group.querySelectorAll('.vc-card:not([style*="display: none"])');
+      group.style.display = visibleCards.length ? '' : 'none';
+    });
+  }
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      applyFilter(tab.getAttribute('data-cat'));
+    });
+  });
+
+  /* ================= QUOTE BUILDER ================= */
+  var quoteBar   = document.getElementById('vcQuoteBar');
+  var countEl    = document.getElementById('vcQuoteCount');
+  var pluralEl   = document.getElementById('vcQuotePlural');
+  var totalEl    = document.getElementById('vcQuoteTotal');
+  var clearBtn   = document.getElementById('vcQuoteClear');
+  var bookBtn    = document.getElementById('vcQuoteBookBtn');
+  var checkboxes = document.querySelectorAll('.vc-select-checkbox');
+
+  function selectedCards() {
+    var selected = [];
+    checkboxes.forEach(function (cb) {
+      if (cb.checked) selected.push(cb.closest('.vc-card'));
+    });
+    return selected;
+  }
+
+  function updateQuote() {
+    var selected = selectedCards();
+    var total = 0;
+
+    selected.forEach(function (card) {
+      var price = parseFloat(card.getAttribute('data-price'));
+      if (!isNaN(price)) total += price;
+      card.classList.add('vc-card-selected');
+    });
+    cards.forEach(function (card) {
+      if (selected.indexOf(card) === -1) card.classList.remove('vc-card-selected');
+    });
+
+    if (selected.length > 0) total += VC_VACCINATION_CHARGE;
+
+    countEl.textContent = selected.length;
+    pluralEl.textContent = selected.length === 1 ? '' : 's';
+    totalEl.textContent = total.toLocaleString();
+
+    quoteBar.classList.toggle('visible', selected.length > 0);
+
+    if (selected.length > 0) {
+      var lines = selected.map(function (card) {
+        var price = parseFloat(card.getAttribute('data-price'));
+        var priceText = !isNaN(price) ? 'PKR ' + price.toLocaleString() : 'Contact for price';
+        return '- ' + card.getAttribute('data-title') + ' (' + card.getAttribute('data-vaccine') + ') - ' + priceText;
+      });
+      var message = 'Hi! I would like to book the following vaccines:\n\n' +
+        lines.join('\n') +
+        '\n\n+ PKR ' + VC_VACCINATION_CHARGE.toLocaleString() + ' home vaccination charge' +
+        '\nTotal: PKR ' + total.toLocaleString();
+      bookBtn.href = 'https://wa.me/' + VC_WHATSAPP + '?text=' + encodeURIComponent(message);
+    } else {
+      bookBtn.href = '#';
+    }
+  }
+
+  checkboxes.forEach(function (cb) {
+    cb.addEventListener('change', updateQuote);
+  });
+
+  clearBtn.addEventListener('click', function () {
+    checkboxes.forEach(function (cb) { cb.checked = false; });
+    updateQuote();
+  });
 });
 </script>
 
