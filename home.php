@@ -31,7 +31,6 @@ $knowledge_categories = [
     [ 'icon' => 'bi-person-fill',         'title' => 'Adults',              'url' => home_url( '/vaccines#adult-vaccines' ) ],
     [ 'icon' => 'bi-heart-pulse-fill',    'title' => 'Pregnancy',           'url' => home_url( '/vaccines#adult-vaccines' ) ],
     [ 'icon' => 'bi-airplane-fill',       'title' => 'Travel',              'url' => home_url( '/travel-vaccines' ) ],
-    [ 'icon' => 'bi-award-fill',          'title' => 'Vaccine Brands',      'url' => home_url( '/vaccine-brands' ) ],
     [ 'icon' => 'bi-patch-question-fill', 'title' => 'FAQs',                'url' => home_url( '/#homepage-faqs' ) ],
     [ 'icon' => 'bi-book-half',           'title' => 'Knowledge Centre',    'url' => home_url( '/knowledge-centre' ) ],
 ];
