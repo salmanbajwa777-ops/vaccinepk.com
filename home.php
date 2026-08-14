@@ -311,7 +311,7 @@ $homepage_faqs = [
             ?>
         </div>
         <div class="text-center mt-5">
-            <a href="<?php echo esc_url( home_url( '/vaccines' ) ); ?>" class="btn-outline-primary">Browse All Vaccines</a>
+            <a href="<?php echo esc_url( home_url( '/pricing' ) ); ?>" class="btn-outline-primary">Browse All Vaccines</a>
         </div>
     </div>
 </section>
