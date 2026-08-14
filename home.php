@@ -224,7 +224,12 @@ $homepage_faqs = [
             // Most Searched Vaccines: curated list, one representative brand per vaccine.
             // Brand-selection logic (cheapest/most relevant of multiple brands) is a
             // separate future task — for now we take the first published brand found
-            // for each vaccine name as the representative.
+            // for each vaccine as the representative.
+            //
+            // Matched via each vaccine post's title -> its linked brands (Parent
+            // Vaccine relationship field on `brand`), not by fuzzy-matching brand
+            // text against this label list. A label here just needs to match (or
+            // alias to) a real `vaccine` post title; the brand link does the rest.
             $msv_order = [
                 'Vaxapox',
                 'Prevenar',
@@ -237,44 +242,52 @@ $homepage_faqs = [
                 'Yellow Fever',
             ];
 
+            // Known aliases where the display label doesn't match the vaccine
+            // post's title directly (e.g. "Vaxapox" is a brand name; the vaccine
+            // post is titled "Chicken Pox Vaccine").
+            $msv_vaccine_title_aliases = [
+                'Vaxapox'       => 'Chicken Pox Vaccine',
+                'Meningococcal' => 'Men-ACYW135',
+                'Yellow Fever'  => 'Stamaril',
+            ];
+
             $all_brands = get_posts( [
                 'post_type'      => 'brand',
                 'posts_per_page' => -1,
                 'post_status'    => 'publish',
             ] );
 
-            // Group brand posts by their vaccine_name meta so we can match against
-            // $msv_order using a loose (case-insensitive, partial) match — the
-            // pricing page's vaccine_name values don't necessarily match these
-            // display labels exactly (e.g. "Typhoid TCV" vs "Typhoid").
-            $brands_by_vaccine = [];
+            // Group brand posts by their linked parent vaccine's post ID.
+            $brands_by_vaccine_id = [];
             foreach ( $all_brands as $b ) {
-                $vname = get_post_meta( $b->ID, 'vaccine_name', true );
-                if ( ! $vname ) continue;
-                $brands_by_vaccine[ $vname ][] = $b;
-            }
+                $b_pod   = pods( 'brand', $b->ID );
+                $related = $b_pod->field( 'parent_vaccine' );
+                if ( ! is_array( $related ) || empty( $related ) ) continue;
 
-            // Known alias pairs where the pricing page's vaccine_name doesn't share
-            // any substring with the homepage display label.
-            $msv_aliases = [
-                'Meningococcal' => 'Men-ACYW135',
-                'Yellow Fever'  => 'Stamaril',
-            ];
+                $first      = reset( $related );
+                $vaccine_id = is_array( $first ) ? (int) ( $first['ID'] ?? 0 ) : (int) $first;
+                if ( ! $vaccine_id ) continue;
+
+                $brands_by_vaccine_id[ $vaccine_id ][] = $b;
+            }
 
             $msv_cards = [];
             foreach ( $msv_order as $label ) {
-                $match_key = null;
-                $aliases   = array_filter( [ $label, $msv_aliases[ $label ] ?? null ] );
-                foreach ( $brands_by_vaccine as $vname => $vbrands ) {
-                    foreach ( $aliases as $needle ) {
-                        if ( strcasecmp( $vname, $needle ) === 0 || stripos( $vname, $needle ) !== false || stripos( $needle, $vname ) !== false ) {
-                            $match_key = $vname;
-                            break 2;
-                        }
-                    }
-                }
+                $title_needle = $msv_vaccine_title_aliases[ $label ] ?? $label;
 
-                $rep          = $match_key ? $brands_by_vaccine[ $match_key ][0] : null;
+                $vaccine_posts = get_posts( [
+                    'post_type'      => 'vaccine',
+                    'post_status'    => 'publish',
+                    'title'          => $title_needle,
+                    'posts_per_page' => 1,
+                ] );
+                $vaccine_id = $vaccine_posts ? $vaccine_posts[0]->ID : 0;
+
+                $reps = $vaccine_id && isset( $brands_by_vaccine_id[ $vaccine_id ] )
+                    ? $brands_by_vaccine_id[ $vaccine_id ]
+                    : [];
+                $rep = $reps ? $reps[0] : null;
+
                 $thumb        = $rep ? get_the_post_thumbnail_url( $rep->ID, 'medium' ) : false;
                 $avail_raw    = $rep ? get_post_meta( $rep->ID, 'availability', true ) : '';
                 $is_available = ( $avail_raw === '1' || strtolower( $avail_raw ) === 'yes' || $avail_raw === true );
