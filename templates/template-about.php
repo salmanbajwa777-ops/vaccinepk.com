@@ -60,9 +60,9 @@ get_header();
                 </div>
             </div>
             <div class="col-lg-6">
-                <img 
-                    src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80" 
-                    alt="Healthcare Professional" 
+                <img
+                    src="https://vaccinepk.com/wp-content/uploads/2026/08/About-Image.png"
+                    alt="Healthcare Professional"
                     class="img-fluid rounded-4 shadow-lg"
                     style="position: relative;"
                 >
