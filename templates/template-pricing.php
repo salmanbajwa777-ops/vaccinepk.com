@@ -90,8 +90,11 @@ $category_tabs = [
 }
 .vc-card-img {
   width: 100%;
-  height: 160px;
-  object-fit: cover;
+  height: 180px;
+  object-fit: contain;
+  background: linear-gradient(135deg, #eaf2f6, #cfe0e8);
+  padding: 10px;
+  box-sizing: border-box;
   cursor: pointer;
 }
 .vc-card-img-placeholder {
@@ -303,8 +306,11 @@ $category_tabs = [
 .vc-modal-close:hover { background: #e74c3c; color: #fff; }
 .vc-modal-image {
   width: 100%;
-  height: 250px;
-  object-fit: cover;
+  height: 280px;
+  object-fit: contain;
+  background: linear-gradient(135deg, #eaf2f6, #cfe0e8);
+  padding: 16px;
+  box-sizing: border-box;
   display: block;
   margin-top: -46px;
 }

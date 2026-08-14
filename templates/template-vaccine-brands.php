@@ -23,8 +23,8 @@ $brands = get_posts( [
     height: 100%; transition: var(--transition); text-decoration: none; color: inherit; display: block;
 }
 .brand-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; }
-.brand-card-img { height: 140px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.brand-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.brand-card-img { height: 180px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; box-sizing: border-box; }
+.brand-card-img img { width: 100%; height: 100%; object-fit: contain; }
 .brand-card-body { padding: 20px; }
 .brand-card-body h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
 .brand-card-meta { font-size: 0.82rem; color: var(--text-light); }
