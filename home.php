@@ -221,88 +221,39 @@ $homepage_faqs = [
         </div>
         <div class="row g-4">
             <?php
-            // Most Searched Vaccines: curated list, one representative brand per vaccine.
-            // Brand-selection logic (cheapest/most relevant of multiple brands) is a
-            // separate future task — for now we take the first published brand found
-            // for each vaccine as the representative.
-            //
-            // Matched via each vaccine post's title -> its linked brands (Parent
-            // Vaccine relationship field on `brand`), not by fuzzy-matching brand
-            // text against this label list. A label here just needs to match (or
-            // alias to) a real `vaccine` post title; the brand link does the rest.
-            $msv_order = [
-                'Vaxapox',
-                'Prevenar',
-                'Hexaxim',
-                'Rotarix',
-                'MMR',
-                'Boostrix',
-                'Meningococcal',
-                'Typhoid',
-                'Yellow Fever',
-            ];
-
-            // Known aliases where the display label doesn't match the vaccine
-            // post's title directly (e.g. "Vaxapox" is a brand name; the vaccine
-            // post is titled "Chicken Pox Vaccine").
-            $msv_vaccine_title_aliases = [
-                'Vaxapox'       => 'Chicken Pox Vaccine',
-                'Meningococcal' => 'Men-ACYW135',
-                'Yellow Fever'  => 'Stamaril',
-                'Hexaxim'       => 'DTaP+IPV+Hib+HB',
-                'Prevenar'      => 'Pneumococcal Vaccine',
-                'Boostrix'      => 'Tdap',
-            ];
-
-            $all_brands = get_posts( [
+            // Most Searched Vaccines: shows every brand post with its own
+            // "Featured on Homepage" checkbox ticked in wp-admin. No label list,
+            // no title matching — the checkbox is the single source of truth for
+            // which brands appear here.
+            $featured_brands = get_posts( [
                 'post_type'      => 'brand',
-                'posts_per_page' => -1,
                 'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+                'meta_query'     => [
+                    [
+                        'key'     => 'featured_on_homepage',
+                        'value'   => '1',
+                        'compare' => '=',
+                    ],
+                ],
             ] );
 
-            // Group brand posts by their linked parent vaccine's post ID.
-            $brands_by_vaccine_id = [];
-            foreach ( $all_brands as $b ) {
-                $b_pod   = pods( 'brand', $b->ID );
-                $related = $b_pod->field( 'parent_vaccine' );
-                if ( ! is_array( $related ) || empty( $related ) ) continue;
-
-                $first      = reset( $related );
-                $vaccine_id = is_array( $first ) ? (int) ( $first['ID'] ?? 0 ) : (int) $first;
-                if ( ! $vaccine_id ) continue;
-
-                $brands_by_vaccine_id[ $vaccine_id ][] = $b;
-            }
-
             $msv_cards = [];
-            foreach ( $msv_order as $label ) {
-                $title_needle = $msv_vaccine_title_aliases[ $label ] ?? $label;
-
-                $vaccine_posts = get_posts( [
-                    'post_type'      => 'vaccine',
-                    'post_status'    => 'publish',
-                    'title'          => $title_needle,
-                    'posts_per_page' => 1,
-                ] );
-                $vaccine_id = $vaccine_posts ? $vaccine_posts[0]->ID : 0;
-
-                $reps = $vaccine_id && isset( $brands_by_vaccine_id[ $vaccine_id ] )
-                    ? $brands_by_vaccine_id[ $vaccine_id ]
-                    : [];
-                $rep = $reps ? $reps[0] : null;
-
-                $thumb        = $rep ? get_the_post_thumbnail_url( $rep->ID, 'medium' ) : false;
-                $avail_raw    = $rep ? get_post_meta( $rep->ID, 'availability', true ) : '';
+            foreach ( $featured_brands as $rep ) {
+                $thumb        = get_the_post_thumbnail_url( $rep->ID, 'medium' );
+                $avail_raw    = get_post_meta( $rep->ID, 'availability', true );
                 $is_available = ( $avail_raw === '1' || strtolower( $avail_raw ) === 'yes' || $avail_raw === true );
-                $description  = $rep ? wp_trim_words( get_post_field( 'post_content', $rep->ID ), 12 ) : '';
-                $disease      = $rep ? get_post_meta( $rep->ID, 'disease', true ) : '';
-                $permalink    = $rep ? get_permalink( $rep->ID ) : site_url( '/pricing' );
+                $description  = wp_trim_words( get_post_field( 'post_content', $rep->ID ), 12 );
+                $disease      = get_post_meta( $rep->ID, 'disease', true );
+                $permalink    = get_permalink( $rep->ID );
 
                 $msv_cards[] = [
-                    'label'       => $label,
+                    'label'       => $rep->post_title,
                     'thumb'       => $thumb,
-                    'available'   => $rep ? $is_available : false,
-                    'has_data'    => (bool) $rep,
+                    'available'   => $is_available,
+                    'has_data'    => true,
                     'description' => $description,
                     'age'         => $disease,
                     'permalink'   => $permalink,
@@ -682,8 +633,8 @@ $homepage_faqs = [
 /* ---- most searched vaccines ---- */
 .vsv-card { background: white; border: 1px solid var(--color-sand); border-radius: 16px; overflow: hidden; height: 100%; transition: var(--transition); }
 .vsv-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-.vsv-card-img { position: relative; height: 140px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; }
-.vsv-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.vsv-card-img { position: relative; height: 180px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; padding: 10px; overflow: hidden; }
+.vsv-card-img img { width: 100%; height: 100%; object-fit: contain; }
 .vsv-card-img i { font-size: 2rem; color: var(--accent-blue); }
 .vsv-badge { position: absolute; top: 10px; right: 10px; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 50px; }
 .vsv-badge-in { background: var(--color-green); color: white; }
