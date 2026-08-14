@@ -249,6 +249,9 @@ $homepage_faqs = [
                 'Vaxapox'       => 'Chicken Pox Vaccine',
                 'Meningococcal' => 'Men-ACYW135',
                 'Yellow Fever'  => 'Stamaril',
+                'Hexaxim'       => 'DTaP+IPV+Hib+HB',
+                'Prevenar'      => 'Pneumococcal Vaccine',
+                'Boostrix'      => 'Tdap',
             ];
 
             $all_brands = get_posts( [
