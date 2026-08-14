@@ -53,7 +53,7 @@ $brands = get_posts( [
                     $manufacturer = get_post_meta( $brand->ID, 'manufacturer_name', true );
                 ?>
                     <div class="col-lg-3 col-md-4 col-6">
-                        <a href="<?php echo esc_url( get_permalink( $brand->ID ) ); ?>" class="brand-card">
+                        <a href="<?php echo esc_url( vaccination_centre_brand_link( $brand->ID ) ); ?>" class="brand-card">
                             <div class="brand-card-img">
                                 <?php if ( $thumb ) : ?>
                                     <img src="<?php echo esc_url( $thumb ); ?>" alt="<?php echo esc_attr( $brand->post_title ); ?>">

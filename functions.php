@@ -188,7 +188,7 @@ function vaccine_search_ajax() {
         $results[] = [
             'type'  => 'brand',
             'title' => $b->post_title,
-            'url'   => get_permalink( $b->ID ),
+            'url'   => vaccination_centre_brand_link( $b->ID ),
             'meta'  => [
                 'disease' => get_post_meta( $b->ID, 'disease', true ),
             ],
@@ -914,6 +914,26 @@ function vaccination_centre_find_vaccine_url( $vaccine_name ) {
 
     $cache[ $vaccine_name ] = $posts ? get_permalink( $posts[0]->ID ) : null;
     return $cache[ $vaccine_name ];
+}
+
+// A `brand` post has no single-page template of its own, so any link to one
+// should instead point at its parent vaccine's page (where all of that
+// vaccine's brands are listed), falling back to the pricing page for brands
+// that aren't linked to a vaccine yet.
+function vaccination_centre_brand_link( $brand_id ) {
+    $brand_pod = pods( 'brand', $brand_id );
+    $related   = $brand_pod->field( 'parent_vaccine' );
+
+    if ( is_array( $related ) && ! empty( $related ) ) {
+        $first      = reset( $related );
+        $vaccine_id = is_array( $first ) ? (int) ( $first['ID'] ?? 0 ) : (int) $first;
+        if ( $vaccine_id ) {
+            $url = get_permalink( $vaccine_id );
+            if ( $url ) return $url;
+        }
+    }
+
+    return site_url( '/pricing' );
 }
 
 
