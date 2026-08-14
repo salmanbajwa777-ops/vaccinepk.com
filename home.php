@@ -225,26 +225,34 @@ $homepage_faqs = [
             // "Featured on Homepage" checkbox ticked in wp-admin. No label list,
             // no title matching — the checkbox is the single source of truth for
             // which brands appear here.
-            $featured_brands = get_posts( [
+            //
+            // Filtered in PHP rather than via meta_query: Pods Yes/No fields
+            // don't reliably store as the same string on every post (the
+            // `availability` field below already has to accept '1' / 'yes' /
+            // true for the same reason), so a DB-level exact match can silently
+            // drop a post that shows "checked" in wp-admin. get_post_meta() +
+            // the same truthy check used for availability avoids guessing at
+            // what meta_query would need to match.
+            $all_brand_posts = get_posts( [
                 'post_type'      => 'brand',
                 'post_status'    => 'publish',
                 'posts_per_page' => -1,
                 'orderby'        => 'title',
                 'order'          => 'ASC',
-                'meta_query'     => [
-                    [
-                        'key'     => 'featured_on_homepage',
-                        'value'   => '1',
-                        'compare' => '=',
-                    ],
-                ],
             ] );
 
+            $is_truthy = function ( $raw ) {
+                return ( $raw === '1' || $raw === 1 || $raw === true || strtolower( (string) $raw ) === 'yes' || strtolower( (string) $raw ) === 'on' );
+            };
+
             $msv_cards = [];
-            foreach ( $featured_brands as $rep ) {
+            foreach ( $all_brand_posts as $rep ) {
+                $featured_raw = get_post_meta( $rep->ID, 'featured_on_homepage', true );
+                if ( ! $is_truthy( $featured_raw ) ) continue;
+
                 $thumb        = get_the_post_thumbnail_url( $rep->ID, 'medium' );
                 $avail_raw    = get_post_meta( $rep->ID, 'availability', true );
-                $is_available = ( $avail_raw === '1' || strtolower( $avail_raw ) === 'yes' || $avail_raw === true );
+                $is_available = $is_truthy( $avail_raw );
                 $description  = wp_trim_words( get_post_field( 'post_content', $rep->ID ), 12 );
                 $disease      = get_post_meta( $rep->ID, 'disease', true );
                 $permalink    = get_permalink( $rep->ID );
