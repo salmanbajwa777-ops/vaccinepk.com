@@ -1,17 +1,44 @@
 <?php
 /**
  * Template Name: Vaccines Page
- * Description: Vaccines listing page for Vaccination Centre
- * FINAL VERSION - Age column only in Child Vaccines tab
+ * Flat list of every vaccine, each showing its linked brands (photo,
+ * price, availability) with a link through to the vaccine's own page
+ * for the full description. No category tabs — category shows as a
+ * tag on each entry instead, since a single vaccine can span more
+ * than one category (e.g. Hepatitis B is both Child and Adult).
  */
 get_header();
+
+$vaccines_query = new WP_Query( [
+    'post_type'      => 'vaccine',
+    'post_status'    => 'publish',
+    'posts_per_page' => -1,
+    'orderby'        => 'title',
+    'order'          => 'ASC',
+] );
+
+// Every brand grouped by its Parent Vaccine relationship, same lookup
+// pattern as single-vaccine.php and /pricing.
+$all_brands       = get_posts( [ 'post_type' => 'brand', 'post_status' => 'publish', 'posts_per_page' => -1 ] );
+$brands_by_vaccine = [];
+foreach ( $all_brands as $b ) {
+    $b_pod   = pods( 'brand', $b->ID );
+    $related = $b_pod->field( 'parent_vaccine' );
+    if ( ! is_array( $related ) || empty( $related ) ) continue;
+
+    $first      = reset( $related );
+    $vaccine_id = is_array( $first ) ? (int) ( $first['ID'] ?? 0 ) : (int) $first;
+    if ( ! $vaccine_id ) continue;
+
+    $brands_by_vaccine[ $vaccine_id ][] = $b;
+}
 ?>
 
 <!-- ================= PAGE HEADER ================= -->
 <section class="page-header" style="background: linear-gradient(135deg, #f6f3ec 0%, #efe9db 100%); padding: 80px 0 60px; position: relative; overflow: hidden;">
     <div style="position: absolute; top: -50%; right: -10%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(201, 162, 75, 0.12) 0%, transparent 70%); border-radius: 50%;"></div>
     <div style="position: absolute; bottom: -30%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(11, 92, 135, 0.1) 0%, transparent 70%); border-radius: 50%;"></div>
-    
+
     <div class="container" style="position: relative; z-index: 1;">
         <div class="row">
             <div class="col-lg-10 mx-auto text-center">
@@ -28,145 +55,77 @@ get_header();
     </div>
 </section>
 
-<!-- ================= CATEGORY TABS ================= -->
 <section class="py-5" style="background: white;">
-    <div class="container">
-        
-        <!-- Category Navigation -->
-        <ul class="nav nav-pills justify-content-center mb-5" id="vaccineTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active px-4 py-2 me-2 mb-2" id="child-vaccines-tab" data-bs-toggle="pill" data-bs-target="#child-vaccines" type="button" role="tab" style="border-radius: 50px;">
-                    <i class="bi bi-heart-fill"></i> Child Vaccines
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link px-4 py-2 me-2 mb-2" id="adult-vaccines-tab" data-bs-toggle="pill" data-bs-target="#adult-vaccines" type="button" role="tab" style="border-radius: 50px;">
-                    <i class="bi bi-person-fill"></i> Adult Vaccines
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link px-4 py-2 me-2 mb-2" id="flu-vaccines-tab" data-bs-toggle="pill" data-bs-target="#flu-vaccines" type="button" role="tab" style="border-radius: 50px;">
-                    <i class="bi bi-shield-fill-plus"></i> Flu Vaccines
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link px-4 py-2 mb-2" id="travel-vaccines-tab" data-bs-toggle="pill" data-bs-target="#travel-vaccines" type="button" role="tab" style="border-radius: 50px;">
-                    <i class="bi bi-airplane-fill"></i> Travel Vaccines
-                </button>
-            </li>
-        </ul>
+    <div class="container" style="max-width: 1100px;">
 
-        <!-- Tab Content -->
-        <div class="tab-content" id="vaccineTabsContent">
-            
-            <?php
-            // Get all vaccine categories
-            $categories = array('child-vaccines', 'adult-vaccines', 'flu-vaccines', 'travel-vaccines');
-            $category_names = array(
-                'child-vaccines' => 'Child Vaccines',
-                'adult-vaccines' => 'Adult Vaccines',
-                'flu-vaccines' => 'Flu Vaccines',
-                'travel-vaccines' => 'Travel Vaccines'
-            );
-            
-            foreach ($categories as $index => $category_slug) :
-                $active_class = ($index === 0) ? 'show active' : '';
-                $show_age_column = ($category_slug === 'child-vaccines'); // Only show age for child vaccines
+        <?php if ( $vaccines_query->have_posts() ) : ?>
+
+            <?php while ( $vaccines_query->have_posts() ) : $vaccines_query->the_post();
+                $vaccine_id   = get_the_ID();
+                $disease_name = get_post_meta( $vaccine_id, 'disease_name', true );
+                $cat_terms    = get_the_terms( $vaccine_id, 'vaccine_category' );
+                $cat_labels   = ( $cat_terms && ! is_wp_error( $cat_terms ) ) ? wp_list_pluck( $cat_terms, 'name' ) : [];
+                $brands       = $brands_by_vaccine[ $vaccine_id ] ?? [];
             ?>
-            
-            <div class="tab-pane fade <?php echo $active_class; ?>" id="<?php echo $category_slug; ?>" role="tabpanel">
-                
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle" style="border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                        <thead style="background: #0a2a38; color: white;">
-                            <tr>
-                                <th class="py-3"><i class="bi bi-heart-pulse"></i> Vaccine</th>
-                                <th class="py-3"><i class="bi bi-shield-check"></i> Brand</th>
-                                <?php if ($show_age_column) : ?>
-                                    <th class="py-3"><i class="bi bi-calendar-event"></i> Age</th>
-                                <?php endif; ?>
-                                <th class="py-3"><i class="bi bi-check-circle"></i> Availability</th>
-                            </tr>
-                        </thead>
-                        <tbody style="background: white;">
-                            <?php
-                            // Query vaccines for this category
-                            $vaccines_args = array(
-                                'post_type' => 'vaccine',
-                                'posts_per_page' => -1,
-                                'tax_query' => array(
-                                    array(
-                                        'taxonomy' => 'vaccine_category',
-                                        'field' => 'slug',
-                                        'terms' => $category_slug
-                                    )
-                                ),
-                                'orderby' => 'title',
-                                'order' => 'ASC'
-                            );
-                            
-                            $vaccines_query = new WP_Query($vaccines_args);
-                            
-                            if ($vaccines_query->have_posts()) :
-                                while ($vaccines_query->have_posts()) : $vaccines_query->the_post();
-                                    $disease_name = get_post_meta(get_the_ID(), 'disease_name', true);
-                                    $vaccine_brand = get_post_meta(get_the_ID(), 'vaccine_brand', true);
-                                    $age_requirement = get_post_meta(get_the_ID(), 'age_requirement', true);
-                                    $availability = get_post_meta(get_the_ID(), 'availability', true);
-                                    
-                                    // Get vaccine content for modal
-                                    $vaccine_title = get_the_title();
-                                    $vaccine_content = get_the_content();
-                                    $vaccine_content = apply_filters('the_content', $vaccine_content);
-                                    
-                                    // Handle availability badge
-                                    $availability_badge = '';
-                                    if ($availability === 'in_stock' || $availability === 'yes' || $availability === '1' || $availability === true) {
-                                        $availability_badge = '<span class="badge" style="background: #7bb14f; color: white;"><i class="bi bi-check-circle-fill"></i> In Stock</span>';
-                                    } elseif ($availability === 'out_of_stock' || $availability === 'no' || $availability === '0' || $availability === false) {
-                                        $availability_badge = '<span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Out of Stock</span>';
-                                    } elseif ($availability === 'coming_soon') {
-                                        $availability_badge = '<span class="badge bg-warning text-dark"><i class="bi bi-clock-fill"></i> Coming Soon</span>';
-                                    } else {
-                                        $availability_badge = '<span class="badge" style="background: #7bb14f; color: white;"><i class="bi bi-check-circle-fill"></i> In Stock</span>';
-                                    }
-                            ?>
-                            <tr class="vaccine-row" style="cursor: pointer;" 
-                                onclick="openVaccineModal(this)"
-                                data-vaccine-title="<?php echo esc_attr($vaccine_title); ?>"
-                                data-vaccine-content='<?php echo htmlspecialchars($vaccine_content, ENT_QUOTES, 'UTF-8'); ?>'>
-                                <td class="ps-4 fw-bold"><?php echo esc_html($disease_name); ?></td>
-                                
-                                <td><?php echo esc_html($vaccine_brand); ?></td>
-                                <?php if ($show_age_column) : ?>
-                                    <td><?php echo esc_html($age_requirement); ?></td>
-                                <?php endif; ?>
-                                <td><?php echo $availability_badge; ?></td>
-                            </tr>
-                            <?php 
-                                endwhile;
-                                wp_reset_postdata();
-                            else :
-                                // Calculate colspan based on whether age column is shown
-                                $empty_colspan = $show_age_column ? '4' : '3';
-                            ?>
-                            <tr>
-                                <td colspan="<?php echo $empty_colspan; ?>" class="text-center py-5">
-                                    <i class="bi bi-inbox" style="font-size: 64px; color: #e7e0d3;"></i>
-                                    <p class="text-muted mt-3 mb-0">No vaccines found in this category yet.</p>
-                                    <p class="text-muted small">Please check back soon or contact us for more information.</p>
-                                </td>
-                            </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+
+            <div class="qv-entry">
+                <div class="qv-entry-head">
+                    <div>
+                        <h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
+                        <?php if ( $disease_name ) : ?><p class="qv-disease"><?php echo esc_html( $disease_name ); ?></p><?php endif; ?>
+                    </div>
+                    <?php if ( $cat_labels ) : ?>
+                    <div class="qv-tags">
+                        <?php foreach ( $cat_labels as $label ) : ?>
+                            <span class="qv-tag"><?php echo esc_html( $label ); ?></span>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
-                
+
+                <?php if ( $brands ) : ?>
+                <div class="qv-brand-row">
+                    <?php foreach ( $brands as $brand ) :
+                        $thumb      = get_the_post_thumbnail_url( $brand->ID, 'medium' );
+                        $price      = get_post_meta( $brand->ID, 'price', true );
+                        $avail      = get_post_meta( $brand->ID, 'availability', true );
+                        $avail_bool = ( $avail === '1' || strtolower( $avail ) === 'yes' || $avail === true );
+                    ?>
+                    <div class="qv-brand<?php echo $avail_bool ? '' : ' qv-brand-oos'; ?>">
+                        <div class="qv-brand-img">
+                            <?php if ( $thumb ) : ?>
+                                <img src="<?php echo esc_url( $thumb ); ?>" alt="<?php echo esc_attr( $brand->post_title ); ?>">
+                            <?php else : ?>
+                                <i class="bi bi-shield-fill-check"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="qv-brand-name"><?php echo esc_html( $brand->post_title ); ?></div>
+                        <div class="qv-brand-bottom">
+                            <?php if ( $price ) : ?>
+                                <span class="qv-brand-price">PKR <?php echo esc_html( number_format( (float) $price ) ); ?></span>
+                            <?php endif; ?>
+                            <span class="qv-brand-avail <?php echo $avail_bool ? 'yes' : 'no'; ?>"><?php echo $avail_bool ? '✓' : '✗'; ?></span>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php else : ?>
+                <p class="qv-no-brands">Brand information is being added.</p>
+                <?php endif; ?>
+
+                <a href="<?php the_permalink(); ?>" class="qv-details-link">
+                    View details &amp; description <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
-            
-            <?php endforeach; ?>
-            
-        </div>
+
+            <?php endwhile; wp_reset_postdata(); ?>
+
+        <?php else : ?>
+            <div class="text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 64px; color: #e7e0d3;"></i>
+                <p class="text-muted mt-3 mb-0">Vaccines are being added. Please check back soon.</p>
+            </div>
+        <?php endif; ?>
 
         <!-- DIRECT BOOKING BUTTON -->
         <div class="text-center mt-5">
@@ -177,46 +136,6 @@ get_header();
 
     </div>
 </section>
-
-<!-- ================= VACCINE DETAILS MODAL ================= -->
-<div class="modal fade" id="vaccineModal" tabindex="-1" aria-labelledby="vaccineModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-        <div class="modal-content" style="border: none; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            
-            <!-- Modal Header -->
-            <div class="modal-header" style="background: #0a2a38; color: white; border: none; padding: 30px;">
-                <div class="d-flex align-items-center">
-                    <div class="me-3" style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
-                        <i class="bi bi-virus2" style="font-size: 32px;"></i>
-                    </div>
-                    <div>
-                        <h5 class="modal-title fw-bold mb-1" id="vaccineModalLabel" style="font-size: 24px;">Vaccine Details</h5>
-                        <p class="mb-0 opacity-75 small">Complete information about this vaccine</p>
-                    </div>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: brightness(0) invert(1);"></button>
-            </div>
-            
-            <!-- Modal Body -->
-            <div class="modal-body" style="padding: 40px; background: #f6f3ec;">
-                <div id="vaccineContentContainer" class="vaccine-content-wrapper">
-                    <!-- Content will be inserted here via JavaScript -->
-                </div>
-            </div>
-            
-            <!-- Modal Footer -->
-            <div class="modal-footer" style="border: none; background: #f6f3ec; padding: 20px 40px;">
-                <!-- <a href="<?php echo home_url('/booking'); ?>" class="btn btn-lg px-4 py-2 me-2" style="background: linear-gradient(135deg, #da7215, #d35324); color: white; border: none; border-radius: 50px; font-weight: 600;">
-                    <i class="bi bi-calendar-check-fill me-2"></i> Book This Vaccine
-                </a> -->
-                <button type="button" class="btn btn-lg px-4 py-2" data-bs-dismiss="modal" style="background: #e7e0d3; color: #16232b; border: none; border-radius: 50px; font-weight: 600;">
-                    <i class="bi bi-x-circle me-2"></i> Close
-                </button>
-            </div>
-            
-        </div>
-    </div>
-</div>
 
 <!-- ================= INFO SECTION ================= -->
 <section class="py-5" style="background: linear-gradient(135deg, #f6f3ec 0%, #eef3ea 100%);">
@@ -255,258 +174,56 @@ get_header();
 </section>
 
 <style>
-/* Tab Navigation Styling */
-.nav-pills .nav-link {
-    background: #e7e0d3;
-    color: #4a575e;
-    border: 2px solid transparent;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.nav-pills .nav-link:hover {
-    background: #e7e0d3;
-    transform: translateY(-2px);
-}
-
-.nav-pills .nav-link.active {
-    background: #0b5c87;
-    color: white;
-    border-color: #0b5c87;
-}
-
-/* Table Row Hover Effect */
-.table tbody tr {
-    transition: all 0.3s;
-}
-
-.table tbody tr.vaccine-row:hover {
-    background: #eaf2f6 !important;
-    transform: scale(1.01);
-    box-shadow: 0 4px 12px rgba(11, 92, 135, 0.15);
-}
-
-/* Clickable Row Indicator */
-.vaccine-row:hover td {
-    color: #0b5c87;
-}
-
-/* Book Now Button Hover */
-a.btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(10, 42, 56, 0.35);
-}
-
-/* Modal Content Styling */
-.vaccine-content-wrapper {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.8;
-    color: #16232b;
-}
-
-.vaccine-content-wrapper h1,
-.vaccine-content-wrapper h2,
-.vaccine-content-wrapper h3,
-.vaccine-content-wrapper h4,
-.vaccine-content-wrapper h5,
-.vaccine-content-wrapper h6 {
-    color: #0b5c87;
-    font-weight: 700;
-    margin-top: 24px;
-    margin-bottom: 16px;
-    line-height: 1.3;
-}
-
-.vaccine-content-wrapper h1 {
-    font-size: 32px;
-    border-bottom: 3px solid #c9a24b;
-    padding-bottom: 12px;
-}
-
-.vaccine-content-wrapper h2 {
-    font-size: 28px;
-    border-left: 4px solid #0b5c87;
-    padding-left: 16px;
-}
-
-.vaccine-content-wrapper h3 {
-    font-size: 24px;
-    color: #0b5c87;
-}
-
-.vaccine-content-wrapper h4 {
-    font-size: 20px;
-    color: #0a2a38;
-}
-
-.vaccine-content-wrapper p {
-    margin-bottom: 16px;
-    font-size: 16px;
-    text-align: justify;
-}
-
-.vaccine-content-wrapper ul,
-.vaccine-content-wrapper ol {
-    margin-left: 20px;
-    margin-bottom: 20px;
-}
-
-.vaccine-content-wrapper ul li,
-.vaccine-content-wrapper ol li {
-    margin-bottom: 12px;
-    padding-left: 8px;
-    position: relative;
-}
-
-.vaccine-content-wrapper ul li::marker {
-    color: #0b5c87;
-    font-size: 20px;
-}
-
-.vaccine-content-wrapper ol li::marker {
-    color: #0b5c87;
-    font-weight: 700;
-}
-
-.vaccine-content-wrapper img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 16px;
-    margin: 24px 0;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    transition: transform 0.3s;
-}
-
-.vaccine-content-wrapper img:hover {
-    transform: scale(1.02);
-}
-
-.vaccine-content-wrapper blockquote {
-    background: linear-gradient(135deg, #f6f3ec 0%, #efe9db 100%);
-    border-left: 5px solid #0b5c87;
-    padding: 20px 24px;
-    margin: 24px 0;
-    border-radius: 8px;
-    font-style: italic;
-    color: #16232b;
-}
-
-.vaccine-content-wrapper table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 24px 0;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.vaccine-content-wrapper table th {
-    background: #0a2a38;
-    color: white;
-    padding: 16px;
-    text-align: left;
-    font-weight: 600;
-}
-
-.vaccine-content-wrapper table td {
-    padding: 14px 16px;
+.qv-entry {
     border-bottom: 1px solid #e7e0d3;
+    padding: 32px 0;
+}
+.qv-entry:first-of-type { padding-top: 0; }
+.qv-entry-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+.qv-entry-head h2 { font-size: 1.4rem; margin: 0 0 4px; }
+.qv-entry-head h2 a { color: #0a2a38; text-decoration: none; }
+.qv-entry-head h2 a:hover { color: #0b5c87; }
+.qv-disease { margin: 0; color: #4a575e; font-size: 13.5px; }
+.qv-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.qv-tag {
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 100px;
+    background: #eaf2f6; color: #0b5c87; white-space: nowrap;
 }
 
-.vaccine-content-wrapper table tr:last-child td {
-    border-bottom: none;
+.qv-brand-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.qv-brand {
+    width: 130px; background: #fff; border: 1px solid #e7e0d3; border-radius: 12px;
+    overflow: hidden; text-align: center;
 }
+.qv-brand-img {
+    height: 90px; background: linear-gradient(135deg, #eaf2f6, #cfe0e8);
+    display: flex; align-items: center; justify-content: center; padding: 6px;
+}
+.qv-brand-img img { width: 100%; height: 100%; object-fit: contain; }
+.qv-brand-img i { font-size: 1.5rem; color: #0b5c87; }
+.qv-brand-name { font-size: 11.5px; font-weight: 700; padding: 8px 8px 4px; color: #16232b; }
+.qv-brand-bottom { display: flex; align-items: center; justify-content: space-between; padding: 0 8px 10px; gap: 4px; }
+.qv-brand-price { font-size: 11px; font-weight: 700; color: #c9a24b; }
+.qv-brand-avail { font-size: 12px; font-weight: 800; }
+.qv-brand-avail.yes { color: #5a9c34; }
+.qv-brand-avail.no { color: #c0392b; }
+.qv-brand-oos { opacity: 0.6; }
+.qv-brand-oos .qv-brand-img img { filter: grayscale(1); }
 
-.vaccine-content-wrapper table tr:hover {
-    background: #f6f3ec;
-}
+.qv-no-brands { font-size: 13.5px; color: #8a959a; margin-bottom: 14px; }
 
-.vaccine-content-wrapper strong,
-.vaccine-content-wrapper b {
-    color: #0b5c87;
-    font-weight: 700;
+.qv-details-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13.5px; font-weight: 700; color: #0b5c87; text-decoration: none;
 }
-
-.vaccine-content-wrapper em,
-.vaccine-content-wrapper i {
-    color: #0b5c87;
-}
-
-.vaccine-content-wrapper a {
-    color: #0b5c87;
-    text-decoration: underline;
-    transition: color 0.3s;
-}
-
-.vaccine-content-wrapper a:hover {
-    color: #c9a24b;
-}
-
-.vaccine-content-wrapper code {
-    background: #e7e0d3;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
-    color: #0b5c87;
-}
-
-.vaccine-content-wrapper pre {
-    background: #16232b;
-    color: #e7e0d3;
-    padding: 20px;
-    border-radius: 12px;
-    overflow-x: auto;
-    margin: 24px 0;
-}
-
-/* Modal Animation */
-.modal.fade .modal-dialog {
-    transition: transform 0.4s ease-out;
-    transform: scale(0.8);
-}
-
-.modal.show .modal-dialog {
-    transform: scale(1);
-}
-
-/* Responsive Styling */
-@media (max-width: 768px) {
-    .vaccine-content-wrapper h1 {
-        font-size: 26px;
-    }
-    
-    .vaccine-content-wrapper h2 {
-        font-size: 22px;
-    }
-    
-    .vaccine-content-wrapper h3 {
-        font-size: 20px;
-    }
-}
+.qv-details-link:hover { color: #0a2a38; }
 </style>
-
-<script>
-// Vanilla JavaScript - No jQuery needed
-function openVaccineModal(element) {
-    // Get data from clicked row
-    const vaccineTitle = element.getAttribute('data-vaccine-title');
-    const vaccineContent = element.getAttribute('data-vaccine-content');
-    
-    // Update modal title
-    document.getElementById('vaccineModalLabel').innerHTML = '<i class="bi bi-virus2 me-2"></i>' + vaccineTitle;
-    
-    // Update modal content
-    document.getElementById('vaccineContentContainer').innerHTML = vaccineContent;
-    
-    // Show modal using Bootstrap 5
-    const modalElement = document.getElementById('vaccineModal');
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
-}
-
-// Debug: Check if script is loading
-console.log('Vaccine modal script loaded successfully!');
-</script>
 
 <?php get_footer(); ?>
