@@ -44,7 +44,7 @@ while (have_posts()) : the_post();
                         <div class="d-flex align-items-center">
                             <?php echo get_avatar(get_the_author_meta('ID'), 48, '', '', array('class' => 'rounded-circle me-3')); ?>
                             <div>
-                                <p class="mb-0 fw-bold" style="color: var(--color-ivory);"><?php the_author(); ?></p>
+                                <p class="mb-0 fw-bold" style="color: var(--color-ivory);"><?php echo esc_html( vaccination_centre_byline() ); ?></p>
                                 <p class="mb-0 small"><?php the_author_meta('description') ? wp_trim_words(get_the_author_meta('description'), 8) : 'Author'; ?></p>
                             </div>
                         </div>
@@ -139,15 +139,15 @@ while (have_posts()) : the_post();
                                 <?php echo get_avatar(get_the_author_meta('ID'), 100, '', '', array('class' => 'rounded-circle')); ?>
                             </div>
                             <div class="flex-grow-1">
-                                <h5 class="fw-bold mb-2">About <?php the_author(); ?></h5>
+                                <h5 class="fw-bold mb-2">About <?php echo esc_html( vaccination_centre_byline() ); ?></h5>
                                 <p class="text-muted mb-3">
-                                    <?php 
+                                    <?php
                                     $author_bio = get_the_author_meta('description');
                                     echo $author_bio ? $author_bio : 'Healthcare professional and writer passionate about child health and vaccination awareness.';
                                     ?>
                                 </p>
                                 <a href="<?php echo get_author_posts_url(get_the_author_meta('ID')); ?>" class="text-decoration-none fw-bold" style="color: var(--color-blue);">
-                                    View all posts by <?php the_author(); ?> <i class="bi bi-arrow-right"></i>
+                                    View all posts by <?php echo esc_html( vaccination_centre_byline() ); ?> <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
                         </div>

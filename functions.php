@@ -727,6 +727,41 @@ add_action( 'save_post_vaccine', function ( $post_id ) {
 
 
 /* ==========================================================================
+   8a. POST BYLINE (free-text author display name, independent of WP user)
+   ========================================================================== */
+add_action( 'add_meta_boxes', function () {
+    add_meta_box( 'post_byline', __( 'Byline', 'vaccination-centre' ),
+        'vaccination_centre_byline_callback', 'post', 'side', 'default' );
+} );
+
+function vaccination_centre_byline_callback( $post ) {
+    wp_nonce_field( 'post_byline_nonce', 'post_byline_nonce_field' );
+    $byline = get_post_meta( $post->ID, '_byline_name', true );
+    ?>
+    <label for="byline_name"><?php _e( 'Author Name', 'vaccination-centre' ); ?></label>
+    <input type="text" id="byline_name" name="byline_name" value="<?php echo esc_attr( $byline ); ?>" class="widefat" placeholder="<?php esc_attr_e( 'e.g. Dr. Salman Bajwa', 'vaccination-centre' ); ?>">
+    <p class="description"><?php _e( 'Optional. Overrides the WordPress user name shown on the front end.', 'vaccination-centre' ); ?></p>
+    <?php
+}
+
+add_action( 'save_post_post', function ( $post_id ) {
+    if ( ! isset( $_POST['post_byline_nonce_field'] ) ||
+         ! wp_verify_nonce( $_POST['post_byline_nonce_field'], 'post_byline_nonce' ) ) return;
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
+    if ( ! current_user_can( 'edit_post', $post_id ) ) return;
+
+    if ( isset( $_POST['byline_name'] ) )
+        update_post_meta( $post_id, '_byline_name', sanitize_text_field( $_POST['byline_name'] ) );
+} );
+
+function vaccination_centre_byline( $post_id = null ) {
+    $post_id = $post_id ?: get_the_ID();
+    $byline  = get_post_meta( $post_id, '_byline_name', true );
+    return $byline ? $byline : get_the_author_meta( 'display_name', get_post_field( 'post_author', $post_id ) );
+}
+
+
+/* ==========================================================================
    9a. REGISTER DISEASE CUSTOM POST TYPE
    ========================================================================== */
 function vaccination_centre_register_disease() {

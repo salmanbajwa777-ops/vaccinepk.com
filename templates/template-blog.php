@@ -101,7 +101,7 @@ if ($featured_query->have_posts()) :
                 <div class="d-flex align-items-center mb-4">
                     <?php echo get_avatar(get_the_author_meta('ID'), 40, '', '', array('class' => 'rounded-circle me-3')); ?>
                     <div>
-                        <p class="mb-0 fw-bold small"><?php the_author(); ?></p>
+                        <p class="mb-0 fw-bold small"><?php echo esc_html( vaccination_centre_byline() ); ?></p>
                         <p class="mb-0 text-muted small"><?php echo human_time_diff(get_the_time('U'), current_time('timestamp')) . ' ago'; ?></p>
                     </div>
                 </div>
@@ -218,7 +218,7 @@ endif;
                         <div class="d-flex align-items-center justify-content-between pt-3" style="border-top: 1px solid #f3f4f6;">
                             <div class="d-flex align-items-center">
                                 <?php echo get_avatar(get_the_author_meta('ID'), 32, '', '', array('class' => 'rounded-circle me-2')); ?>
-                                <span class="small text-muted"><?php the_author(); ?></span>
+                                <span class="small text-muted"><?php echo esc_html( vaccination_centre_byline() ); ?></span>
                             </div>
                             <a href="<?php the_permalink(); ?>" class="text-decoration-none small fw-bold" style="color: var(--color-blue);">
                                 Read More <i class="bi bi-arrow-right"></i>
