@@ -28,6 +28,12 @@ $related_vaccines = get_posts( [
     background: var(--color-navy);
     color: white; padding: 60px 0; margin-bottom: 50px;
 }
+.disease-hero h1 { color: var(--color-ivory); }
+.disease-hero h1 i { color: var(--color-gold); }
+.disease-hero .accent-bar {
+    width: 56px; height: 4px; background: var(--color-gold);
+    border-radius: 2px; margin: 0 0 16px;
+}
 .disease-detail-card {
     background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(10,42,56,0.08);
     padding: 40px; margin-bottom: 30px;
@@ -51,6 +57,7 @@ $related_vaccines = get_posts( [
                 <li class="breadcrumb-item active" aria-current="page" style="color:white;"><?php the_title(); ?></li>
             </ol>
         </nav>
+        <div class="accent-bar"></div>
         <h1 class="display-4 fw-bold mb-2"><i class="bi bi-virus2 me-3"></i><?php the_title(); ?></h1>
         <p class="lead mb-0">Symptoms, complications, prevention, and vaccination guidance.</p>
     </div>
