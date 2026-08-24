@@ -877,6 +877,7 @@ function vaccination_centre_city_details_callback( $post ) {
     $areas         = get_post_meta( $post->ID, 'city_areas_covered', true );
     $response_time = get_post_meta( $post->ID, 'city_response_time', true );
     $address       = get_post_meta( $post->ID, 'city_clinic_address', true );
+    $staff_email   = get_post_meta( $post->ID, 'city_staff_email', true );
     ?>
     <table class="form-table">
         <tr>
@@ -894,6 +895,13 @@ function vaccination_centre_city_details_callback( $post ) {
             <th><label for="city_clinic_address"><?php _e( 'Clinic Address (optional)', 'vaccination-centre' ); ?></label></th>
             <td><input type="text" id="city_clinic_address" name="city_clinic_address" value="<?php echo esc_attr( $address ); ?>" class="regular-text"></td>
         </tr>
+        <tr>
+            <th><label for="city_staff_email"><?php _e( 'Staff / PA Email', 'vaccination-centre' ); ?></label></th>
+            <td>
+                <input type="email" id="city_staff_email" name="city_staff_email" value="<?php echo esc_attr( $staff_email ); ?>" class="regular-text" placeholder="staff@example.com">
+                <p class="description"><?php _e( 'This person is CC\'d on every booking notification for this city. Leave blank to skip.', 'vaccination-centre' ); ?></p>
+            </td>
+        </tr>
     </table>
     <?php
 }
@@ -910,6 +918,8 @@ add_action( 'save_post_city', function ( $post_id ) {
         update_post_meta( $post_id, 'city_response_time', sanitize_text_field( $_POST['city_response_time'] ) );
     if ( isset( $_POST['city_clinic_address'] ) )
         update_post_meta( $post_id, 'city_clinic_address', sanitize_text_field( $_POST['city_clinic_address'] ) );
+    if ( isset( $_POST['city_staff_email'] ) )
+        update_post_meta( $post_id, 'city_staff_email', sanitize_email( $_POST['city_staff_email'] ) );
 } );
 
 
