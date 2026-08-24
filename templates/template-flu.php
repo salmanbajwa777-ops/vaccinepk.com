@@ -349,12 +349,13 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
                         <input type="text" name="address" class="flu-bf-input" placeholder="House, street, area...">
                     </div>
                     <div class="flu-field-group">
-                        <label class="flu-field-label">Preferred date*</label>
-                        <input type="date" name="preferred_date" class="flu-bf-input" required>
+                        <label class="flu-field-label">Preferred date <span class="flu-field-hint">optional</span></label>
+                        <input type="text" id="fluDateDisplay" class="flu-bf-input" placeholder="dd/mm/yyyy" inputmode="numeric" autocomplete="off" maxlength="10">
+                        <input type="hidden" name="preferred_date" id="fluDateValue">
                     </div>
                     <div class="flu-field-group">
-                        <label class="flu-field-label">Preferred time slot*</label>
-                        <select name="time_slot" class="flu-bf-input" required>
+                        <label class="flu-field-label">Preferred time slot <span class="flu-field-hint">optional</span></label>
+                        <select name="time_slot" class="flu-bf-input">
                             <option value="">Select time</option>
                             <option>Morning (9AM – 12PM)</option>
                             <option>Afternoon (12PM – 3PM)</option>
@@ -509,6 +510,42 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     });
 
     recalc();
+
+    // dd/mm/yyyy display input, kept in sync with a hidden yyyy-mm-dd field
+    // (what the server actually receives) — matches the site's other
+    // properties, since a native <input type="date"> shows whatever format
+    // the visitor's OS/browser locale happens to use.
+    (function () {
+        var display = document.getElementById('fluDateDisplay');
+        var hidden  = document.getElementById('fluDateValue');
+
+        display.addEventListener('input', function () {
+            var digits = display.value.replace(/[^\d]/g, '').slice(0, 8);
+            var out = digits;
+            if (digits.length > 4) out = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+            else if (digits.length > 2) out = digits.slice(0, 2) + '/' + digits.slice(2);
+            display.value = out;
+
+            hidden.value = '';
+            if (digits.length === 8) {
+                var day = parseInt(digits.slice(0, 2), 10);
+                var month = parseInt(digits.slice(2, 4), 10);
+                var year = parseInt(digits.slice(4, 8), 10);
+                var d = new Date(year, month - 1, day);
+                var isReal = d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+                if (isReal) {
+                    hidden.value = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                    display.setCustomValidity('');
+                } else {
+                    display.setCustomValidity('Enter a real date as dd/mm/yyyy');
+                }
+            } else if (digits.length > 0) {
+                display.setCustomValidity('Enter the full date as dd/mm/yyyy');
+            } else {
+                display.setCustomValidity('');
+            }
+        });
+    })();
 
     var form = document.getElementById('fluBookingForm');
     var msg  = document.getElementById('fluFormMsg');
