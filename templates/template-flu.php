@@ -139,7 +139,7 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
 
 .flu-booking-form { padding: 30px; }
 .flu-bf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 22px; }
-@media (max-width: 640px) { .flu-bf-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .flu-bf-grid { grid-template-columns: 1fr; } }
 .flu-bf-input { width: 100%; padding: 12px 14px; border: 2px solid var(--color-sand); border-radius: 8px; font-size: 14.5px; color: var(--color-ink-strong); background: #fff; }
 .flu-bf-input:focus-visible { outline: none; border-color: var(--color-blue); box-shadow: 0 0 0 3px rgba(11,92,135,.1); }
 .flu-bf-checkbox { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--color-ink); margin-bottom: 22px; }
