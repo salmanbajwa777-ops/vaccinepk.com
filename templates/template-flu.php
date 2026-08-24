@@ -60,8 +60,8 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
 .flu-hero-badges { display: flex; gap: 8px; flex-wrap: wrap; position: relative; z-index: 1; }
 .flu-hero-badge { font-size: 12px; font-weight: 700; padding: 5px 13px; border-radius: 100px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.18); }
 
-.flu-section { padding: 48px 0; }
-.flu-section-label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-blue); margin-bottom: 8px; }
+.flu-section { padding: 32px 0; }
+.flu-section-label { font-size: 15px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; color: var(--color-blue); margin-bottom: 6px; }
 .flu-section h2 { font-family: var(--font-display); font-size: 1.55rem; color: var(--color-ink-strong); margin-bottom: 6px; }
 .flu-section > p { color: var(--color-ink); font-size: 14.5px; margin: 0 0 26px; max-width: 62ch; }
 
@@ -175,7 +175,8 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     .flu-hero .lead { font-size: 14px; }
     .flu-hero-badge { font-size: 11px; padding: 4px 10px; }
 
-    .flu-section { padding: 32px 0; }
+    .flu-section { padding: 22px 0; }
+    .flu-section-label { font-size: 14px; }
     .flu-section h2 { font-size: 1.25rem; }
     .flu-section > p { font-size: 13.5px; }
 
@@ -341,11 +342,6 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
                                 <tr><td><?php echo (int) $base_group + 1; ?>th person onward</td><td>+ PKR <?php echo esc_html( number_format( $extra_charge ) ); ?> each</td></tr>
                             </tbody>
                         </table>
-                    </div>
-
-                    <div class="flu-info-note">
-                        <i class="bi bi-info-circle-fill" style="color:var(--color-blue);"></i>
-                        <span>First-time children under 9 need a second dose 4 weeks later — our staff will guide you at the visit and schedule that separately when it's due.</span>
                     </div>
                 </div>
 
