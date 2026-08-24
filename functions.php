@@ -1187,6 +1187,33 @@ function vaccinepk_flu_setting( $field_name, $default = '' ) {
     return ( $value !== '' && $value !== null && $value !== [] ) ? $value : $default;
 }
 
+// TEMPORARY diagnostic — admin-only, remove once the Currency-field read bug
+// is confirmed fixed. Dumps every storage path we've tried so we can see the
+// actual stored value instead of guessing further. Visit /?flu_debug=1 while
+// logged in as an admin.
+add_action( 'template_redirect', function () {
+    if ( ! isset( $_GET['flu_debug'] ) || ! current_user_can( 'manage_options' ) ) return;
+
+    header( 'Content-Type: text/plain' );
+    foreach ( [ 'base_service_charge', 'base_group', 'extra_person_charges', 'admin_notification_email' ] as $f ) {
+        echo "=== $f ===\n";
+        echo 'get_option: '; var_export( get_option( 'flu_bookings_setting_' . $f, '(not set)' ) ); echo "\n";
+        if ( function_exists( 'pods_field_raw' ) ) {
+            echo 'pods_field_raw: '; var_export( pods_field_raw( 'flu_bookings_setting', 0, $f ) ); echo "\n";
+        }
+        $pod = pods( 'flu_bookings_setting' );
+        echo 'pods()->field: '; var_export( $pod ? $pod->field( $f ) : '(no pod)' ); echo "\n\n";
+    }
+
+    global $wpdb;
+    echo "=== raw wp_options rows LIKE 'flu_bookings_setting%' ===\n";
+    $rows = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE 'flu_bookings_setting%'" );
+    foreach ( $rows as $row ) {
+        echo $row->option_name . ' => '; var_export( $row->option_value ); echo "\n";
+    }
+    exit;
+} );
+
 // Same charge-tier rule everywhere it's used: flat base charge covers the
 // base group size, then a per-person charge for every person beyond that.
 function vaccinepk_flu_service_charge( $people_count ) {
