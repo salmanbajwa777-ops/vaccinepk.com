@@ -1206,11 +1206,23 @@ add_action( 'template_redirect', function () {
     }
 
     global $wpdb;
-    echo "=== raw wp_options rows LIKE 'flu_bookings_setting%' ===\n";
-    $rows = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE 'flu_bookings_setting%'" );
+    echo "=== raw wp_options rows LIKE '%flu_bookings%' ===\n";
+    $rows = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE '%flu_bookings%'" );
     foreach ( $rows as $row ) {
         echo $row->option_name . ' => '; var_export( $row->option_value ); echo "\n";
     }
+    if ( ! $rows ) echo "(none found)\n";
+
+    echo "\n=== flu_bookings_setting posts ===\n";
+    $posts = get_posts( [ 'post_type' => 'flu_bookings_setting', 'post_status' => 'any', 'posts_per_page' => -1 ] );
+    foreach ( $posts as $p ) {
+        echo "Post ID {$p->ID}, status={$p->post_status}\n";
+        $meta = get_post_meta( $p->ID );
+        foreach ( $meta as $key => $vals ) {
+            echo "  $key => "; var_export( $vals ); echo "\n";
+        }
+    }
+    if ( ! $posts ) echo "(none found)\n";
     exit;
 } );
 
