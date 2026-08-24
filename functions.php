@@ -1165,66 +1165,22 @@ function vaccinepk_flu_bookings_table_exists() {
     return $exists;
 }
 
-// flu_bookings_setting is a Pods "Custom Settings Page". Number fields round-trip
-// fine via plain get_option('flu_bookings_setting_{field}'), but Currency fields
-// (base_service_charge, extra_person_charges) are a known Pods quirk: they can
-// silently save empty on a Settings Page until the field is re-saved (Pods
-// issues #5597 / #3218). pods_field_raw() goes through Pods' own getter instead
-// of a raw option read, so it's tried first; get_option() and a plain field()
-// call are kept as fallbacks in case any one path is the one that actually has
-// data on a given install.
+// flu_bookings_setting is a Pods "Custom Settings Page", but on this install
+// it stores its field values as plain POST META on the single settings post
+// (confirmed via a direct wp_postmeta dump — NOT wp_options, and NOT reliably
+// readable through pods()->field() either). Reading get_post_meta() directly
+// is therefore the simple, correct path: no Pods API layer to fight.
 function vaccinepk_flu_setting( $field_name, $default = '' ) {
-    if ( function_exists( 'pods_field_raw' ) ) {
-        $value = pods_field_raw( 'flu_bookings_setting', 0, $field_name );
-        if ( $value !== '' && $value !== null && $value !== [] ) return $value;
+    static $settings_post_id = null;
+    if ( $settings_post_id === null ) {
+        $posts = get_posts( [ 'post_type' => 'flu_bookings_setting', 'post_status' => 'publish', 'posts_per_page' => 1 ] );
+        $settings_post_id = $posts ? $posts[0]->ID : 0;
     }
+    if ( ! $settings_post_id ) return $default;
 
-    $value = get_option( 'flu_bookings_setting_' . $field_name, '' );
-    if ( $value !== '' && $value !== null ) return $value;
-
-    $pod = pods( 'flu_bookings_setting' );
-    $value = $pod ? $pod->field( $field_name ) : '';
-    return ( $value !== '' && $value !== null && $value !== [] ) ? $value : $default;
+    $value = get_post_meta( $settings_post_id, $field_name, true );
+    return ( $value !== '' && $value !== null && $value !== false ) ? $value : $default;
 }
-
-// TEMPORARY diagnostic — admin-only, remove once the Currency-field read bug
-// is confirmed fixed. Dumps every storage path we've tried so we can see the
-// actual stored value instead of guessing further. Visit /?flu_debug=1 while
-// logged in as an admin.
-add_action( 'template_redirect', function () {
-    if ( ! isset( $_GET['flu_debug'] ) || ! current_user_can( 'manage_options' ) ) return;
-
-    header( 'Content-Type: text/plain' );
-    foreach ( [ 'base_service_charge', 'base_group', 'extra_person_charges', 'admin_notification_email' ] as $f ) {
-        echo "=== $f ===\n";
-        echo 'get_option: '; var_export( get_option( 'flu_bookings_setting_' . $f, '(not set)' ) ); echo "\n";
-        if ( function_exists( 'pods_field_raw' ) ) {
-            echo 'pods_field_raw: '; var_export( pods_field_raw( 'flu_bookings_setting', 0, $f ) ); echo "\n";
-        }
-        $pod = pods( 'flu_bookings_setting' );
-        echo 'pods()->field: '; var_export( $pod ? $pod->field( $f ) : '(no pod)' ); echo "\n\n";
-    }
-
-    global $wpdb;
-    echo "=== raw wp_options rows LIKE '%flu_bookings%' ===\n";
-    $rows = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE '%flu_bookings%'" );
-    foreach ( $rows as $row ) {
-        echo $row->option_name . ' => '; var_export( $row->option_value ); echo "\n";
-    }
-    if ( ! $rows ) echo "(none found)\n";
-
-    echo "\n=== flu_bookings_setting posts ===\n";
-    $posts = get_posts( [ 'post_type' => 'flu_bookings_setting', 'post_status' => 'any', 'posts_per_page' => -1 ] );
-    foreach ( $posts as $p ) {
-        echo "Post ID {$p->ID}, status={$p->post_status}\n";
-        $meta = get_post_meta( $p->ID );
-        foreach ( $meta as $key => $vals ) {
-            echo "  $key => "; var_export( $vals ); echo "\n";
-        }
-    }
-    if ( ! $posts ) echo "(none found)\n";
-    exit;
-} );
 
 // Same charge-tier rule everywhere it's used: flat base charge covers the
 // base group size, then a per-person charge for every person beyond that.
