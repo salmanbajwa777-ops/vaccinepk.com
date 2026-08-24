@@ -1146,3 +1146,154 @@ add_action( 'wp_head', function () {
 
     echo "\n<script type=\"application/ld+json\">" . wp_json_encode( $schema ) . "</script>\n";
 } );
+
+
+/* ==========================================================================
+   14. FLU BOOKING PAGE (/flu) — SUBMIT HANDLER
+       Table: {$wpdb->prefix}flu_bookings (see sql/2026-08-25-flu-bookings.sql).
+       Price/charge are stored as a snapshot at booking time so a later change
+       to a Brand's price or the Flu Bookings Settings charge tiers can never
+       silently reprice a booking that already happened.
+   ========================================================================== */
+function vaccinepk_flu_bookings_table_exists() {
+    global $wpdb;
+    static $exists = null;
+    if ( $exists === null ) {
+        $table  = $wpdb->prefix . 'flu_bookings';
+        $exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table;
+    }
+    return $exists;
+}
+
+// Same charge-tier rule everywhere it's used: flat base charge covers the
+// base group size, then a per-person charge for every person beyond that.
+function vaccinepk_flu_service_charge( $people_count ) {
+    $settings   = pods( 'flu_bookings_setting' );
+    $base       = (float) $settings->field( 'base_service_charge' );
+    $base_group = (int) $settings->field( 'base_group' );
+    $extra_each = (float) $settings->field( 'extra_person_charges' );
+
+    if ( $people_count <= $base_group ) return $base;
+    return $base + ( $people_count - $base_group ) * $extra_each;
+}
+
+function vaccinepk_submit_flu_booking_ajax() {
+    check_ajax_referer( 'vaccination_booking_nonce', 'nonce' );
+
+    if ( ! vaccinepk_flu_bookings_table_exists() ) {
+        wp_send_json_error( [ 'message' => 'Booking is temporarily unavailable. Please call or WhatsApp us instead.' ] );
+    }
+
+    $full_name    = isset( $_POST['full_name'] ) ? sanitize_text_field( $_POST['full_name'] ) : '';
+    $whatsapp     = isset( $_POST['whatsapp_number'] ) ? sanitize_text_field( $_POST['whatsapp_number'] ) : '';
+    $email        = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    $address      = isset( $_POST['address'] ) ? sanitize_text_field( $_POST['address'] ) : '';
+    $brand_id     = isset( $_POST['brand_id'] ) ? absint( $_POST['brand_id'] ) : 0;
+    $city_id      = isset( $_POST['city_id'] ) ? absint( $_POST['city_id'] ) : 0;
+    $people_count = isset( $_POST['people_count'] ) ? min( 30, max( 1, absint( $_POST['people_count'] ) ) ) : 1;
+    $pref_date    = isset( $_POST['preferred_date'] ) ? sanitize_text_field( $_POST['preferred_date'] ) : '';
+    $time_slot    = isset( $_POST['time_slot'] ) ? sanitize_text_field( $_POST['time_slot'] ) : '';
+    $location     = ( isset( $_POST['location_type'] ) && $_POST['location_type'] === 'home' ) ? 'home' : 'clinic';
+
+    if ( ! $full_name || ! $whatsapp || ! $email || ! $brand_id || ! $city_id ) {
+        wp_send_json_error( [ 'message' => 'Please fill in all required fields.' ] );
+    }
+
+    $brand = get_post( $brand_id );
+    $city  = get_post( $city_id );
+    if ( ! $brand || $brand->post_type !== 'brand' || ! $city || $city->post_type !== 'city' ) {
+        wp_send_json_error( [ 'message' => 'Invalid brand or city selected.' ] );
+    }
+
+    $brand_price     = (float) get_post_meta( $brand_id, 'price', true );
+    $service_charge  = vaccinepk_flu_service_charge( $people_count );
+    $total           = ( $brand_price * $people_count ) + $service_charge;
+
+    global $wpdb;
+    $wpdb->insert(
+        $wpdb->prefix . 'flu_bookings',
+        [
+            'full_name'               => $full_name,
+            'whatsapp_number'         => $whatsapp,
+            'email'                   => $email,
+            'city_id'                 => $city_id,
+            'city_name'               => $city->post_title,
+            'address'                 => $address,
+            'brand_id'                => $brand_id,
+            'brand_name'              => $brand->post_title,
+            'people_count'            => $people_count,
+            'brand_price_snapshot'    => $brand_price,
+            'service_charge_snapshot' => $service_charge,
+            'total_snapshot'          => $total,
+            'preferred_date'          => $pref_date ?: null,
+            'time_slot'               => $time_slot,
+            'location_type'           => $location,
+            'status'                  => 'new',
+            'created_at'              => current_time( 'mysql' ),
+        ],
+        [ '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s', '%d', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s' ]
+    );
+
+    // The booking row above is the source of truth — it's already saved by
+    // this point. Email is best-effort on top of it, so a mail-server hiccup
+    // must never look like a failed booking to the person who just paid
+    // nothing and is waiting for a confirmation screen.
+    vaccinepk_send_flu_booking_emails( [
+        'full_name'       => $full_name,
+        'whatsapp_number' => $whatsapp,
+        'email'           => $email,
+        'city_name'       => $city->post_title,
+        'city_staff_email'=> get_post_meta( $city_id, 'city_staff_email', true ),
+        'address'         => $address,
+        'brand_name'      => $brand->post_title,
+        'people_count'    => $people_count,
+        'total'           => $total,
+        'preferred_date'  => $pref_date,
+        'time_slot'       => $time_slot,
+        'location'        => $location,
+    ] );
+
+    wp_send_json_success( [ 'total' => $total ] );
+}
+add_action( 'wp_ajax_submit_flu_booking',        'vaccinepk_submit_flu_booking_ajax' );
+add_action( 'wp_ajax_nopriv_submit_flu_booking', 'vaccinepk_submit_flu_booking_ajax' );
+
+function vaccinepk_send_flu_booking_emails( $b ) {
+    $settings    = pods( 'flu_bookings_setting' );
+    $admin_email = $settings->field( 'admin_notification_email' );
+
+    $location_label = $b['location'] === 'home' ? 'Home Service' : 'Clinic Visit';
+    $subject_ref     = 'Flu Booking — ' . $b['full_name'] . ' (' . $b['city_name'] . ')';
+
+    $body = "<p><strong>New flu vaccine booking</strong></p><ul>"
+        . '<li>Name: ' . esc_html( $b['full_name'] ) . '</li>'
+        . '<li>WhatsApp: ' . esc_html( $b['whatsapp_number'] ) . '</li>'
+        . '<li>Email: ' . esc_html( $b['email'] ) . '</li>'
+        . '<li>City: ' . esc_html( $b['city_name'] ) . '</li>'
+        . ( $b['address'] ? '<li>Address: ' . esc_html( $b['address'] ) . '</li>' : '' )
+        . '<li>Brand: ' . esc_html( $b['brand_name'] ) . '</li>'
+        . '<li>People: ' . esc_html( $b['people_count'] ) . '</li>'
+        . '<li>Total: PKR ' . number_format( $b['total'] ) . '</li>'
+        . ( $b['preferred_date'] ? '<li>Preferred date: ' . esc_html( $b['preferred_date'] ) . '</li>' : '' )
+        . ( $b['time_slot'] ? '<li>Time slot: ' . esc_html( $b['time_slot'] ) . '</li>' : '' )
+        . '<li>Location: ' . esc_html( $location_label ) . '</li>'
+        . '</ul>';
+
+    $headers = [ 'Content-Type: text/html; charset=UTF-8' ];
+
+    if ( $admin_email ) {
+        wp_mail( $admin_email, $subject_ref, $body, $headers );
+    }
+    if ( $b['city_staff_email'] ) {
+        wp_mail( $b['city_staff_email'], $subject_ref, $body, $headers );
+    }
+
+    $customer_body = "<p>Hi " . esc_html( $b['full_name'] ) . ",</p>"
+        . "<p>Thanks for booking your flu vaccine with Vaccine.Pk. Here's a summary:</p><ul>"
+        . '<li>Brand: ' . esc_html( $b['brand_name'] ) . '</li>'
+        . '<li>People: ' . esc_html( $b['people_count'] ) . '</li>'
+        . '<li>Total: PKR ' . number_format( $b['total'] ) . '</li>'
+        . '<li>Location: ' . esc_html( $location_label ) . '</li>'
+        . '</ul><p>We\'ll contact you on WhatsApp shortly to confirm your appointment slot.</p>';
+    wp_mail( $b['email'], 'Your Flu Vaccine Booking — Vaccine.Pk', $customer_body, $headers );
+}
