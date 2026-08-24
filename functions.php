@@ -1165,26 +1165,28 @@ function vaccinepk_flu_bookings_table_exists() {
     return $exists;
 }
 
-// flu_bookings_setting is a Pods "Custom Settings Page", which Pods stores as
-// a single real post (not a true options-style pod like site_contact_settings) —
-// pods('flu_bookings_setting') with no ID does not reliably resolve its fields,
-// so every reader must fetch that one post explicitly.
-function vaccinepk_flu_settings_pod() {
-    static $pod = null;
-    if ( $pod !== null ) return $pod;
+// flu_bookings_setting is a Pods "Custom Settings Page". Pods registers a
+// placeholder post for it (so REST/admin routes exist), but the field VALUES
+// themselves save to wp_options under `flu_bookings_setting_{field_name}`,
+// not to that post's meta — pods('flu_bookings_setting')->field(...) can
+// return empty depending on Pods version/caching, so read wp_options first
+// (the documented, storage-accurate path) and fall back to the Pods API call
+// only if that's somehow empty too.
+function vaccinepk_flu_setting( $field_name, $default = '' ) {
+    $value = get_option( 'flu_bookings_setting_' . $field_name, '' );
+    if ( $value !== '' && $value !== null ) return $value;
 
-    $existing = get_posts( [ 'post_type' => 'flu_bookings_setting', 'post_status' => 'publish', 'posts_per_page' => 1 ] );
-    $pod      = $existing ? pods( 'flu_bookings_setting', $existing[0]->ID ) : pods( 'flu_bookings_setting' );
-    return $pod;
+    $pod = pods( 'flu_bookings_setting' );
+    $value = $pod ? $pod->field( $field_name ) : '';
+    return ( $value !== '' && $value !== null ) ? $value : $default;
 }
 
 // Same charge-tier rule everywhere it's used: flat base charge covers the
 // base group size, then a per-person charge for every person beyond that.
 function vaccinepk_flu_service_charge( $people_count ) {
-    $settings   = vaccinepk_flu_settings_pod();
-    $base       = (float) $settings->field( 'base_service_charge' );
-    $base_group = (int) $settings->field( 'base_group' ) ?: 4;
-    $extra_each = (float) $settings->field( 'extra_person_charges' );
+    $base       = (float) vaccinepk_flu_setting( 'base_service_charge' );
+    $base_group = (int) vaccinepk_flu_setting( 'base_group', 4 );
+    $extra_each = (float) vaccinepk_flu_setting( 'extra_person_charges' );
 
     if ( $people_count <= $base_group ) return $base;
     return $base + ( $people_count - $base_group ) * $extra_each;
@@ -1272,8 +1274,7 @@ add_action( 'wp_ajax_submit_flu_booking',        'vaccinepk_submit_flu_booking_a
 add_action( 'wp_ajax_nopriv_submit_flu_booking', 'vaccinepk_submit_flu_booking_ajax' );
 
 function vaccinepk_send_flu_booking_emails( $b ) {
-    $settings    = vaccinepk_flu_settings_pod();
-    $admin_email = $settings->field( 'admin_notification_email' );
+    $admin_email = vaccinepk_flu_setting( 'admin_notification_email' );
 
     $location_label = $b['location'] === 'home' ? 'Home Service' : 'Clinic Visit';
     $subject_ref     = 'Flu Booking — ' . $b['full_name'] . ' (' . $b['city_name'] . ')';
