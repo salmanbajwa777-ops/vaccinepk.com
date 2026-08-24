@@ -164,6 +164,65 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
 .flu-sticky-cta .amount { font-family: var(--font-display); font-weight: 800; font-size: 19px; color: #fff; }
 .flu-sticky-cta .amount-label { font-size: 11px; color: var(--color-sub-on-blue); }
 @media (max-width: 860px) { .flu-sticky-cta { display: block; } }
+
+/* ===== Small phones (mid-range Samsung etc., ~360-412px) =====
+   The breakpoints above only reflow columns; below this width the
+   desktop type scale, padding, and touch targets are still too small
+   for a real phone, so this pass resizes rather than just re-stacks. */
+@media (max-width: 480px) {
+    .flu-hero { padding: 36px 0 30px; }
+    .flu-hero h1 { font-size: 1.55rem; line-height: 1.25; }
+    .flu-hero .lead { font-size: 14px; }
+    .flu-hero-badge { font-size: 11px; padding: 4px 10px; }
+
+    .flu-section { padding: 32px 0; }
+    .flu-section h2 { font-size: 1.25rem; }
+    .flu-section > p { font-size: 13.5px; }
+
+    .flu-brand-card { border-radius: 14px; }
+    .flu-brand-img { height: 130px; }
+    .flu-brand-body { padding: 14px 16px; }
+    .flu-brand-body h3 { font-size: 1rem; }
+    .flu-brand-price { font-size: 1.15rem; }
+    .flu-brand-avail { font-size: 10px; padding: 3px 9px; top: 9px; right: 9px; }
+
+    .flu-calc-card { border-radius: 14px; }
+    .flu-calc-left, .flu-calc-right, .flu-booking-form { padding: 18px 16px; }
+    .flu-field-group { margin-bottom: 20px; }
+    .flu-selected-chip { font-size: 13px; padding: 11px 13px; }
+
+    /* Steppers are the main tap target on this page — make them thumb-sized. */
+    .flu-stepper button { width: 52px; height: 52px; font-size: 22px; }
+    .flu-stepper input { width: 70px; height: 52px; font-size: 18px; }
+
+    .flu-tier-table { font-size: 12px; }
+    .flu-tier-table th, .flu-tier-table td { padding: 7px 6px; }
+
+    .flu-sum-row { font-size: 13.5px; }
+    .flu-sum-total .amount { font-size: 26px; }
+    .flu-btn { font-size: 14px; padding: 14px 20px; }
+    .flu-calc-right .flu-btn { padding: 16px; }
+
+    .flu-booking-summary-strip { padding: 12px 16px; gap: 16px; }
+    .flu-bss-item .v { font-size: 13px; }
+    .flu-bss-total .v { font-size: 16px; }
+
+    /* 16px min font-size on inputs stops iOS Safari auto-zooming on focus,
+       which otherwise makes the form feel broken on exactly this class of
+       device. */
+    .flu-bf-input, #fluDateDisplay { font-size: 16px; padding: 13px 14px; }
+    .flu-loc-opt { font-size: 13.5px; padding: 13px 14px; }
+    .flu-bf-checkbox { font-size: 12.5px; }
+
+    .flu-faq-item summary { font-size: 13.5px; padding: 14px 16px; }
+    .flu-faq-item p { font-size: 13.5px; padding: 0 16px 16px; }
+
+    /* Sticky bar is the primary CTA once someone has scrolled past the
+       calculator on a phone — give it more presence, not less. */
+    .flu-sticky-cta { padding: 12px 14px; }
+    .flu-sticky-cta .amount { font-size: 17px; }
+    .flu-sticky-cta .flu-btn { padding: 12px 20px; font-size: 13.5px; }
+}
 </style>
 
 <!-- ================= HERO ================= -->
