@@ -17,9 +17,9 @@ $site_settings = pods( 'site_contact_settings' );
 $whatsapp      = $site_settings->field( 'whatsapp_number' );
 $whatsapp_link = preg_replace( '/[^0-9]/', '', (string) $whatsapp );
 
-$booking_settings = pods( 'flu_bookings_setting' );
+$booking_settings = vaccinepk_flu_settings_pod();
 $base_charge      = (float) $booking_settings->field( 'base_service_charge' );
-$base_group       = (int) $booking_settings->field( 'base_group' );
+$base_group       = (int) $booking_settings->field( 'base_group' ) ?: 4;
 $extra_charge     = (float) $booking_settings->field( 'extra_person_charges' );
 
 // Every brand whose Parent Vaccine relationship points at the Flu vaccine post.

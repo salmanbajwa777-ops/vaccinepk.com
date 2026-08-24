@@ -1165,12 +1165,25 @@ function vaccinepk_flu_bookings_table_exists() {
     return $exists;
 }
 
+// flu_bookings_setting is a Pods "Custom Settings Page", which Pods stores as
+// a single real post (not a true options-style pod like site_contact_settings) —
+// pods('flu_bookings_setting') with no ID does not reliably resolve its fields,
+// so every reader must fetch that one post explicitly.
+function vaccinepk_flu_settings_pod() {
+    static $pod = null;
+    if ( $pod !== null ) return $pod;
+
+    $existing = get_posts( [ 'post_type' => 'flu_bookings_setting', 'post_status' => 'publish', 'posts_per_page' => 1 ] );
+    $pod      = $existing ? pods( 'flu_bookings_setting', $existing[0]->ID ) : pods( 'flu_bookings_setting' );
+    return $pod;
+}
+
 // Same charge-tier rule everywhere it's used: flat base charge covers the
 // base group size, then a per-person charge for every person beyond that.
 function vaccinepk_flu_service_charge( $people_count ) {
-    $settings   = pods( 'flu_bookings_setting' );
+    $settings   = vaccinepk_flu_settings_pod();
     $base       = (float) $settings->field( 'base_service_charge' );
-    $base_group = (int) $settings->field( 'base_group' );
+    $base_group = (int) $settings->field( 'base_group' ) ?: 4;
     $extra_each = (float) $settings->field( 'extra_person_charges' );
 
     if ( $people_count <= $base_group ) return $base;
@@ -1259,7 +1272,7 @@ add_action( 'wp_ajax_submit_flu_booking',        'vaccinepk_submit_flu_booking_a
 add_action( 'wp_ajax_nopriv_submit_flu_booking', 'vaccinepk_submit_flu_booking_ajax' );
 
 function vaccinepk_send_flu_booking_emails( $b ) {
-    $settings    = pods( 'flu_bookings_setting' );
+    $settings    = vaccinepk_flu_settings_pod();
     $admin_email = $settings->field( 'admin_notification_email' );
 
     $location_label = $b['location'] === 'home' ? 'Home Service' : 'Clinic Visit';
