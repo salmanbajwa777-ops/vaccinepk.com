@@ -1165,20 +1165,26 @@ function vaccinepk_flu_bookings_table_exists() {
     return $exists;
 }
 
-// flu_bookings_setting is a Pods "Custom Settings Page". Pods registers a
-// placeholder post for it (so REST/admin routes exist), but the field VALUES
-// themselves save to wp_options under `flu_bookings_setting_{field_name}`,
-// not to that post's meta — pods('flu_bookings_setting')->field(...) can
-// return empty depending on Pods version/caching, so read wp_options first
-// (the documented, storage-accurate path) and fall back to the Pods API call
-// only if that's somehow empty too.
+// flu_bookings_setting is a Pods "Custom Settings Page". Number fields round-trip
+// fine via plain get_option('flu_bookings_setting_{field}'), but Currency fields
+// (base_service_charge, extra_person_charges) are a known Pods quirk: they can
+// silently save empty on a Settings Page until the field is re-saved (Pods
+// issues #5597 / #3218). pods_field_raw() goes through Pods' own getter instead
+// of a raw option read, so it's tried first; get_option() and a plain field()
+// call are kept as fallbacks in case any one path is the one that actually has
+// data on a given install.
 function vaccinepk_flu_setting( $field_name, $default = '' ) {
+    if ( function_exists( 'pods_field_raw' ) ) {
+        $value = pods_field_raw( 'flu_bookings_setting', 0, $field_name );
+        if ( $value !== '' && $value !== null && $value !== [] ) return $value;
+    }
+
     $value = get_option( 'flu_bookings_setting_' . $field_name, '' );
     if ( $value !== '' && $value !== null ) return $value;
 
     $pod = pods( 'flu_bookings_setting' );
     $value = $pod ? $pod->field( $field_name ) : '';
-    return ( $value !== '' && $value !== null ) ? $value : $default;
+    return ( $value !== '' && $value !== null && $value !== [] ) ? $value : $default;
 }
 
 // Same charge-tier rule everywhere it's used: flat base charge covers the
