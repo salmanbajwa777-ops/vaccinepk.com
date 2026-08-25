@@ -60,6 +60,31 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
 .flu-hero-badges { display: flex; gap: 8px; flex-wrap: wrap; position: relative; z-index: 1; }
 .flu-hero-badge { font-size: 12px; font-weight: 700; padding: 5px 13px; border-radius: 100px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.18); }
 
+.flu-progress {
+    position: sticky; top: var(--flu-header-h, 0px); z-index: 30; display: flex; align-items: center; justify-content: center;
+    gap: 10px; background: var(--color-navy); padding: 12px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+.flu-progress-step {
+    display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--color-sub-on-blue);
+    transition: color .2s;
+}
+.flu-progress-num {
+    width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.12);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 13px; flex-shrink: 0;
+    transition: background .2s, color .2s;
+}
+.flu-progress-label { font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.flu-progress-line { width: 24px; height: 2px; background: rgba(255,255,255,0.18); flex-shrink: 0; }
+.flu-progress-step.is-active { color: #fff; }
+.flu-progress-step.is-active .flu-progress-num { background: var(--color-gold); color: var(--color-navy); }
+.flu-progress-step.is-done .flu-progress-num { background: var(--color-green); color: #fff; }
+@media (max-width: 480px) {
+    .flu-progress { gap: 6px; padding: 10px 10px; }
+    .flu-progress-label { display: none; }
+    .flu-progress-line { width: 16px; }
+}
+
 .flu-section { padding: 32px 0; }
 .flu-section-label { font-size: 15px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; color: var(--color-blue); margin-bottom: 6px; }
 .flu-section h2 { font-family: var(--font-display); font-size: 1.55rem; color: var(--color-ink-strong); margin-bottom: 6px; }
@@ -121,7 +146,15 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
 .flu-sum-row .v { font-weight: 700; color: var(--color-ink-strong); }
 .flu-sum-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--color-sand); }
 .flu-sum-total .label { font-size: 12.5px; color: var(--color-ink); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-.flu-sum-total .amount { font-family: var(--font-display); font-size: 30px; font-weight: 800; color: var(--color-gold); }
+.flu-sum-total .amount { font-family: var(--font-display); font-size: 30px; font-weight: 800; color: var(--color-gold); display: inline-block; }
+.flu-sum-total .amount.flu-pulse { animation: fluTotalPulse .4s ease-out; }
+@keyframes fluTotalPulse {
+    0% { transform: scale(1.12); color: var(--color-green); }
+    100% { transform: scale(1); color: var(--color-gold); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .flu-sum-total .amount.flu-pulse { animation: none; }
+}
 
 .flu-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14.5px; padding: 13px 24px; border-radius: 100px; text-decoration: none; white-space: nowrap; border: none; cursor: pointer; transition: transform .15s, box-shadow .15s; }
 .flu-btn-gold { background: var(--color-gold); color: var(--color-navy); }
@@ -244,8 +277,26 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     </div>
 </section>
 
+<!-- ================= STEP PROGRESS ================= -->
+<nav class="flu-progress" id="fluProgress" aria-label="Booking progress">
+    <a href="#choose-brand" class="flu-progress-step" data-step="1">
+        <span class="flu-progress-num">1</span>
+        <span class="flu-progress-label">Brand</span>
+    </a>
+    <span class="flu-progress-line"></span>
+    <a href="#calculator" class="flu-progress-step" data-step="2">
+        <span class="flu-progress-num">2</span>
+        <span class="flu-progress-label">Total</span>
+    </a>
+    <span class="flu-progress-line"></span>
+    <a href="#your-details" class="flu-progress-step" data-step="3">
+        <span class="flu-progress-num">3</span>
+        <span class="flu-progress-label">Details</span>
+    </a>
+</nav>
+
 <!-- ================= BRAND GRID ================= -->
-<section class="flu-section">
+<section class="flu-section" id="choose-brand">
     <div class="container">
         <div class="flu-section-label">Step 1 — Choose a brand</div>
         <h2>Available flu vaccine brands this season</h2>
@@ -517,7 +568,12 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
         document.getElementById('fluSumVaccineLabel').textContent = 'Vaccine — ' + people + ' × ' + fmt(selectedBrand.price);
         document.getElementById('fluSumVaccine').textContent = fmt(vaccineTotal);
         document.getElementById('fluSumCharge').textContent = fmt(charge);
-        document.getElementById('fluSumTotal').textContent = fmt(total);
+
+        var totalEl = document.getElementById('fluSumTotal');
+        totalEl.textContent = fmt(total);
+        totalEl.classList.remove('flu-pulse');
+        void totalEl.offsetWidth; // restart the animation on every change
+        totalEl.classList.add('flu-pulse');
 
         document.getElementById('fluBssBrand').textContent = selectedBrand.name || '—';
         document.getElementById('fluBssPeople').textContent = people;
@@ -565,6 +621,43 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     });
 
     recalc();
+
+    // The site header is sticky at top:0 with no fixed height, so the
+    // progress bar's own sticky offset has to match it dynamically or the
+    // two overlap.
+    (function () {
+        var header = document.querySelector('header');
+        function setHeaderOffset() {
+            document.documentElement.style.setProperty('--flu-header-h', (header ? header.offsetHeight : 0) + 'px');
+        }
+        setHeaderOffset();
+        window.addEventListener('resize', setHeaderOffset);
+    })();
+
+    // Step-progress bar: highlights the section currently in view and marks
+    // earlier steps as done, so the visitor always knows how far through the
+    // 3-step flow they are.
+    (function () {
+        var steps = Array.prototype.slice.call(document.querySelectorAll('.flu-progress-step'));
+        var sections = steps.map(function (s) { return document.querySelector(s.getAttribute('href')); }).filter(Boolean);
+        if (!sections.length) return;
+
+        function updateProgress() {
+            var scrollPos = window.scrollY + window.innerHeight * 0.35;
+            var activeIndex = 0;
+            sections.forEach(function (sec, i) {
+                if (sec.offsetTop <= scrollPos) activeIndex = i;
+            });
+            steps.forEach(function (step, i) {
+                step.classList.toggle('is-active', i === activeIndex);
+                step.classList.toggle('is-done', i < activeIndex);
+            });
+        }
+
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        window.addEventListener('resize', updateProgress);
+        updateProgress();
+    })();
 
     // dd/mm/yyyy display input, kept in sync with a hidden yyyy-mm-dd field
     // (what the server actually receives) — matches the site's other
