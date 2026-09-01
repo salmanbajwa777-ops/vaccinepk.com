@@ -1043,6 +1043,14 @@ add_filter( 'wp_mail_from_name', function () {
     return 'Vaccine.Pk';
 } );
 
+// TEMPORARY diagnostic: the flu-booking customer confirmation email was not
+// arriving (admin + city-staff copies did) while no error was visible anywhere
+// else. Log whatever PHPMailer/wp_mail actually reports so we can see the real
+// failure instead of guessing. Remove once the cause is found.
+add_action( 'wp_mail_failed', function ( $wp_error ) {
+    error_log( 'FLU_MAIL_FAILED: ' . $wp_error->get_error_message() . ' | data: ' . print_r( $wp_error->get_error_data(), true ) );
+} );
+
 // Reading time helper
 function vaccination_centre_reading_time() {
     return vaccination_centre_reading_time_for( get_the_ID() );
