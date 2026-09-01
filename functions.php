@@ -465,8 +465,8 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
         .dv-brand-name{font-weight:600;color:#16232b;font-size:14px}
         .dv-brand-mfr{font-size:12px;color:#8a959a;display:block}
         .dv-brand-price{font-size:13px;font-weight:700;color:#c9a24b;white-space:nowrap}
-        .dv-waiting-note{font-size:13px;color:#8a6d1f;background:#fbf3e0;border:1px solid #eadfc0;
-            border-radius:8px;padding:10px 12px;margin:0}
+        .dv-waiting-note{font-size:12px;color:#8a6d1f;background:#fbf3e0;border:1px solid #eadfc0;
+            border-radius:8px;padding:8px 10px;margin:6px 0 0}
         .dv-hint{font-size:12px;color:#8a959a;margin-bottom:10px;display:block}
         .dv-other-input-wrap{display:none;margin-top:10px}
         .dv-other-input-wrap input[type="text"]{width:100%;padding:12px 15px;border:2px solid #0b5c87;
@@ -505,7 +505,17 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
         if ( $age_range ) $html .= '<span class="dv-group-age">' . esc_html( $age_range ) . '</span>';
 
         if ( empty( $brands ) ) {
-            $html .= '<p class="dv-waiting-note">We\'ll get back to you soon with an update on brand availability for this vaccine.</p>';
+            $request_id = esc_attr( $group_uid . '_request' );
+            $request_value = esc_attr( $vaccine->post_title . ' - Requested (brand TBC)' );
+
+            $html .= '<div class="dv-item">';
+            $html .= '<input type="checkbox" name="' . $field_name . '[]" id="' . $request_id . '" value="' . $request_value . '">';
+            $html .= '<label class="dv-label" for="' . $request_id . '">';
+            $html .= '<span class="dv-checkbox-box">&#10003;</span>';
+            $html .= '<span class="dv-info"><span class="dv-vaccine-name">Request this vaccine</span>';
+            $html .= '<p class="dv-waiting-note">We\'ll get back to you soon with an update on brand availability and price for this vaccine.</p>';
+            $html .= '</span></label></div>';
+
             $html .= '</div>'; // end dv-group
             continue;
         }
@@ -1006,6 +1016,9 @@ add_action( 'save_post_city', function ( $post_id ) {
        Each vaccine name is matched against the `vaccine` CPT by title
        (see vaccination_centre_find_vaccine_url()) so links point to a
        real single-vaccine page when one exists.
+       Kept separate from vaccinepk_immunization_schedule_data() below (used
+       by templates/template-schedule.php) because home.php's schedule strip
+       still reads this flat shape and links to these #slug anchors.
    ========================================================================== */
 function vaccination_centre_schedule_stages() {
     return [
@@ -1018,6 +1031,144 @@ function vaccination_centre_schedule_stages() {
         [ 'slug' => '12-months', 'label' => '12 Months', 'vaccines' => [ 'MMR', 'PCV Booster' ] ],
         [ 'slug' => '15-months', 'label' => '15 Months', 'vaccines' => [ 'Chickenpox' ] ],
         [ 'slug' => '18-months', 'label' => '18 Months', 'vaccines' => [ 'DPT Booster', 'OPV Booster' ] ],
+    ];
+}
+
+
+/* ==========================================================================
+   9d. IMMUNIZATION SCHEDULE — EPI vs. private-only breakdown
+       Used by templates/template-schedule.php. Static PHP array (same
+       pattern as vaccination_centre_schedule_stages() above) rather than a
+       CPT or ACF field group — this content rarely changes and the theme
+       doesn't otherwise depend on ACF (Pods is used for CPT-backed data).
+       epi_covered: true = free at govt EPI centers, false = private-only.
+
+       Two rows below are Salman's best guess, NOT confirmed against the
+       official EPI schedule — flagged inline. Confirm and flip if wrong:
+         - 9 Months / TCV (Typhoid)
+         - 18-21 Months / DPT, HBV, Hib boosters
+   ========================================================================== */
+function vaccinepk_immunization_schedule_data() {
+    return [
+        [
+            'slug'     => 'birth',
+            'label'    => 'Birth',
+            'vaccines' => [
+                [ 'name' => 'BCG',         'disease' => 'Tuberculosis', 'epi' => true ],
+                [ 'name' => 'OPV',         'disease' => 'Polio', 'epi' => true ],
+                [ 'name' => 'Hepatitis B', 'disease' => 'Hepatitis B', 'epi' => true ],
+            ],
+        ],
+        [
+            'slug'     => '6-8-weeks',
+            'label'    => '6-8 Weeks',
+            'vaccines' => [
+                [ 'name' => 'OPV/IPV',       'disease' => 'Polio', 'epi' => true ],
+                [ 'name' => 'DPT',           'disease' => 'Diphtheria, pertussis, tetanus', 'epi' => true ],
+                [ 'name' => 'HBV',           'disease' => 'Hepatitis B', 'epi' => true ],
+                [ 'name' => 'Hib',           'disease' => 'Haemophilus influenzae b', 'epi' => true ],
+                [ 'name' => 'PCV',           'disease' => 'Pneumococcal disease', 'epi' => true ],
+                [ 'name' => 'Rotavirus GE',  'disease' => 'Rotavirus gastroenteritis', 'epi' => true ],
+            ],
+        ],
+        [
+            'slug'     => '10-16-weeks',
+            'label'    => '10-16 Weeks',
+            'vaccines' => [
+                [ 'name' => 'OPV/IPV',       'disease' => 'Polio', 'epi' => true ],
+                [ 'name' => 'DPT',           'disease' => 'Diphtheria, pertussis, tetanus', 'epi' => true ],
+                [ 'name' => 'HBV',           'disease' => 'Hepatitis B', 'epi' => true ],
+                [ 'name' => 'Hib',           'disease' => 'Haemophilus influenzae b', 'epi' => true ],
+                [ 'name' => 'PCV',           'disease' => 'Pneumococcal disease', 'epi' => true ],
+                [ 'name' => 'Rotavirus GE',  'disease' => 'Rotavirus gastroenteritis', 'epi' => true ],
+            ],
+        ],
+        [
+            'slug'     => '14-24-weeks',
+            'label'    => '14-24 Weeks',
+            'vaccines' => [
+                [ 'name' => 'OPV/IPV', 'disease' => 'Polio', 'epi' => true ],
+                [ 'name' => 'DPT',     'disease' => 'Diphtheria, pertussis, tetanus', 'epi' => true ],
+                [ 'name' => 'HBV',     'disease' => 'Hepatitis B', 'epi' => true ],
+                [ 'name' => 'Hib',     'disease' => 'Haemophilus influenzae b', 'epi' => true ],
+                [ 'name' => 'PCV',     'disease' => 'Pneumococcal disease', 'epi' => true ],
+            ],
+        ],
+        [
+            'slug'     => '6-7-months',
+            'label'    => '6 & 7 Months',
+            'vaccines' => [
+                [ 'name' => 'Influenza', 'disease' => 'Seasonal flu', 'epi' => false ],
+            ],
+        ],
+        [
+            'slug'     => '9-months',
+            'label'    => '9 Months',
+            'vaccines' => [
+                [ 'name' => 'MR',      'disease' => 'Measles, rubella', 'epi' => true ],
+                // NEEDS CONFIRMATION — best guess only, confirm in wp-admin.
+                [ 'name' => 'TCV',     'disease' => 'Typhoid', 'epi' => true, 'needs_confirmation' => true ],
+                [ 'name' => 'IPV',     'disease' => 'Polio', 'epi' => true ],
+                [ 'name' => 'MenACWY', 'disease' => 'Meningococcal disease', 'epi' => false ],
+            ],
+        ],
+        [
+            'slug'     => '12-15-months',
+            'label'    => '12-15 Months',
+            'vaccines' => [
+                [ 'name' => 'Chickenpox',   'disease' => 'Varicella', 'epi' => false ],
+                [ 'name' => 'Hepatitis A',  'disease' => 'Hepatitis A', 'epi' => false ],
+                [ 'name' => 'MenACWY',      'disease' => 'Meningococcal disease', 'epi' => false ],
+                [ 'name' => 'MMR',          'disease' => 'Measles, mumps, rubella', 'epi' => false ],
+                [ 'name' => 'PCV',          'disease' => 'Pneumococcal disease (booster)', 'epi' => false ],
+                [ 'name' => 'Cholera',      'disease' => 'Cholera', 'epi' => false ],
+            ],
+        ],
+        [
+            'slug'     => '18-21-months',
+            'label'    => '18-21 Months',
+            'vaccines' => [
+                [ 'name' => 'Hepatitis A', 'disease' => 'Hepatitis A', 'epi' => false ],
+                [ 'name' => 'IPV',         'disease' => 'Polio', 'epi' => true ],
+                // NEEDS CONFIRMATION — best guess only, confirm in wp-admin.
+                [ 'name' => 'DPT', 'disease' => 'Diphtheria, pertussis, tetanus (booster)', 'epi' => false, 'needs_confirmation' => true ],
+                // NEEDS CONFIRMATION — best guess only, confirm in wp-admin.
+                [ 'name' => 'HBV', 'disease' => 'Hepatitis B (booster)', 'epi' => false, 'needs_confirmation' => true ],
+                // NEEDS CONFIRMATION — best guess only, confirm in wp-admin.
+                [ 'name' => 'Hib', 'disease' => 'Haemophilus influenzae b (booster)', 'epi' => false, 'needs_confirmation' => true ],
+            ],
+        ],
+        [
+            'slug'     => '3-4-years',
+            'label'    => '3-4 Years',
+            'vaccines' => [
+                [ 'name' => 'MMR',        'disease' => 'Measles, mumps, rubella', 'epi' => false ],
+                [ 'name' => 'Chickenpox', 'disease' => 'Varicella', 'epi' => false ],
+                [ 'name' => 'Typhoid',    'disease' => 'Typhoid (booster)', 'epi' => false ],
+            ],
+        ],
+        [
+            'slug'     => '5-years',
+            'label'    => '5 Years',
+            'vaccines' => [
+                [ 'name' => 'PPSV',    'disease' => 'Pneumococcal disease', 'epi' => false ],
+                [ 'name' => 'Covid19', 'disease' => 'COVID-19', 'epi' => false ],
+            ],
+        ],
+        [
+            'slug'     => '7-years',
+            'label'    => '7 Years',
+            'vaccines' => [
+                [ 'name' => 'Tdap', 'disease' => 'Tetanus, diphtheria, pertussis', 'epi' => false ],
+            ],
+        ],
+        [
+            'slug'     => '9-years',
+            'label'    => '9 Years',
+            'vaccines' => [
+                [ 'name' => 'HPV', 'disease' => 'Human papillomavirus', 'epi' => false ],
+            ],
+        ],
     ];
 }
 

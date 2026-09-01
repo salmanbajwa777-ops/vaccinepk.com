@@ -23,17 +23,84 @@ if ( has_custom_logo() ) {
 }
 
 // ---- Section 2: Knowledge Categories ----
+// tier: primary (largest, top row) | secondary (audience/use-case) | resource (supporting)
 $knowledge_categories = [
-    [ 'icon' => 'bi-shield-fill-check',   'title' => 'Vaccines',            'url' => home_url( '/vaccines' ) ],
-    [ 'icon' => 'bi-virus2',              'title' => 'Diseases',            'url' => home_url( '/diseases' ) ],
-    [ 'icon' => 'bi-calendar2-week-fill', 'title' => 'Vaccination Schedule', 'url' => home_url( '/vaccination-schedule' ) ],
-    [ 'icon' => 'bi-emoji-smile-fill',    'title' => 'Children',            'url' => home_url( '/vaccines#child-vaccines' ) ],
-    [ 'icon' => 'bi-person-fill',         'title' => 'Adults',              'url' => home_url( '/vaccines#adult-vaccines' ) ],
-    [ 'icon' => 'bi-heart-pulse-fill',    'title' => 'Pregnancy',           'url' => home_url( '/vaccines#adult-vaccines' ) ],
-    [ 'icon' => 'bi-airplane-fill',       'title' => 'Travel',              'url' => home_url( '/travel-vaccines' ) ],
-    [ 'icon' => 'bi-patch-question-fill', 'title' => 'FAQs',                'url' => home_url( '/#homepage-faqs' ) ],
-    [ 'icon' => 'bi-book-half',           'title' => 'Knowledge Centre',    'url' => home_url( '/knowledge-centre' ) ],
+    [
+        'tier'  => 'primary',
+        'icon'  => 'bi-shield-fill-check',
+        'title' => 'Vaccines',
+        'desc'  => "Explore vaccines, brands, eligibility & protection",
+        'cta'   => 'Explore',
+        'url'   => home_url( '/vaccines' ),
+    ],
+    [
+        'tier'  => 'primary',
+        'icon'  => 'bi-virus2',
+        'title' => 'Diseases',
+        'desc'  => 'Understand diseases and prevention',
+        'cta'   => 'Explore',
+        'url'   => home_url( '/diseases' ),
+    ],
+    [
+        'tier'  => 'primary',
+        'icon'  => 'bi-calendar2-week-fill',
+        'title' => 'Vaccination Schedule',
+        'desc'  => "See what's due and when",
+        'cta'   => 'View Schedule',
+        'url'   => home_url( '/vaccination-schedule' ),
+    ],
+    [
+        'tier'  => 'secondary',
+        'icon'  => 'bi-emoji-smile-fill',
+        'title' => 'Children',
+        'desc'  => 'Vaccines by age and stage',
+        'cta'   => 'Explore',
+        'url'   => home_url( '/vaccines#child-vaccines' ),
+    ],
+    [
+        'tier'  => 'secondary',
+        'icon'  => 'bi-person-fill',
+        'title' => 'Adults',
+        'desc'  => 'Adult protection and recommended vaccines',
+        'cta'   => 'Explore',
+        'url'   => home_url( '/vaccines#adult-vaccines' ),
+    ],
+    [
+        'tier'  => 'secondary',
+        'icon'  => 'bi-heart-pulse-fill',
+        'title' => 'Pregnancy',
+        'desc'  => 'Vaccines for every stage of pregnancy',
+        'cta'   => 'Explore',
+        'url'   => home_url( '/vaccines#adult-vaccines' ),
+    ],
+    [
+        'tier'  => 'secondary',
+        'icon'  => 'bi-airplane-fill',
+        'title' => 'Travel',
+        'desc'  => 'Travel vaccines and health guidance',
+        'cta'   => 'Explore',
+        'url'   => home_url( '/travel-vaccines' ),
+    ],
+    [
+        'tier'  => 'resource',
+        'icon'  => 'bi-patch-question-fill',
+        'title' => 'FAQs',
+        'desc'  => 'Answers to common vaccination questions',
+        'cta'   => 'Browse FAQs',
+        'url'   => home_url( '/#homepage-faqs' ),
+    ],
+    [
+        'tier'  => 'resource',
+        'icon'  => 'bi-book-half',
+        'title' => 'Knowledge Centre',
+        'desc'  => 'Doctor-reviewed guides and the latest vaccine information',
+        'cta'   => 'Explore Guides',
+        'url'   => home_url( '/knowledge-centre' ),
+    ],
 ];
+$knowledge_categories_primary   = array_values( array_filter( $knowledge_categories, fn( $c ) => 'primary' === $c['tier'] ) );
+$knowledge_categories_secondary = array_values( array_filter( $knowledge_categories, fn( $c ) => 'secondary' === $c['tier'] ) );
+$knowledge_categories_resource  = array_values( array_filter( $knowledge_categories, fn( $c ) => 'resource' === $c['tier'] ) );
 
 // ---- Section 4: Featured Knowledge (evergreen topics; link only if a matching post exists) ----
 $featured_knowledge_topics = [
@@ -192,18 +259,54 @@ $homepage_faqs = [
 </section>
 
 <!-- ================= SECTION 2: KNOWLEDGE CATEGORIES ================= -->
-<section class="py-5" style="background: white;">
+<section class="py-5 knowledge-section">
     <div class="container">
         <div class="text-center mb-5">
+            <span class="knowledge-eyebrow">Explore</span>
             <h2>Explore Vaccine Knowledge</h2>
-            <p class="section-subtitle">Pakistan's largest collection of vaccine and vaccination information — start anywhere.</p>
+            <p class="section-subtitle">Reliable information. Expert guidance. Better health for everyone.</p>
         </div>
-        <div class="row g-4">
-            <?php foreach ( $knowledge_categories as $cat ) : ?>
-                <div class="col-lg-2 col-md-3 col-6">
-                    <a href="<?php echo esc_url( $cat['url'] ); ?>" class="knowledge-cat-card">
-                        <div class="knowledge-cat-icon"><i class="bi <?php echo esc_attr( $cat['icon'] ); ?>"></i></div>
-                        <h6><?php echo esc_html( $cat['title'] ); ?></h6>
+
+        <div class="row g-3 g-md-4 mb-3 mb-md-4">
+            <?php foreach ( $knowledge_categories_primary as $cat ) :
+                $slug = sanitize_html_class( $cat['title'] ); ?>
+                <div class="col-lg-4 col-12">
+                    <a href="<?php echo esc_url( $cat['url'] ); ?>" class="knowledge-cat-card knowledge-cat-card--primary knowledge-cat--<?php echo esc_attr( $slug ); ?>">
+                        <span class="knowledge-cat-blob" aria-hidden="true"></span>
+                        <div class="knowledge-cat-icon"><i class="bi <?php echo esc_attr( $cat['icon'] ); ?>" aria-hidden="true"></i></div>
+                        <h3 class="knowledge-cat-title"><?php echo esc_html( $cat['title'] ); ?></h3>
+                        <p class="knowledge-cat-desc"><?php echo esc_html( $cat['desc'] ); ?></p>
+                        <span class="knowledge-cat-cta"><?php echo esc_html( $cat['cta'] ); ?> <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="row g-3 g-md-4 mb-3 mb-md-4">
+            <?php foreach ( $knowledge_categories_secondary as $cat ) :
+                $slug = sanitize_html_class( $cat['title'] ); ?>
+                <div class="col-lg-3 col-md-3 col-6">
+                    <a href="<?php echo esc_url( $cat['url'] ); ?>" class="knowledge-cat-card knowledge-cat-card--secondary knowledge-cat--<?php echo esc_attr( $slug ); ?>">
+                        <span class="knowledge-cat-blob" aria-hidden="true"></span>
+                        <div class="knowledge-cat-icon"><i class="bi <?php echo esc_attr( $cat['icon'] ); ?>" aria-hidden="true"></i></div>
+                        <h3 class="knowledge-cat-title"><?php echo esc_html( $cat['title'] ); ?></h3>
+                        <p class="knowledge-cat-desc"><?php echo esc_html( $cat['desc'] ); ?></p>
+                        <span class="knowledge-cat-cta"><?php echo esc_html( $cat['cta'] ); ?> <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="row g-3 g-md-4">
+            <?php foreach ( $knowledge_categories_resource as $cat ) :
+                $slug = sanitize_html_class( $cat['title'] ); ?>
+                <div class="col-md-6 col-12">
+                    <a href="<?php echo esc_url( $cat['url'] ); ?>" class="knowledge-cat-card knowledge-cat-card--resource knowledge-cat--<?php echo esc_attr( $slug ); ?>">
+                        <span class="knowledge-cat-blob" aria-hidden="true"></span>
+                        <div class="knowledge-cat-icon"><i class="bi <?php echo esc_attr( $cat['icon'] ); ?>" aria-hidden="true"></i></div>
+                        <h3 class="knowledge-cat-title"><?php echo esc_html( $cat['title'] ); ?></h3>
+                        <p class="knowledge-cat-desc"><?php echo esc_html( $cat['desc'] ); ?></p>
+                        <span class="knowledge-cat-cta"><?php echo esc_html( $cat['cta'] ); ?> <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
                     </a>
                 </div>
             <?php endforeach; ?>
@@ -625,17 +728,106 @@ $homepage_faqs = [
 .hero-stat-num { font-size: 1.8rem; font-weight: 800; color: var(--accent-blue); line-height: 1; margin-bottom: 6px; }
 .hero-stat-lbl { font-size: 0.82rem; color: var(--text-light); font-weight: 600; }
 
-/* ---- knowledge categories ---- */
+/* ---- knowledge categories: soft gradient cards ---- */
+.knowledge-section { background: #F8FBFD; }
+
+.knowledge-eyebrow {
+    display: inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-blue); margin-bottom: 10px;
+}
+
 .knowledge-cat-card {
-    display: block; text-align: center; background: white; border: 1px solid var(--color-sand); border-radius: 16px;
-    padding: 22px 12px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition);
+    position: relative; display: flex; flex-direction: column; overflow: hidden;
+    text-align: left; text-decoration: none; color: inherit; height: 100%;
+    border-radius: 20px; border: 1px solid rgba(16, 45, 65, 0.06);
+    box-shadow: 0 6px 20px rgba(16, 24, 40, 0.05);
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 }
-.knowledge-cat-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; border-color: transparent; }
+.knowledge-cat-card:hover,
+.knowledge-cat-card:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
+    color: inherit;
+    border-color: rgba(16, 45, 65, 0.1);
+}
+.knowledge-cat-card:active { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(16, 24, 40, 0.06); }
+.knowledge-cat-card:focus-visible { outline: 2px solid rgba(11, 92, 135, 0.35); outline-offset: 3px; }
+
+.knowledge-cat-card--primary { padding: 28px; min-height: 220px; justify-content: flex-start; }
+.knowledge-cat-card--secondary { padding: 22px; min-height: 170px; justify-content: flex-start; }
+.knowledge-cat-card--resource { padding: 22px; min-height: 130px; justify-content: flex-start; }
+
+.knowledge-cat-blob {
+    position: absolute; right: -30px; bottom: -30px; width: 120px; height: 120px; border-radius: 50%;
+    background: radial-gradient(circle, currentColor 0%, transparent 70%); opacity: 0.14; pointer-events: none;
+    transition: opacity 200ms ease;
+}
+.knowledge-cat-card:hover .knowledge-cat-blob { opacity: 0.22; }
+
 .knowledge-cat-icon {
-    width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 12px; background: var(--color-blue-tint);
-    color: var(--color-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    width: 56px; height: 56px; margin-bottom: 16px; border-radius: 50%; background: rgba(255,255,255,0.6);
+    display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;
+    transition: background 200ms ease;
 }
-.knowledge-cat-card h6 { font-weight: 700; font-size: 0.85rem; margin: 0; }
+.knowledge-cat-card:hover .knowledge-cat-icon { background: rgba(255,255,255,0.85); }
+.knowledge-cat-card--secondary .knowledge-cat-icon,
+.knowledge-cat-card--resource .knowledge-cat-icon { width: 48px; height: 48px; font-size: 1.2rem; margin-bottom: 12px; }
+
+.knowledge-cat-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: #0B2940; margin: 0 0 6px; }
+.knowledge-cat-card--secondary .knowledge-cat-title,
+.knowledge-cat-card--resource .knowledge-cat-title { font-size: 1rem; }
+
+.knowledge-cat-desc {
+    font-size: 0.88rem; font-weight: 400; line-height: 1.55; color: #52687A; margin: 0 0 14px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.knowledge-cat-cta {
+    margin-top: auto; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
+}
+.knowledge-cat-cta i { transition: transform 200ms ease; }
+.knowledge-cat-card:hover .knowledge-cat-cta i { transform: translateX(4px); }
+
+/* per-category gradients + accent colors (brand navy/blue/green/gold family) */
+.knowledge-cat--Vaccines { background: linear-gradient(135deg, #E6F7F4, #D5F2EF); color: #0D8F8A; }
+.knowledge-cat--Vaccines .knowledge-cat-icon,
+.knowledge-cat--Vaccines .knowledge-cat-cta { color: #0D8F8A; }
+
+.knowledge-cat--Diseases { background: linear-gradient(135deg, #E8F1FD, #D7E6FA); color: var(--color-blue); }
+.knowledge-cat--Diseases .knowledge-cat-icon,
+.knowledge-cat--Diseases .knowledge-cat-cta { color: var(--color-blue); }
+
+.knowledge-cat--VaccinationSchedule { background: linear-gradient(135deg, #EAF0E9, #DCEAD8); color: var(--color-navy); }
+.knowledge-cat--VaccinationSchedule .knowledge-cat-icon,
+.knowledge-cat--VaccinationSchedule .knowledge-cat-cta { color: var(--color-navy); }
+
+.knowledge-cat--Children { background: linear-gradient(135deg, #E9F8EF, #DAF2E0); color: var(--color-green); }
+.knowledge-cat--Children .knowledge-cat-icon,
+.knowledge-cat--Children .knowledge-cat-cta { color: var(--color-green); }
+
+.knowledge-cat--Adults { background: linear-gradient(135deg, #E8F2FD, #DCEAFB); color: var(--color-blue); }
+.knowledge-cat--Adults .knowledge-cat-icon,
+.knowledge-cat--Adults .knowledge-cat-cta { color: var(--color-blue); }
+
+.knowledge-cat--Pregnancy { background: linear-gradient(135deg, #FFEFF4, #FFDCE8); color: #C9668A; }
+.knowledge-cat--Pregnancy .knowledge-cat-icon,
+.knowledge-cat--Pregnancy .knowledge-cat-cta { color: #C9668A; }
+
+.knowledge-cat--Travel { background: linear-gradient(135deg, #FBF3E4, #F5E6C7); color: var(--color-gold); }
+.knowledge-cat--Travel .knowledge-cat-icon,
+.knowledge-cat--Travel .knowledge-cat-cta { color: var(--color-gold); }
+
+.knowledge-cat--FAQs { background: linear-gradient(135deg, #EFF1FC, #E2E6F8); color: #5A6BB0; }
+.knowledge-cat--FAQs .knowledge-cat-icon,
+.knowledge-cat--FAQs .knowledge-cat-cta { color: #5A6BB0; }
+
+.knowledge-cat--KnowledgeCentre { background: linear-gradient(135deg, #E6F7FA, #D6F0F5); color: #27A7B3; }
+.knowledge-cat--KnowledgeCentre .knowledge-cat-icon,
+.knowledge-cat--KnowledgeCentre .knowledge-cat-cta { color: #27A7B3; }
+
+@media (max-width: 767.98px) {
+    .knowledge-cat-card--primary { min-height: 0; }
+}
 
 /* ---- most searched vaccines ---- */
 .vsv-card { background: white; border: 1px solid var(--color-sand); border-radius: 16px; overflow: hidden; height: 100%; transition: var(--transition); }
