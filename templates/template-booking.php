@@ -153,11 +153,11 @@ get_header();
         <div class="modal-content" style="border: none; border-radius: 20px; overflow: hidden;">
             <div class="modal-header" style="background: #0a2a38; color: white; border: none; padding: 24px 30px; align-items: flex-start; gap: 20px;">
                 <div style="min-width: 0;">
-                    <h3 class="modal-title fw-bold mb-1" id="formCategoryTitle" style="line-height: 1.3;">
+                    <h3 class="modal-title fw-bold mb-1" id="formCategoryTitle" style="line-height: 1.3; color: #ffffff;">
                         <i class="bi bi-clipboard2-pulse-fill me-2"></i>
                         Child Vaccination Booking
                     </h3>
-                    <p class="mb-0 opacity-75 small">Complete the form below to schedule your appointment</p>
+                    <p class="mb-0 opacity-75 small" style="color: #ffffff;">Complete the form below to schedule your appointment</p>
                 </div>
                 <button type="button" class="btn-close btn-close-white flex-shrink-0" data-bs-dismiss="modal" aria-label="Close" style="margin: 4px 0 0 0;"></button>
             </div>
