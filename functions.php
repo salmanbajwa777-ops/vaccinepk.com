@@ -413,12 +413,19 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
     $field_name = esc_attr( $tag->name );
     $uid        = 'dv_' . $field_name . '_' . uniqid();
 
-    // ── Resolve brands per vaccine; drop vaccines with no linked brand ─────
+    // ── Resolve available brands per vaccine. Every vaccine in the category
+    //    stays visible — one with no *available* brand shows a waiting note
+    //    instead of a brand list, rather than disappearing from the form. ──
     $all_brands = get_posts( [ 'post_type' => 'brand', 'post_status' => 'publish', 'posts_per_page' => -1 ] );
 
-    $vaccines_with_brands = [];
+    $is_brand_available = function ( $brand_id ) {
+        $a = get_post_meta( $brand_id, 'availability', true );
+        return $a === '1' || strtolower( (string) $a ) === 'yes' || $a === true;
+    };
+
+    $vaccine_brand_map = [];
     foreach ( $vaccines as $vaccine ) {
-        $brands_for_vaccine = [];
+        $available_brands = [];
         foreach ( $all_brands as $b ) {
             $b_pod   = pods( 'brand', $b->ID );
             $related = $b_pod->field( 'parent_vaccine' );
@@ -426,13 +433,11 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
 
             $first      = reset( $related );
             $vaccine_id = is_array( $first ) ? (int) ( $first['ID'] ?? 0 ) : (int) $first;
-            if ( $vaccine_id === $vaccine->ID ) {
-                $brands_for_vaccine[] = $b;
+            if ( $vaccine_id === $vaccine->ID && $is_brand_available( $b->ID ) ) {
+                $available_brands[] = $b;
             }
         }
-        if ( ! empty( $brands_for_vaccine ) ) {
-            $vaccines_with_brands[] = [ 'vaccine' => $vaccine, 'brands' => $brands_for_vaccine ];
-        }
+        $vaccine_brand_map[] = [ 'vaccine' => $vaccine, 'brands' => $available_brands ];
     }
 
     // ── CSS (injected once per page) ──────────────────────────────────────
@@ -460,6 +465,8 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
         .dv-brand-name{font-weight:600;color:#16232b;font-size:14px}
         .dv-brand-mfr{font-size:12px;color:#8a959a;display:block}
         .dv-brand-price{font-size:13px;font-weight:700;color:#c9a24b;white-space:nowrap}
+        .dv-waiting-note{font-size:13px;color:#8a6d1f;background:#fbf3e0;border:1px solid #eadfc0;
+            border-radius:8px;padding:10px 12px;margin:0}
         .dv-hint{font-size:12px;color:#8a959a;margin-bottom:10px;display:block}
         .dv-other-input-wrap{display:none;margin-top:10px}
         .dv-other-input-wrap input[type="text"]{width:100%;padding:12px 15px;border:2px solid #0b5c87;
@@ -477,7 +484,7 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
         </style>';
     }
 
-    if ( empty( $vaccines_with_brands ) ) {
+    if ( empty( $vaccine_brand_map ) ) {
         $html .= '<span class="wpcf7-form-control-wrap" data-name="' . $field_name . '">';
         $html .= '<p style="color:#4a575e;font-size:14px;">No vaccines available yet (slug: ' . esc_html( $tax_slug ) . ')</p>';
         $html .= '</span>';
@@ -487,7 +494,7 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
     $html .= '<span class="wpcf7-form-control-wrap" data-name="' . $field_name . '">';
     $html .= '<span class="dv-hint">&#10003; Select a brand for each vaccine you want</span>';
 
-    foreach ( $vaccines_with_brands as $entry ) {
+    foreach ( $vaccine_brand_map as $entry ) {
         $vaccine   = $entry['vaccine'];
         $brands    = $entry['brands'];
         $age_range = get_post_meta( $vaccine->ID, '_vaccine_age_range', true );
@@ -496,21 +503,20 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
         $html .= '<div class="dv-group">';
         $html .= '<span class="dv-group-name">' . esc_html( $vaccine->post_title ) . '</span>';
         if ( $age_range ) $html .= '<span class="dv-group-age">' . esc_html( $age_range ) . '</span>';
+
+        if ( empty( $brands ) ) {
+            $html .= '<p class="dv-waiting-note">We\'ll get back to you soon with an update on brand availability for this vaccine.</p>';
+            $html .= '</div>'; // end dv-group
+            continue;
+        }
+
         $html .= '<div class="dv-brand-list">';
 
-        // "None" option so a vaccine group is opt-in, not pre-selected.
         // The radios are UI-only (name is NOT the CF7 field, so CF7 never sees
         // per-vaccine dynamic field names); JS mirrors the checked radio's
         // value into one shared hidden checkbox already inside {field}[].
-        $none_id = esc_attr( $group_uid . '_none' );
         $hidden_id = esc_attr( $group_uid . '_hidden' );
         $html .= '<input type="checkbox" class="dv-hidden-choice" name="' . $field_name . '[]" id="' . $hidden_id . '" value="" style="display:none;">';
-
-        $html .= '<div class="dv-brand-item">';
-        $html .= '<input type="radio" class="dv-brand-radio" name="' . $group_uid . '" id="' . $none_id . '" data-hidden="' . $hidden_id . '" value="" checked>';
-        $html .= '<label class="dv-brand-label" for="' . $none_id . '" style="background:transparent;border-style:dashed;">';
-        $html .= '<span class="dv-brand-main"><span class="dv-radio-box"></span><span class="dv-brand-name" style="color:#8a959a;">Skip this vaccine</span></span>';
-        $html .= '</label></div>';
 
         foreach ( $brands as $brand ) {
             $b_price      = get_post_meta( $brand->ID, 'price', true );
