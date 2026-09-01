@@ -413,67 +413,125 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
     $field_name = esc_attr( $tag->name );
     $uid        = 'dv_' . $field_name . '_' . uniqid();
 
+    // ── Resolve brands per vaccine; drop vaccines with no linked brand ─────
+    $all_brands = get_posts( [ 'post_type' => 'brand', 'post_status' => 'publish', 'posts_per_page' => -1 ] );
+
+    $vaccines_with_brands = [];
+    foreach ( $vaccines as $vaccine ) {
+        $brands_for_vaccine = [];
+        foreach ( $all_brands as $b ) {
+            $b_pod   = pods( 'brand', $b->ID );
+            $related = $b_pod->field( 'parent_vaccine' );
+            if ( ! is_array( $related ) || empty( $related ) ) continue;
+
+            $first      = reset( $related );
+            $vaccine_id = is_array( $first ) ? (int) ( $first['ID'] ?? 0 ) : (int) $first;
+            if ( $vaccine_id === $vaccine->ID ) {
+                $brands_for_vaccine[] = $b;
+            }
+        }
+        if ( ! empty( $brands_for_vaccine ) ) {
+            $vaccines_with_brands[] = [ 'vaccine' => $vaccine, 'brands' => $brands_for_vaccine ];
+        }
+    }
+
     // ── CSS (injected once per page) ──────────────────────────────────────
     static $css_done = false;
     $html = '';
     if ( ! $css_done ) {
         $css_done = true;
         $html .= '<style>
-        .dv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:6px}
-        .dv-item{position:relative}
-        .dv-item input[type="checkbox"]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
-        .dv-label{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:2px solid #e7e0d3;
-            border-radius:12px;cursor:pointer;background:#fff;transition:all .2s ease;user-select:none}
-        .dv-label:hover{border-color:#0b5c87;background:#eaf2f6;box-shadow:0 2px 10px rgba(11,92,135,.12);transform:translateY(-1px)}
-        .dv-item input[type="checkbox"]:checked+.dv-label{border-color:#0b5c87;
-            background:#eaf2f6;box-shadow:0 3px 16px rgba(11,92,135,.18)}
-        .dv-checkbox-box{width:22px;height:22px;min-width:22px;border:2px solid #d1d5db;border-radius:6px;
-            background:#fff;display:flex;align-items:center;justify-content:center;margin-top:1px;
-            transition:all .2s ease;font-size:13px;color:transparent;font-weight:700}
-        .dv-item input[type="checkbox"]:checked+.dv-label .dv-checkbox-box{background:#0b5c87;border-color:#0b5c87;color:#fff}
-        .dv-info{flex:1}
-        .dv-vaccine-name{font-weight:600;color:#16232b;font-size:14px;line-height:1.4;display:block;margin-bottom:5px}
-        .dv-item input[type="checkbox"]:checked+.dv-label .dv-vaccine-name{color:#0a2a38}
-        .dv-vaccine-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-        .dv-price{font-size:13px;font-weight:700;color:#c9a24b}
-        .dv-age{font-size:11px;color:#4a575e;background:#e7e0d3;padding:2px 8px;border-radius:20px}
+        .dv-group{border:2px solid #e7e0d3;border-radius:12px;padding:14px 16px;margin-bottom:12px;background:#fff}
+        .dv-group-name{font-weight:700;color:#16232b;font-size:15px;display:block;margin-bottom:2px}
+        .dv-group-age{font-size:11px;color:#4a575e;background:#e7e0d3;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:10px}
+        .dv-brand-list{display:flex;flex-direction:column;gap:8px}
+        .dv-brand-item{position:relative}
+        .dv-brand-item input[type="radio"]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+        .dv-brand-label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;
+            border:2px solid #e7e0d3;border-radius:10px;cursor:pointer;background:#fafafa;transition:all .2s ease;user-select:none}
+        .dv-brand-label:hover{border-color:#0b5c87;background:#eaf2f6}
+        .dv-brand-item input[type="radio"]:checked+.dv-brand-label{border-color:#0b5c87;background:#eaf2f6;box-shadow:0 3px 16px rgba(11,92,135,.15)}
+        .dv-radio-box{width:18px;height:18px;min-width:18px;border:2px solid #d1d5db;border-radius:50%;background:#fff;
+            position:relative;transition:all .2s ease}
+        .dv-brand-item input[type="radio"]:checked+.dv-brand-label .dv-radio-box{border-color:#0b5c87}
+        .dv-brand-item input[type="radio"]:checked+.dv-brand-label .dv-radio-box::after{content:"";position:absolute;
+            inset:3px;border-radius:50%;background:#0b5c87}
+        .dv-brand-main{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+        .dv-brand-name{font-weight:600;color:#16232b;font-size:14px}
+        .dv-brand-mfr{font-size:12px;color:#8a959a;display:block}
+        .dv-brand-price{font-size:13px;font-weight:700;color:#c9a24b;white-space:nowrap}
         .dv-hint{font-size:12px;color:#8a959a;margin-bottom:10px;display:block}
         .dv-other-input-wrap{display:none;margin-top:10px}
         .dv-other-input-wrap input[type="text"]{width:100%;padding:12px 15px;border:2px solid #0b5c87;
             border-radius:8px;font-size:14px;background:#eaf2f6;box-sizing:border-box;font-family:inherit}
+        .dv-item{position:relative}
+        .dv-item input[type="checkbox"]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+        .dv-label{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:2px solid #e7e0d3;
+            border-radius:12px;cursor:pointer;background:#fff;transition:all .2s ease;user-select:none}
+        .dv-item input[type="checkbox"]:checked+.dv-label{border-color:#0b5c87;background:#eaf2f6;box-shadow:0 3px 16px rgba(11,92,135,.18)}
+        .dv-checkbox-box{width:22px;height:22px;min-width:22px;border:2px solid #d1d5db;border-radius:6px;
+            background:#fff;display:flex;align-items:center;justify-content:center;margin-top:1px;
+            transition:all .2s ease;font-size:13px;color:transparent;font-weight:700}
+        .dv-item input[type="checkbox"]:checked+.dv-label .dv-checkbox-box{background:#0b5c87;border-color:#0b5c87;color:#fff}
         @keyframes fadeInDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
         </style>';
     }
 
-    if ( empty( $vaccines ) ) {
+    if ( empty( $vaccines_with_brands ) ) {
         $html .= '<span class="wpcf7-form-control-wrap" data-name="' . $field_name . '">';
-        $html .= '<p style="color:#4a575e;font-size:14px;">No vaccines found (slug: ' . esc_html( $tax_slug ) . ')</p>';
+        $html .= '<p style="color:#4a575e;font-size:14px;">No vaccines available yet (slug: ' . esc_html( $tax_slug ) . ')</p>';
         $html .= '</span>';
         return $html;
     }
 
     $html .= '<span class="wpcf7-form-control-wrap" data-name="' . $field_name . '">';
-    $html .= '<span class="dv-hint">&#10003; Select one or more vaccines</span>';
-    $html .= '<div class="dv-grid" id="' . esc_attr( $uid ) . '">';
+    $html .= '<span class="dv-hint">&#10003; Select a brand for each vaccine you want</span>';
 
-    foreach ( $vaccines as $vaccine ) {
-        $price     = get_post_meta( $vaccine->ID, '_vaccine_price', true );
+    foreach ( $vaccines_with_brands as $entry ) {
+        $vaccine   = $entry['vaccine'];
+        $brands    = $entry['brands'];
         $age_range = get_post_meta( $vaccine->ID, '_vaccine_age_range', true );
-        $v_name    = esc_attr( $vaccine->post_title );
-        $cb_id     = esc_attr( $uid . '_' . $vaccine->ID );
+        $group_uid = esc_attr( $uid . '_v' . $vaccine->ID );
 
-        $html .= '<div class="dv-item">';
-        $html .= '<input type="checkbox" name="' . $field_name . '[]" id="' . $cb_id . '" value="' . $v_name . '">';
-        $html .= '<label class="dv-label" for="' . $cb_id . '">';
-        $html .= '<span class="dv-checkbox-box">&#10003;</span>';
-        $html .= '<span class="dv-info"><span class="dv-vaccine-name">' . esc_html( $vaccine->post_title ) . '</span>';
-        $html .= '<span class="dv-vaccine-meta">';
-        if ( $price )     $html .= '<span class="dv-price">PKR ' . number_format( (float) $price ) . '</span>';
-        if ( $age_range ) $html .= '<span class="dv-age">' . esc_html( $age_range ) . '</span>';
-        $html .= '</span></span></label></div>';
+        $html .= '<div class="dv-group">';
+        $html .= '<span class="dv-group-name">' . esc_html( $vaccine->post_title ) . '</span>';
+        if ( $age_range ) $html .= '<span class="dv-group-age">' . esc_html( $age_range ) . '</span>';
+        $html .= '<div class="dv-brand-list">';
+
+        // "None" option so a vaccine group is opt-in, not pre-selected.
+        // The radios are UI-only (name is NOT the CF7 field, so CF7 never sees
+        // per-vaccine dynamic field names); JS mirrors the checked radio's
+        // value into one shared hidden checkbox already inside {field}[].
+        $none_id = esc_attr( $group_uid . '_none' );
+        $hidden_id = esc_attr( $group_uid . '_hidden' );
+        $html .= '<input type="checkbox" class="dv-hidden-choice" name="' . $field_name . '[]" id="' . $hidden_id . '" value="" style="display:none;">';
+
+        $html .= '<div class="dv-brand-item">';
+        $html .= '<input type="radio" class="dv-brand-radio" name="' . $group_uid . '" id="' . $none_id . '" data-hidden="' . $hidden_id . '" value="" checked>';
+        $html .= '<label class="dv-brand-label" for="' . $none_id . '" style="background:transparent;border-style:dashed;">';
+        $html .= '<span class="dv-brand-main"><span class="dv-radio-box"></span><span class="dv-brand-name" style="color:#8a959a;">Skip this vaccine</span></span>';
+        $html .= '</label></div>';
+
+        foreach ( $brands as $brand ) {
+            $b_price      = get_post_meta( $brand->ID, 'price', true );
+            $b_mfr        = get_post_meta( $brand->ID, 'manufacturer_name', true );
+            $b_id         = esc_attr( $group_uid . '_' . $brand->ID );
+            $b_value      = esc_attr( $vaccine->post_title . ' - ' . $brand->post_title );
+
+            $html .= '<div class="dv-brand-item">';
+            $html .= '<input type="radio" class="dv-brand-radio" name="' . $group_uid . '" id="' . $b_id . '" data-hidden="' . $hidden_id . '" value="' . $b_value . '">';
+            $html .= '<label class="dv-brand-label" for="' . $b_id . '">';
+            $html .= '<span class="dv-brand-main"><span class="dv-radio-box"></span><span>';
+            $html .= '<span class="dv-brand-name">' . esc_html( $brand->post_title ) . '</span>';
+            if ( $b_mfr ) $html .= '<span class="dv-brand-mfr">' . esc_html( $b_mfr ) . '</span>';
+            $html .= '</span></span>';
+            if ( $b_price ) $html .= '<span class="dv-brand-price">PKR ' . number_format( (float) $b_price ) . '</span>';
+            $html .= '</label></div>';
+        }
+
+        $html .= '</div>'; // end dv-brand-list
+        $html .= '</div>'; // end dv-group
     }
-
-    $html .= '</div>'; // end dv-grid
 
     // ── Other Vaccine card ─────────────────────────────────────────────────
     $other_cb_id   = esc_attr( $uid . '_other' );
@@ -565,6 +623,19 @@ function vaccinationInitForms() {
                     if (ta) { ta.removeAttribute('required'); ta.value = ''; }
                 }
             });
+        });
+    });
+
+    /* ── 1b. Brand radio groups → mirror choice into hidden CF7 checkbox ── */
+    document.querySelectorAll('.dv-brand-radio').forEach(function(r) {
+        if (r.dataset.brandInit) return;
+        r.dataset.brandInit = '1';
+
+        r.addEventListener('change', function() {
+            var hidden = document.getElementById(r.getAttribute('data-hidden'));
+            if (!hidden) return;
+            hidden.value   = r.value;
+            hidden.checked = !! r.value;
         });
     });
 
