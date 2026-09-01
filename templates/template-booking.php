@@ -151,15 +151,15 @@ get_header();
 <div class="modal fade" id="bookingFormModal" tabindex="-1" aria-labelledby="bookingFormModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content" style="border: none; border-radius: 20px; overflow: hidden;">
-            <div class="modal-header" style="background: #0a2a38; color: white; border: none; padding: 30px;">
-                <div>
-                    <h3 class="modal-title fw-bold mb-1" id="formCategoryTitle">
+            <div class="modal-header" style="background: #0a2a38; color: white; border: none; padding: 24px 30px; align-items: flex-start; gap: 20px;">
+                <div style="min-width: 0;">
+                    <h3 class="modal-title fw-bold mb-1" id="formCategoryTitle" style="line-height: 1.3;">
                         <i class="bi bi-clipboard2-pulse-fill me-2"></i>
                         Child Vaccination Booking
                     </h3>
                     <p class="mb-0 opacity-75 small">Complete the form below to schedule your appointment</p>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white flex-shrink-0" data-bs-dismiss="modal" aria-label="Close" style="margin: 4px 0 0 0;"></button>
             </div>
             <div class="modal-body" style="padding: 40px; background: #f6f3ec;">
                 <div id="form-container">
@@ -304,6 +304,75 @@ document.addEventListener('DOMContentLoaded', function() {
     border-width: 0.3rem;
 }
 
+#bookingFormModal .modal-body {
+    scrollbar-width: thin;
+    scrollbar-color: #b8ad95 #f6f3ec;
+}
+
+#bookingFormModal .modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+#bookingFormModal .modal-body::-webkit-scrollbar-track {
+    background: #f6f3ec;
+}
+
+#bookingFormModal .modal-body::-webkit-scrollbar-thumb {
+    background-color: #b8ad95;
+    border-radius: 10px;
+}
+
+@media (max-width: 576px) {
+    .booking-category-card {
+        height: 320px !important;
+    }
+
+    .booking-category-card .card-overlay {
+        padding: 24px !important;
+    }
+
+    .booking-category-card .display-6 {
+        font-size: 1.5rem !important;
+    }
+
+    .booking-category-card .fs-5 {
+        font-size: 0.95rem !important;
+    }
+
+    .booking-category-card .bi {
+        font-size: 40px !important;
+    }
+
+    .booking-category-card .badge {
+        font-size: 0.75rem !important;
+    }
+
+    .booking-category-card .btn-lg {
+        padding: 10px 24px !important;
+        font-size: 0.95rem !important;
+    }
+
+    #bookingFormModal .modal-header {
+        padding: 18px 20px !important;
+    }
+
+    #bookingFormModal .modal-header .modal-title {
+        font-size: 1.1rem !important;
+    }
+
+    #bookingFormModal .modal-body {
+        padding: 20px !important;
+    }
+
+    #form-container .wpcf7-form {
+        padding: 18px !important;
+    }
+
+    #form-container .wpcf7-form .row > [class*="col-"] {
+        margin-bottom: 0;
+    }
+}
+
 /* Contact Form 7 Styling */
 #form-container .wpcf7-form {
     background: white;
@@ -330,11 +399,35 @@ document.addEventListener('DOMContentLoaded', function() {
 #form-container .wpcf7-form textarea,
 #form-container .wpcf7-form select {
     width: 100%;
+    height: 48px;
     padding: 12px 15px;
     border: 2px solid #e7e0d3;
     border-radius: 8px;
     font-size: 15px;
+    line-height: 1.4;
+    font-family: inherit;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #fff;
     transition: all 0.3s;
+}
+
+#form-container .wpcf7-form select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2316232b' d='M4 6l4 4 4-4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    padding-right: 40px;
+}
+
+#form-container .wpcf7-form textarea {
+    height: auto;
+    min-height: 100px;
+}
+
+#form-container .wpcf7-form input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.4);
+    cursor: pointer;
 }
 
 #form-container .wpcf7-form input[type="text"]:focus,
