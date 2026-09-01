@@ -1036,6 +1036,13 @@ add_action( 'init', function () {
 // Disable file editing from admin
 if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) define( 'DISALLOW_FILE_EDIT', true );
 
+// Every outgoing wp_mail() (booking notifications included) shows "Vaccine.Pk"
+// as the sender name instead of WordPress's default "WordPress" — the address
+// itself is untouched, only the display name.
+add_filter( 'wp_mail_from_name', function () {
+    return 'Vaccine.Pk';
+} );
+
 // Reading time helper
 function vaccination_centre_reading_time() {
     return vaccination_centre_reading_time_for( get_the_ID() );
@@ -1280,9 +1287,15 @@ function vaccinepk_send_flu_booking_emails( $b ) {
     $location_label = $b['location'] === 'home' ? 'Home Service' : 'Clinic Visit';
     $subject_ref     = 'Flu Booking — ' . $b['full_name'] . ' (' . $b['city_name'] . ')';
 
+    // Same digits-only -> wa.me pattern used elsewhere on the site (e.g.
+    // single-vaccine.php's "Ask a Question on WhatsApp" link).
+    $wa_digits = preg_replace( '/[^0-9]/', '', (string) $b['whatsapp_number'] );
+    $wa_link   = $wa_digits ? 'https://wa.me/' . $wa_digits : '';
+
     $body = "<p><strong>New flu vaccine booking</strong></p><ul>"
         . '<li>Name: ' . esc_html( $b['full_name'] ) . '</li>'
-        . '<li>WhatsApp: ' . esc_html( $b['whatsapp_number'] ) . '</li>'
+        . '<li>WhatsApp: ' . esc_html( $b['whatsapp_number'] )
+            . ( $wa_link ? ' &nbsp;<a href="' . esc_url( $wa_link ) . '">Message on WhatsApp</a>' : '' ) . '</li>'
         . '<li>Email: ' . esc_html( $b['email'] ) . '</li>'
         . '<li>City: ' . esc_html( $b['city_name'] ) . '</li>'
         . ( $b['address'] ? '<li>Address: ' . esc_html( $b['address'] ) . '</li>' : '' )
