@@ -147,41 +147,24 @@ get_header();
     </div>
 </section>
 
-<!-- ================= BOOKING FORM MODAL ================= -->
-<div class="modal fade" id="bookingFormModal" tabindex="-1" aria-labelledby="bookingFormModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" style="border: none; border-radius: 20px; overflow: hidden;">
-            <div class="modal-header" style="background: #0a2a38; color: white; border: none; padding: 24px 30px; align-items: flex-start; gap: 20px;">
-                <div style="min-width: 0;">
-                    <h3 class="modal-title fw-bold mb-1" id="formCategoryTitle" style="line-height: 1.3; color: #ffffff;">
-                        <i class="bi bi-clipboard2-pulse-fill me-2"></i>
-                        Child Vaccination Booking
-                    </h3>
-                    <p class="mb-0 opacity-75 small" style="color: #ffffff;">Complete the form below to schedule your appointment</p>
-                </div>
-                <button type="button" class="btn-close btn-close-white flex-shrink-0" data-bs-dismiss="modal" aria-label="Close" style="margin: 4px 0 0 0;"></button>
-            </div>
-            <div class="modal-body" style="padding: 40px; background: #f6f3ec;">
-                <div id="form-container">
-                    <!-- Form will be loaded here via AJAX -->
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Handle category card clicks
+    // Handle category card clicks — navigate to each category's own booking page
+    const categoryUrls = {
+        'child':  '<?php echo home_url( '/book-child-vaccination' ); ?>',
+        'adult':  '<?php echo home_url( '/book-adult-vaccination' ); ?>',
+        'flu':    '<?php echo home_url( '/flu' ); ?>',
+        'travel': '<?php echo home_url( '/book-travel-vaccination' ); ?>'
+    };
+
     document.querySelectorAll('.booking-category-card').forEach(card => {
         card.addEventListener('click', function() {
             const category = this.getAttribute('data-category');
-            loadBookingForm(category);
-            
-            const formModal = new bootstrap.Modal(document.getElementById('bookingFormModal'));
-            formModal.show();
+            if (categoryUrls[category]) {
+                window.location.href = categoryUrls[category];
+            }
         });
         
         // Enhanced hover effects
@@ -199,79 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (img) img.style.transform = 'scale(1) rotate(0deg)';
         });
     });
-    
-    function loadBookingForm(category) {
-        const formContainer = document.getElementById('form-container');
-        const formTitle = document.getElementById('formCategoryTitle');
-        
-        const categoryTitles = {
-            'child': 'Child Vaccination Booking',
-            'adult': 'Adult Vaccination Booking',
-            'flu': 'Flu Vaccination Booking',
-            'travel': 'Travel Vaccination Booking'
-        };
-        
-        const categoryIcons = {
-            'child': 'heart-pulse-fill',
-            'adult': 'person-hearts',
-            'flu': 'shield-fill-plus',
-            'travel': 'airplane-fill'
-        };
-        
-        formTitle.innerHTML = `<i class="bi bi-${categoryIcons[category]} me-2"></i>${categoryTitles[category]}`;
-        
-        // Show loading spinner
-        formContainer.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-4 text-muted fw-bold">Loading your booking form...</p>
-            </div>
-        `;
-        
-        // Load form via WordPress AJAX (admin-ajax.php) — proper WordPress context
-        const formData = new FormData();
-        formData.append('action', 'load_booking_form');
-        formData.append('nonce', vaccination_ajax.nonce);
-        formData.append('category', category);
-
-        fetch(vaccination_ajax.ajax_url, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.text())
-            .then(html => {
-                formContainer.innerHTML = html;
-                
-                // Reinitialize Contact Form 7 if needed
-                if (typeof wpcf7 !== 'undefined') {
-                    formContainer.querySelectorAll('.wpcf7-form').forEach(form => {
-                        wpcf7.init(form);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error loading form:', error);
-                formContainer.innerHTML = `
-                    <div class="alert alert-danger">
-                        <h6 class="fw-bold mb-2"><i class="bi bi-exclamation-triangle-fill"></i> Error Loading Form</h6>
-                        <p class="mb-3">We couldn't load the booking form. Please try again or contact us directly.</p>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <a href="tel:+923335196658" class="btn btn-primary btn-sm">
-                                <i class="bi bi-telephone-fill"></i> Call +92 333 5196658
-                            </a>
-                            <a href="https://wa.me/923335196658?text=I want to book ${categoryTitles[category]}" class="btn btn-success btn-sm" target="_blank">
-                                <i class="bi bi-whatsapp"></i> WhatsApp
-                            </a>
-                            <a href="mailto:info@vaccinepk.com?subject=${categoryTitles[category]}" class="btn btn-secondary btn-sm">
-                                <i class="bi bi-envelope-fill"></i> Email
-                            </a>
-                        </div>
-                    </div>
-                `;
-            });
-    }
 });
 </script>
 
@@ -298,28 +208,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .booking-category-card:hover .card-overlay {
     background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.1) 100%) !important;
-}
-
-.spinner-border {
-    border-width: 0.3rem;
-}
-
-#bookingFormModal .modal-body {
-    scrollbar-width: thin;
-    scrollbar-color: #b8ad95 #f6f3ec;
-}
-
-#bookingFormModal .modal-body::-webkit-scrollbar {
-    width: 8px;
-}
-
-#bookingFormModal .modal-body::-webkit-scrollbar-track {
-    background: #f6f3ec;
-}
-
-#bookingFormModal .modal-body::-webkit-scrollbar-thumb {
-    background-color: #b8ad95;
-    border-radius: 10px;
 }
 
 @media (max-width: 576px) {
@@ -351,139 +239,6 @@ document.addEventListener('DOMContentLoaded', function() {
         padding: 10px 24px !important;
         font-size: 0.95rem !important;
     }
-
-    #bookingFormModal .modal-header {
-        padding: 18px 20px !important;
-    }
-
-    #bookingFormModal .modal-header .modal-title {
-        font-size: 1.1rem !important;
-    }
-
-    #bookingFormModal .modal-body {
-        padding: 20px !important;
-    }
-
-    #form-container .wpcf7-form {
-        padding: 18px !important;
-    }
-
-    #form-container .wpcf7-form .row > [class*="col-"] {
-        margin-bottom: 0;
-    }
-}
-
-/* Contact Form 7 Styling */
-#form-container .wpcf7-form {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-}
-
-#form-container .wpcf7-form p {
-    margin-bottom: 20px;
-}
-
-#form-container .wpcf7-form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #16232b;
-}
-
-#form-container .wpcf7-form input[type="text"],
-#form-container .wpcf7-form input[type="email"],
-#form-container .wpcf7-form input[type="tel"],
-#form-container .wpcf7-form input[type="date"],
-#form-container .wpcf7-form textarea,
-#form-container .wpcf7-form select {
-    width: 100%;
-    height: 48px;
-    padding: 12px 15px;
-    border: 2px solid #e7e0d3;
-    border-radius: 8px;
-    font-size: 15px;
-    line-height: 1.4;
-    font-family: inherit;
-    box-sizing: border-box;
-    -webkit-appearance: none;
-    appearance: none;
-    background-color: #fff;
-    transition: all 0.3s;
-}
-
-#form-container .wpcf7-form select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2316232b' d='M4 6l4 4 4-4z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    padding-right: 40px;
-}
-
-#form-container .wpcf7-form textarea {
-    height: auto;
-    min-height: 100px;
-}
-
-#form-container .wpcf7-form input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.4);
-    cursor: pointer;
-}
-
-#form-container .wpcf7-form input[type="text"]:focus,
-#form-container .wpcf7-form input[type="email"]:focus,
-#form-container .wpcf7-form input[type="tel"]:focus,
-#form-container .wpcf7-form input[type="date"]:focus,
-#form-container .wpcf7-form textarea:focus,
-#form-container .wpcf7-form select:focus {
-    border-color: #0b5c87;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(11, 92, 135, 0.1);
-}
-
-#form-container .wpcf7-form input[type="submit"] {
-    background: #0a2a38;
-    color: white;
-    border: none;
-    padding: 15px 40px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-#form-container .wpcf7-form input[type="submit"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(11, 92, 135, 0.3);
-}
-
-#form-container .wpcf7-not-valid-tip {
-    color: #dc2626;
-    font-size: 13px;
-    margin-top: 5px;
-}
-
-#form-container .wpcf7-response-output {
-    margin: 20px 0 0 0;
-    padding: 15px;
-    border-radius: 8px;
-    border: 2px solid;
-}
-
-#form-container .wpcf7-mail-sent-ok {
-    border-color: #10b981;
-    background-color: #d1fae5;
-    color: #065f46;
-}
-
-#form-container .wpcf7-validation-errors,
-#form-container .wpcf7-mail-sent-ng {
-    border-color: #ef4444;
-    background-color: #fee2e2;
-    color: #991b1b;
 }
 </style>
 
