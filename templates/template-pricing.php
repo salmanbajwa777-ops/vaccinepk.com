@@ -91,11 +91,12 @@ $category_tabs = [
 .vc-card-img {
   width: 100%;
   height: 180px;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
   background: linear-gradient(135deg, #eaf2f6, #cfe0e8);
-  padding: 10px;
   box-sizing: border-box;
   cursor: pointer;
+  display: block;
 }
 .vc-card-img-placeholder {
   width: 100%;
@@ -307,9 +308,9 @@ $category_tabs = [
 .vc-modal-image {
   width: 100%;
   height: 280px;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
   background: linear-gradient(135deg, #eaf2f6, #cfe0e8);
-  padding: 16px;
   box-sizing: border-box;
   display: block;
   margin-top: -46px;
