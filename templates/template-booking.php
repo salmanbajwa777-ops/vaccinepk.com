@@ -38,109 +38,97 @@ get_header();
         <div class="row g-4">
             <!-- Child Vaccination Card -->
             <div class="col-lg-6">
-                <div class="booking-category-card" data-category="child" style="cursor: pointer; position: relative; border-radius: 24px; overflow: hidden; height: 400px; box-shadow: 0 15px 50px rgba(0,0,0,0.15); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
-                    <img src="https://images.unsplash.com/photo-1612277795421-9bc7706a4a34?auto=format&fit=crop&w=1000&q=80" 
-                         alt="Child Vaccination" 
-                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
-                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 24, 32, 0.92) 0%, rgba(10, 24, 32, 0.55) 35%, rgba(10, 24, 32, 0.05) 65%, rgba(10, 24, 32, 0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
-                        <div class="text-white">
-                            <div class="mb-4">
-                                <i class="bi bi-heart-pulse-fill" style="font-size: 64px; opacity: 0.9;"></i>
-                            </div>
-                            <h2 class="fw-bold mb-3 display-6" style="text-shadow: 0 2px 14px rgba(0,0,0,0.45);">Child Vaccination</h2>
-                            <p class="mb-4 fs-5" style="opacity: 0.95; text-shadow: 0 1px 8px rgba(0,0,0,0.4);">Complete immunization schedule for infants and children following WHO & EPI guidelines.</p>
-                            <div class="d-flex flex-wrap gap-3 mb-4">
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-calendar-event"></i> Birth to 18 years</span>
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-house-heart"></i> Home service available</span>
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-shield-check"></i> WHO compliant</span>
-                            </div>
-                            <button class="btn btn-lg px-5 fw-bold" style="border-radius: 50px; background: #c9a24b; color: #0a2a38;">
-                                Book Child Vaccination <i class="bi bi-arrow-right-circle-fill ms-2"></i>
-                            </button>
-                        </div>
+                <div class="booking-category-card" data-category="child">
+                    <div class="card-photo">
+                        <img src="https://images.unsplash.com/photo-1612277795421-9bc7706a4a34?auto=format&fit=crop&w=1000&q=80"
+                             alt="Child Vaccination">
+                        <div class="pulse-indicator"></div>
+                        <i class="bi bi-heart-pulse-fill card-icon"></i>
                     </div>
-                    <div class="pulse-indicator" style="position: absolute; top: 30px; right: 30px; width: 20px; height: 20px; background: #6bb63f; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                    <div class="card-plate">
+                        <h2 class="fw-bold mb-3 display-6">Child Vaccination</h2>
+                        <p class="mb-4 fs-5">Complete immunization schedule for infants and children following WHO & EPI guidelines.</p>
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-calendar-event"></i> Birth to 18 years</span>
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-house-heart"></i> Home service available</span>
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-shield-check"></i> WHO compliant</span>
+                        </div>
+                        <button class="btn btn-lg px-5 fw-bold" style="border-radius: 50px; background: #c9a24b; color: #0a2a38;">
+                            Book Child Vaccination <i class="bi bi-arrow-right-circle-fill ms-2"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Adult Vaccination Card -->
             <div class="col-lg-6">
-                <div class="booking-category-card" data-category="adult" style="cursor: pointer; position: relative; border-radius: 24px; overflow: hidden; height: 400px; box-shadow: 0 15px 50px rgba(0,0,0,0.15); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
-                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000&q=80" 
-                         alt="Adult Vaccination" 
-                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
-                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 24, 32, 0.92) 0%, rgba(10, 24, 32, 0.55) 35%, rgba(10, 24, 32, 0.05) 65%, rgba(10, 24, 32, 0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
-                        <div class="text-white">
-                            <div class="mb-4">
-                                <i class="bi bi-person-hearts" style="font-size: 64px; opacity: 0.9;"></i>
-                            </div>
-                            <h2 class="fw-bold mb-3 display-6" style="text-shadow: 0 2px 14px rgba(0,0,0,0.45);">Adult Vaccination</h2>
-                            <p class="mb-4 fs-5" style="opacity: 0.95; text-shadow: 0 1px 8px rgba(0,0,0,0.4);">Essential immunizations for adults including boosters and preventive vaccines.</p>
-                            <div class="d-flex flex-wrap gap-3 mb-4">
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-people"></i> 18+ years</span>
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-clipboard2-pulse"></i> Health screening</span>
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-award"></i> Expert care</span>
-                            </div>
-                            <button class="btn btn-lg px-5 fw-bold" style="border-radius: 50px; background: #c9a24b; color: #0a2a38;">
-                                Book Adult Vaccination <i class="bi bi-arrow-right-circle-fill ms-2"></i>
-                            </button>
-                        </div>
+                <div class="booking-category-card" data-category="adult">
+                    <div class="card-photo">
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000&q=80"
+                             alt="Adult Vaccination">
+                        <div class="pulse-indicator"></div>
+                        <i class="bi bi-person-hearts card-icon"></i>
                     </div>
-                    <div class="pulse-indicator" style="position: absolute; top: 30px; right: 30px; width: 20px; height: 20px; background: #6bb63f; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                    <div class="card-plate">
+                        <h2 class="fw-bold mb-3 display-6">Adult Vaccination</h2>
+                        <p class="mb-4 fs-5">Essential immunizations for adults including boosters and preventive vaccines.</p>
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-people"></i> 18+ years</span>
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-clipboard2-pulse"></i> Health screening</span>
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-award"></i> Expert care</span>
+                        </div>
+                        <button class="btn btn-lg px-5 fw-bold" style="border-radius: 50px; background: #c9a24b; color: #0a2a38;">
+                            Book Adult Vaccination <i class="bi bi-arrow-right-circle-fill ms-2"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Flu Vaccination Card -->
             <div class="col-lg-6">
-                <div class="booking-category-card" data-category="flu" style="cursor: pointer; position: relative; border-radius: 24px; overflow: hidden; height: 400px; box-shadow: 0 15px 50px rgba(0,0,0,0.15); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
-                    <img src="https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=1000&q=80" 
-                         alt="Flu Vaccination" 
-                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
-                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 24, 32, 0.92) 0%, rgba(10, 24, 32, 0.55) 35%, rgba(10, 24, 32, 0.05) 65%, rgba(10, 24, 32, 0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
-                        <div class="text-white">
-                            <div class="mb-4">
-                                <i class="bi bi-shield-fill-plus" style="font-size: 64px; opacity: 0.9;"></i>
-                            </div>
-                            <h2 class="fw-bold mb-3 display-6" style="text-shadow: 0 2px 14px rgba(0,0,0,0.45);">Flu Vaccination</h2>
-                            <p class="mb-4 fs-5" style="opacity: 0.95; text-shadow: 0 1px 8px rgba(0,0,0,0.4);">Seasonal flu protection for all ages. Protect yourself and your loved ones.</p>
-                            <div class="d-flex flex-wrap gap-3 mb-4">
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-circle"></i> All ages</span>
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-calendar3"></i> Annual dose</span>
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-star"></i> Quick service</span>
-                            </div>
-                            <button class="btn btn-lg px-5 fw-bold" style="border-radius: 50px; background: #c9a24b; color: #0a2a38;">
-                                Book Flu Vaccination <i class="bi bi-arrow-right-circle-fill ms-2"></i>
-                            </button>
-                        </div>
+                <div class="booking-category-card" data-category="flu">
+                    <div class="card-photo">
+                        <img src="https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=1000&q=80"
+                             alt="Flu Vaccination">
+                        <div class="pulse-indicator"></div>
+                        <i class="bi bi-shield-fill-plus card-icon"></i>
                     </div>
-                    <div class="pulse-indicator" style="position: absolute; top: 30px; right: 30px; width: 20px; height: 20px; background: #6bb63f; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                    <div class="card-plate">
+                        <h2 class="fw-bold mb-3 display-6">Flu Vaccination</h2>
+                        <p class="mb-4 fs-5">Seasonal flu protection for all ages. Protect yourself and your loved ones.</p>
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-circle"></i> All ages</span>
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-calendar3"></i> Annual dose</span>
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-star"></i> Quick service</span>
+                        </div>
+                        <button class="btn btn-lg px-5 fw-bold" style="border-radius: 50px; background: #c9a24b; color: #0a2a38;">
+                            Book Flu Vaccination <i class="bi bi-arrow-right-circle-fill ms-2"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Travel Vaccination Card -->
             <div class="col-lg-6">
-                <div class="booking-category-card" data-category="travel" style="cursor: pointer; position: relative; border-radius: 24px; overflow: hidden; height: 400px; box-shadow: 0 15px 50px rgba(0,0,0,0.15); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
-                    <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1000&q=80" 
-                         alt="Travel Vaccination" 
-                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
-                    <div class="card-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 24, 32, 0.92) 0%, rgba(10, 24, 32, 0.55) 35%, rgba(10, 24, 32, 0.05) 65%, rgba(10, 24, 32, 0) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;">
-                        <div class="text-white">
-                            <div class="mb-4">
-                                <i class="bi bi-airplane-fill" style="font-size: 64px; opacity: 0.9;"></i>
-                            </div>
-                            <h2 class="fw-bold mb-3 display-6" style="text-shadow: 0 2px 14px rgba(0,0,0,0.45);">Travel Vaccination</h2>
-                            <p class="mb-4 fs-5" style="opacity: 0.95; text-shadow: 0 1px 8px rgba(0,0,0,0.4);">Pre-travel immunizations for domestic and international destinations.</p>
-                            <div class="d-flex flex-wrap gap-3 mb-4">
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-globe"></i> All destinations</span>
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-file-earmark-medical"></i> Verified</span>
-                                <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-clock"></i> Same day service</span>
-                            </div>
-                            <button class="btn btn-lg px-5 fw-bold" style="border-radius: 50px; background: #c9a24b; color: #0a2a38;">
-                                Book Travel Vaccination <i class="bi bi-arrow-right-circle-fill ms-2"></i>
-                            </button>
-                        </div>
+                <div class="booking-category-card" data-category="travel">
+                    <div class="card-photo">
+                        <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1000&q=80"
+                             alt="Travel Vaccination">
+                        <div class="pulse-indicator"></div>
+                        <i class="bi bi-airplane-fill card-icon"></i>
                     </div>
-                    <div class="pulse-indicator" style="position: absolute; top: 30px; right: 30px; width: 20px; height: 20px; background: #6bb63f; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                    <div class="card-plate">
+                        <h2 class="fw-bold mb-3 display-6">Travel Vaccination</h2>
+                        <p class="mb-4 fs-5">Pre-travel immunizations for domestic and international destinations.</p>
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-globe"></i> All destinations</span>
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-file-earmark-medical"></i> Verified</span>
+                            <span class="badge bg-white text-dark px-3 py-2"><i class="bi bi-clock"></i> Same day service</span>
+                        </div>
+                        <button class="btn btn-lg px-5 fw-bold" style="border-radius: 50px; background: #c9a24b; color: #0a2a38;">
+                            Book Travel Vaccination <i class="bi bi-arrow-right-circle-fill ms-2"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -169,17 +157,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Enhanced hover effects
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-15px) scale(1.02)';
-            this.style.boxShadow = '0 25px 70px rgba(0,0,0,0.25)';
+            this.style.transform = 'translateY(-10px)';
+            this.style.boxShadow = '0 25px 70px rgba(10,42,56,0.28)';
             const img = this.querySelector('img');
-            if (img) img.style.transform = 'scale(1.15) rotate(2deg)';
+            if (img) img.style.transform = 'scale(1.08)';
         });
-        
+
         card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-            this.style.boxShadow = '0 15px 50px rgba(0,0,0,0.15)';
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 15px 50px rgba(10,42,56,0.15)';
             const img = this.querySelector('img');
-            if (img) img.style.transform = 'scale(1) rotate(0deg)';
+            if (img) img.style.transform = 'scale(1)';
         });
     });
 });
@@ -199,24 +187,76 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .booking-category-card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(10, 42, 56, 0.15);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
+    height: 100%;
 }
 
-.booking-category-card .card-overlay {
-    transition: background 0.4s;
+.booking-category-card .card-photo {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
 }
 
-.booking-category-card:hover .card-overlay {
-    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.1) 100%) !important;
+.booking-category-card .card-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.booking-category-card .card-icon {
+    position: absolute;
+    bottom: 16px;
+    left: 20px;
+    font-size: 40px;
+    color: #fff;
+    opacity: 0.95;
+    text-shadow: 0 2px 10px rgba(10, 24, 32, 0.5);
+}
+
+.booking-category-card .pulse-indicator {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 14px;
+    height: 14px;
+    background: #6bb63f;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+    animation: pulse 2s infinite;
+}
+
+.booking-category-card .card-plate {
+    flex: 1;
+    background: var(--color-navy, #0a2a38);
+    color: #fff;
+    padding: 32px 40px 36px;
+    display: flex;
+    flex-direction: column;
+}
+
+.booking-category-card .card-plate .display-6 {
+    color: #fff;
+}
+
+.booking-category-card .card-plate p {
+    color: rgba(246, 243, 236, 0.82);
 }
 
 @media (max-width: 576px) {
-    .booking-category-card {
-        height: 320px !important;
+    .booking-category-card .card-photo {
+        height: 160px;
     }
 
-    .booking-category-card .card-overlay {
-        padding: 24px !important;
+    .booking-category-card .card-plate {
+        padding: 24px;
     }
 
     .booking-category-card .display-6 {
@@ -227,8 +267,8 @@ document.addEventListener('DOMContentLoaded', function() {
         font-size: 0.95rem !important;
     }
 
-    .booking-category-card .bi {
-        font-size: 40px !important;
+    .booking-category-card .card-icon {
+        font-size: 32px;
     }
 
     .booking-category-card .badge {
