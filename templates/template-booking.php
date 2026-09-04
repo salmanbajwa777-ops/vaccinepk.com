@@ -155,19 +155,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Enhanced hover effects
+        // Enhanced hover effects (image motion is a pure-CSS ambient loop, see .card-photo img)
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-10px)';
             this.style.boxShadow = '0 25px 70px rgba(10,42,56,0.28)';
-            const img = this.querySelector('img');
-            if (img) img.style.transform = 'scale(1.08)';
         });
 
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0)';
             this.style.boxShadow = '0 15px 50px rgba(10,42,56,0.15)';
-            const img = this.querySelector('img');
-            if (img) img.style.transform = 'scale(1)';
         });
     });
 });
@@ -183,6 +179,15 @@ document.addEventListener('DOMContentLoaded', function() {
     50% {
         transform: scale(1.5);
         opacity: 0.5;
+    }
+}
+
+@keyframes ambient-zoom {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.06);
     }
 }
 
@@ -208,7 +213,19 @@ document.addEventListener('DOMContentLoaded', function() {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s;
+    animation: ambient-zoom 16s ease-in-out infinite;
+}
+
+/* Stagger each card's cycle so all four don't breathe in lockstep */
+.booking-category-card[data-category="child"] .card-photo img  { animation-delay: -1s; }
+.booking-category-card[data-category="adult"] .card-photo img  { animation-delay: -5s; }
+.booking-category-card[data-category="flu"] .card-photo img    { animation-delay: -9s; }
+.booking-category-card[data-category="travel"] .card-photo img { animation-delay: -13s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .booking-category-card .card-photo img {
+        animation: none;
+    }
 }
 
 .booking-category-card .card-icon {
