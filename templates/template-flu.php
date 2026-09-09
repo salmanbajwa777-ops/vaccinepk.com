@@ -257,6 +257,52 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     .flu-sticky-cta .amount { font-size: 17px; }
     .flu-sticky-cta .flu-btn { padding: 12px 20px; font-size: 13.5px; }
 }
+
+/* ================= Preferred-date calendar popup ================= */
+.flu-date-field { position: relative; }
+.flu-date-popup {
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 40;
+    width: 300px; max-width: calc(100vw - 32px); background: #fff; border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(10,42,56,.24); border: 1px solid var(--color-sand);
+    padding: 14px; opacity: 0; pointer-events: none; transform: translateY(6px);
+    transition: opacity .15s, transform .15s;
+}
+.flu-date-popup.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.flu-date-popup-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.flu-date-popup-title { font-size: 14.5px; font-weight: 700; color: var(--color-ink-strong); }
+.flu-date-nav-btn {
+    width: 30px; height: 30px; border: none; border-radius: 50%; background: transparent;
+    color: var(--color-ink-strong); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background .15s;
+}
+.flu-date-nav-btn:hover:not(:disabled) { background: var(--color-blue-tint); }
+.flu-date-nav-btn:disabled { opacity: .3; cursor: not-allowed; }
+.flu-date-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px; }
+.flu-date-weekdays span { text-align: center; font-size: 10.5px; font-weight: 700; color: var(--color-ink); opacity: .6; padding: 4px 0; }
+.flu-date-days { display: grid; grid-template-columns: repeat(7,1fr); row-gap: 2px; }
+.flu-date-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    border: none; background: none; border-radius: 50%; font-size: 13px; color: var(--color-ink-strong);
+    cursor: pointer; position: relative; font-variant-numeric: tabular-nums; font-family: inherit;
+}
+.flu-date-day:hover:not(:disabled):not(.selected) { background: var(--color-blue-tint); }
+.flu-date-day.outside { color: var(--color-ink); opacity: .35; }
+.flu-date-day.today { color: var(--color-blue); font-weight: 800; }
+.flu-date-day.today::after {
+    content: ""; position: absolute; bottom: 3px; left: 50%; translate: -50% 0;
+    width: 4px; height: 4px; border-radius: 50%; background: var(--color-gold);
+}
+.flu-date-day.selected { background: var(--color-blue); color: #fff; font-weight: 700; }
+.flu-date-day:disabled { opacity: .25; cursor: not-allowed; }
+.flu-date-popup-foot { display: flex; justify-content: flex-end; padding-top: 8px; margin-top: 8px; border-top: 1px solid var(--color-sand); }
+.flu-date-clear {
+    border: none; background: none; font-weight: 700; font-size: 12.5px; padding: 6px 10px;
+    border-radius: 8px; cursor: pointer; color: var(--color-ink); transition: background .15s; font-family: inherit;
+}
+.flu-date-clear:hover { background: var(--color-sand); }
+@media (prefers-reduced-motion: reduce) {
+    .flu-date-popup { transition: none; }
+}
 </style>
 
 <!-- ================= HERO ================= -->
@@ -454,10 +500,24 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
                         <label class="flu-field-label">Address <span class="flu-field-hint">required for home service</span></label>
                         <input type="text" name="address" class="flu-bf-input" placeholder="House, street, area...">
                     </div>
-                    <div class="flu-field-group">
+                    <div class="flu-field-group flu-date-field">
                         <label class="flu-field-label">Preferred date <span class="flu-field-hint">optional</span></label>
                         <input type="text" id="fluDateDisplay" class="flu-bf-input" placeholder="dd/mm/yyyy" inputmode="numeric" autocomplete="off" maxlength="10">
                         <input type="hidden" name="preferred_date" id="fluDateValue">
+                        <div class="flu-date-popup" id="fluDatePopup">
+                            <div class="flu-date-popup-head">
+                                <button type="button" class="flu-date-nav-btn" id="fluDatePrev" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+                                <div class="flu-date-popup-title" id="fluDateTitle"></div>
+                                <button type="button" class="flu-date-nav-btn" id="fluDateNext" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
+                            </div>
+                            <div class="flu-date-weekdays">
+                                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                            </div>
+                            <div class="flu-date-days" id="fluDateDays"></div>
+                            <div class="flu-date-popup-foot">
+                                <button type="button" class="flu-date-clear" id="fluDateClear">Clear</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="flu-field-group">
                         <label class="flu-field-label">Preferred time slot <span class="flu-field-hint">optional</span></label>
@@ -662,13 +722,27 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     // dd/mm/yyyy display input, kept in sync with a hidden yyyy-mm-dd field
     // (what the server actually receives) — matches the site's other
     // properties, since a native <input type="date"> shows whatever format
-    // the visitor's OS/browser locale happens to use.
+    // the visitor's OS/browser locale happens to use. A calendar popup sits
+    // alongside typing so visitors aren't forced to hand-type digits.
     (function () {
         var display = document.getElementById('fluDateDisplay');
         var hidden  = document.getElementById('fluDateValue');
+        var popup   = document.getElementById('fluDatePopup');
+        var titleEl = document.getElementById('fluDateTitle');
+        var daysEl  = document.getElementById('fluDateDays');
+        var prevBtn = document.getElementById('fluDatePrev');
+        var nextBtn = document.getElementById('fluDateNext');
+        var clearBtn = document.getElementById('fluDateClear');
 
-        display.addEventListener('input', function () {
-            var digits = display.value.replace(/[^\d]/g, '').slice(0, 8);
+        var MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var MAX_DATE = new Date(today);
+        MAX_DATE.setMonth(MAX_DATE.getMonth() + 6);
+
+        function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+        function applyDigits(digits) {
             var out = digits;
             if (digits.length > 4) out = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
             else if (digits.length > 2) out = digits.slice(0, 2) + '/' + digits.slice(2);
@@ -682,7 +756,7 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
                 var d = new Date(year, month - 1, day);
                 var isReal = d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
                 if (isReal) {
-                    hidden.value = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                    hidden.value = year + '-' + pad(month) + '-' + pad(day);
                     display.setCustomValidity('');
                 } else {
                     display.setCustomValidity('Enter a real date as dd/mm/yyyy');
@@ -692,6 +766,115 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
             } else {
                 display.setCustomValidity('');
             }
+        }
+
+        display.addEventListener('input', function () {
+            applyDigits(display.value.replace(/[^\d]/g, '').slice(0, 8));
+        });
+
+        // Calendar popup, defaulting to whatever the typed value already resolved to.
+        var viewYear = today.getFullYear(), viewMonth = today.getMonth();
+
+        function parseHidden() {
+            var v = hidden.value;
+            if (!v || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
+            var parts = v.split('-');
+            return { y: parseInt(parts[0], 10), m: parseInt(parts[1], 10) - 1, d: parseInt(parts[2], 10) };
+        }
+
+        function renderCalendar() {
+            titleEl.textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+
+            var atMin = viewYear === today.getFullYear() && viewMonth === today.getMonth();
+            var atMax = viewYear === MAX_DATE.getFullYear() && viewMonth === MAX_DATE.getMonth();
+            prevBtn.disabled = atMin;
+            nextBtn.disabled = atMax;
+
+            var selected = parseHidden();
+            daysEl.innerHTML = '';
+
+            var firstDow = new Date(viewYear, viewMonth, 1).getDay();
+            var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+            var daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
+
+            var cells = [];
+            for (var i = firstDow - 1; i >= 0; i--) cells.push({ d: daysInPrevMonth - i, outside: true, dir: -1 });
+            for (var d = 1; d <= daysInMonth; d++) cells.push({ d: d, outside: false });
+            var trail = 1;
+            while (cells.length % 7 !== 0) cells.push({ d: trail++, outside: true, dir: 1 });
+
+            cells.forEach(function (cell) {
+                var cy = viewYear, cm = viewMonth;
+                if (cell.outside) {
+                    cm = viewMonth + cell.dir;
+                    cy = viewYear;
+                    if (cm < 0) { cm = 11; cy = viewYear - 1; }
+                    if (cm > 11) { cm = 0; cy = viewYear + 1; }
+                }
+
+                var cellDate = new Date(cy, cm, cell.d);
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'flu-date-day' + (cell.outside ? ' outside' : '');
+                btn.textContent = cell.d;
+
+                var isToday = cellDate.getTime() === today.getTime();
+                var isSelected = selected && selected.y === cy && selected.m === cm && selected.d === cell.d;
+                var isOutOfRange = cellDate < today || cellDate > MAX_DATE;
+
+                if (isToday) btn.classList.add('today');
+                if (isSelected) btn.classList.add('selected');
+                if (isOutOfRange) btn.disabled = true;
+
+                btn.addEventListener('click', function () {
+                    display.value = pad(cell.d) + '/' + pad(cm + 1) + '/' + cy;
+                    hidden.value = cy + '-' + pad(cm + 1) + '-' + pad(cell.d);
+                    display.setCustomValidity('');
+                    closePopup();
+                });
+                daysEl.appendChild(btn);
+            });
+        }
+
+        function openPopup() {
+            var sel = parseHidden();
+            if (sel) { viewYear = sel.y; viewMonth = sel.m; }
+            else { viewYear = today.getFullYear(); viewMonth = today.getMonth(); }
+            renderCalendar();
+            popup.classList.add('open');
+            document.addEventListener('click', onOutsideClick);
+            document.addEventListener('keydown', onKeydown);
+        }
+        function closePopup() {
+            popup.classList.remove('open');
+            document.removeEventListener('click', onOutsideClick);
+            document.removeEventListener('keydown', onKeydown);
+        }
+        function onOutsideClick(e) {
+            if (!popup.contains(e.target) && e.target !== display) closePopup();
+        }
+        function onKeydown(e) {
+            if (e.key === 'Escape') closePopup();
+        }
+
+        display.addEventListener('focus', openPopup);
+        display.addEventListener('click', function (e) { e.stopPropagation(); if (!popup.classList.contains('open')) openPopup(); });
+
+        prevBtn.addEventListener('click', function () {
+            viewMonth--;
+            if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+            renderCalendar();
+        });
+        nextBtn.addEventListener('click', function () {
+            viewMonth++;
+            if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+            renderCalendar();
+        });
+        clearBtn.addEventListener('click', function () {
+            display.value = '';
+            hidden.value = '';
+            display.setCustomValidity('');
+            closePopup();
         });
     })();
 
