@@ -596,13 +596,17 @@ add_action( 'wpcf7_init', function () {
 // booking forms (template-vaccination-booking.php) — the same three field
 // shapes (location toggle, yes/no radio, time slot select) repeat across
 // all three category templates, so they're built once here.
+// The .wpcf7-list-item wrapper below isn't decorative — it's what the
+// existing "Home Service -> reveal address textarea" script (functions.php
+// section 6, vaccinationInitForms()) keys off of via radio.closest('.wpcf7-list-item')
+// to find each option's label text. Without it, that already-working
+// site-wide script silently never fires for these radios.
 function vaccinepk_render_location_radio() {
-    $uid = 'loc_' . uniqid();
     return '<span class="wpcf7-form-control-wrap" data-name="location">'
-        . '<label style="display:inline-flex;align-items:center;gap:6px;font-weight:normal;margin-right:20px;">'
-        . '<input type="radio" name="location" value="Clinic Visit" checked required> Clinic Visit</label>'
-        . '<label style="display:inline-flex;align-items:center;gap:6px;font-weight:normal;">'
-        . '<input type="radio" name="location" value="Home Service"> Home Service</label>'
+        . '<span class="wpcf7-list-item"><label style="display:inline-flex;align-items:center;gap:6px;font-weight:normal;margin-right:20px;">'
+        . '<input type="radio" name="location" value="Clinic Visit" checked required> Clinic Visit</label></span>'
+        . '<span class="wpcf7-list-item"><label style="display:inline-flex;align-items:center;gap:6px;font-weight:normal;">'
+        . '<input type="radio" name="location" value="Home Service"> Home Service</label></span>'
         . '</span>';
 }
 
