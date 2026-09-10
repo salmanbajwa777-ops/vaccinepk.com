@@ -140,7 +140,7 @@ $nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
                             </div>
                             <div class="home-address-wrap mb-3">
                                 <label>Delivery Address*</label>
-                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..." required></textarea>
+                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..."></textarea>
                                 <p class="home-address-hint">🏠 Our staff will provide services at this address.</p>
                             </div>
                             <div class="mb-3">
@@ -217,7 +217,7 @@ $nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
                             </div>
                             <div class="home-address-wrap mb-3">
                                 <label>Delivery Address <span style="color:#ef4444;">*</span></label>
-                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..." required></textarea>
+                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..."></textarea>
                                 <p class="home-address-hint">📍 Our staff will provide services at this address.</p>
                             </div>
                             <div class="mb-3">
@@ -321,7 +321,7 @@ $nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
                             </div>
                             <div class="home-address-wrap mb-3">
                                 <label>Delivery Address <span style="color:#ef4444;">*</span></label>
-                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..." required></textarea>
+                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..."></textarea>
                                 <p class="home-address-hint">📍 Our staff will provide services at this address.</p>
                             </div>
                             <div class="mb-3">
