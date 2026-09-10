@@ -2,8 +2,12 @@
 /**
  * Template Name: Vaccination Booking (Category Page)
  * Description: Dedicated full-page booking form for one vaccination category
- * (child/adult/travel), replacing the homepage popup modal on mobile.
- * The page slug decides which CF7 form loads — see $slug_to_category below.
+ * (child/adult/travel). The page slug decides which category renders — see
+ * $slug_to_category below. Submits via AJAX to functions.php section 15
+ * (vaccinepk_submit_{category}_booking_ajax), the same admin+city-staff+
+ * client email pattern as the /flu page (functions.php section 14), rather
+ * than the old Contact Form 7 forms (posts 30/31/33 — left in place,
+ * unlinked, in case of rollback).
  */
 get_header();
 
@@ -11,12 +15,6 @@ $slug_to_category = [
     'book-child-vaccination'  => 'child',
     'book-adult-vaccination'  => 'adult',
     'book-travel-vaccination' => 'travel',
-];
-
-$form_ids = [
-    'child'  => 'd12af79',
-    'adult'  => 'b9ff7a4',
-    'travel' => 'ed84fa1',
 ];
 
 $category_labels = [
@@ -39,7 +37,9 @@ $category_subs = [
 
 $slug     = get_post_field( 'post_name', get_the_ID() );
 $category = $slug_to_category[ $slug ] ?? 'child';
-$form_id  = $form_ids[ $category ];
+
+$cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC' ] );
+$nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
 ?>
 
 <!-- ================= PAGE HEADER ================= -->
@@ -73,7 +73,278 @@ $form_id  = $form_ids[ $category ];
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <div id="vb-form-wrap">
-                    <?php echo do_shortcode( '[contact-form-7 id="' . esc_attr( $form_id ) . '"]' ); ?>
+                    <form class="wpcf7-form" id="vbBookingForm">
+                        <input type="hidden" name="action" value="submit_<?php echo esc_attr( $category ); ?>_booking">
+                        <input type="hidden" name="nonce" value="<?php echo esc_attr( $nonce ); ?>">
+
+                        <?php if ( $category === 'child' ) : ?>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Parent/Guardian Name*</label>
+                                    <input type="text" name="parent_name" class="form-control" placeholder="Enter full name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Father / Husband Name*</label>
+                                    <input type="text" name="f_h_name" class="form-control" placeholder="Enter father/husband name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Phone Number*</label>
+                                    <input type="tel" name="phone" class="form-control" placeholder="+92 3XX XXXXXXX" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Gender*</label>
+                                    <select name="gender" class="form-control" required>
+                                        <option value="">Select</option>
+                                        <option>Male</option><option>Female</option><option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Email Address*</label>
+                                    <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Child's Name*</label>
+                                    <input type="text" name="child_name" class="form-control" placeholder="Enter child's name" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Child's Date of Birth*</label>
+                                    <input type="date" name="child_dob" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Preferred Appointment Date*</label>
+                                    <input type="date" name="appointment_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>City*</label>
+                                    <select name="city_id" class="form-control" required>
+                                        <option value="">Select city</option>
+                                        <?php foreach ( $cities as $city ) : ?>
+                                            <option value="<?php echo esc_attr( $city->ID ); ?>"><?php echo esc_html( $city->post_title ); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="fw-bold mb-3">Select Vaccines (check all that apply)*</label>
+                                <?php echo vaccinepk_render_vaccine_picker( 'child', 'child' ); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Preferred Location*</label>
+                                <?php echo vaccinepk_render_location_radio(); ?>
+                            </div>
+                            <div class="home-address-wrap mb-3">
+                                <label>Delivery Address*</label>
+                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..." required></textarea>
+                                <p class="home-address-hint">🏠 Our staff will provide services at this address.</p>
+                            </div>
+                            <div class="mb-3">
+                                <label>Preferred Time Slot*</label>
+                                <?php echo vaccinepk_render_time_slot_select(); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Additional Notes</label>
+                                <textarea name="notes" class="form-control" rows="4" placeholder="Any allergies, medical conditions, or special requirements..."></textarea>
+                            </div>
+
+                        <?php elseif ( $category === 'adult' ) : ?>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Full Name*</label>
+                                    <input type="text" name="full_name" class="form-control" placeholder="Enter your full name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Father / Husband Name*</label>
+                                    <input type="text" name="f_h_name" class="form-control" placeholder="Enter your father/husband name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Phone Number*</label>
+                                    <input type="tel" name="phone" class="form-control" placeholder="+92 3XX XXXXXXX" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Gender*</label>
+                                    <select name="gender" class="form-control" required>
+                                        <option value="">Select</option>
+                                        <option>Male</option><option>Female</option><option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Email Address*</label>
+                                    <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Age*</label>
+                                    <input type="number" name="age" min="18" max="100" class="form-control" placeholder="18" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Preferred Appointment Date*</label>
+                                    <input type="date" name="appointment_date" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>City*</label>
+                                    <select name="city_id" class="form-control" required>
+                                        <option value="">Select city</option>
+                                        <?php foreach ( $cities as $city ) : ?>
+                                            <option value="<?php echo esc_attr( $city->ID ); ?>"><?php echo esc_html( $city->post_title ); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="fw-bold mb-3">Select Vaccines (check all that apply)*</label>
+                                <?php echo vaccinepk_render_vaccine_picker( 'adult', 'adult' ); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Do you have any chronic health conditions?</label>
+                                <?php echo vaccinepk_render_yes_no_radio( 'health_condition', 'No', 'Yes (please specify in notes)' ); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Are you currently taking any medications?</label>
+                                <?php echo vaccinepk_render_yes_no_radio( 'medications', 'No', 'Yes (please specify in notes)' ); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Preferred Location*</label>
+                                <?php echo vaccinepk_render_location_radio(); ?>
+                            </div>
+                            <div class="home-address-wrap mb-3">
+                                <label>Delivery Address <span style="color:#ef4444;">*</span></label>
+                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..." required></textarea>
+                                <p class="home-address-hint">📍 Our staff will provide services at this address.</p>
+                            </div>
+                            <div class="mb-3">
+                                <label>Preferred Time Slot*</label>
+                                <?php echo vaccinepk_render_time_slot_select(); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Additional Notes</label>
+                                <textarea name="notes" class="form-control" rows="4" placeholder="Medical conditions, allergies, medications, or special requirements..."></textarea>
+                            </div>
+
+                        <?php else : /* travel */ ?>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Full Name (as per passport/NIC)*</label>
+                                    <input type="text" name="full_name" class="form-control" placeholder="Enter your full name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Father / Husband Name*</label>
+                                    <input type="text" name="f_h_name" class="form-control" placeholder="Enter your father/husband name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Phone Number*</label>
+                                    <input type="tel" name="phone" class="form-control" placeholder="+92 3XX XXXXXXX" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Gender*</label>
+                                    <select name="gender" class="form-control" required>
+                                        <option value="">Select</option>
+                                        <option>Male</option><option>Female</option><option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Email Address*</label>
+                                    <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Date of Birth*</label>
+                                    <input type="date" name="dob" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Passport/NIC Number*</label>
+                                    <input type="text" name="passport" class="form-control" placeholder="Enter passport/NIC number" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Destination Country*</label>
+                                    <input type="text" name="destination" class="form-control" placeholder="e.g., Saudi Arabia, UK, USA" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Travel Date*</label>
+                                    <input type="date" name="travel_date" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Preferred Appointment Date*</label>
+                                    <input type="date" name="appointment_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Purpose of Travel*</label>
+                                    <select name="travel_purpose" class="form-control" required>
+                                        <option value="">Select</option>
+                                        <option>Tourism</option><option>Business</option><option>Hajj/Umrah</option>
+                                        <option>Education</option><option>Work/Employment</option><option>Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>City*</label>
+                                    <select name="city_id" class="form-control" required>
+                                        <option value="">Select city</option>
+                                        <?php foreach ( $cities as $city ) : ?>
+                                            <option value="<?php echo esc_attr( $city->ID ); ?>"><?php echo esc_html( $city->post_title ); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="fw-bold mb-3">Select Travel Vaccines (check all required)*</label>
+                                <div class="alert alert-info small mb-3">
+                                    <i class="bi bi-info-circle"></i> Different countries require different vaccines. Select all that apply to your destination.
+                                </div>
+                                <?php echo vaccinepk_render_vaccine_picker( 'travel', 'travel' ); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Do you need a Vaccination Certificate?*</label>
+                                <?php echo vaccinepk_render_yes_no_radio( 'certificate', 'Yes - International Certificate', 'No' ); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Any previous travel vaccines?</label>
+                                <?php echo vaccinepk_render_yes_no_radio( 'previous_vaccines', 'Yes (please specify in notes)', 'No' ); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Preferred Location*</label>
+                                <?php echo vaccinepk_render_location_radio(); ?>
+                            </div>
+                            <div class="home-address-wrap mb-3">
+                                <label>Delivery Address <span style="color:#ef4444;">*</span></label>
+                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..." required></textarea>
+                                <p class="home-address-hint">📍 Our staff will provide services at this address.</p>
+                            </div>
+                            <div class="mb-3">
+                                <label>Preferred Time Slot*</label>
+                                <?php echo vaccinepk_render_time_slot_select(); ?>
+                            </div>
+                            <div class="mb-3">
+                                <label>Additional Notes</label>
+                                <textarea name="notes" class="form-control" rows="4" placeholder="Medical conditions, allergies, previous vaccinations, or special requirements..."></textarea>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="mb-3">
+                            <label class="d-flex align-items-start gap-2">
+                                <input type="checkbox" required style="margin-top:4px;">
+                                <span>I agree to the terms and conditions and privacy policy*</span>
+                            </label>
+                        </div>
+                        <div class="text-center mt-4">
+                            <input type="submit" value="Book <?php echo esc_attr( $category_labels[ $category ] ); ?>">
+                        </div>
+                        <div class="wpcf7-response-output" id="vbFormMsg" style="display:none;"></div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -104,6 +375,7 @@ $form_id  = $form_ids[ $category ];
 #vb-form-wrap .wpcf7-form input[type="email"],
 #vb-form-wrap .wpcf7-form input[type="tel"],
 #vb-form-wrap .wpcf7-form input[type="date"],
+#vb-form-wrap .wpcf7-form input[type="number"],
 #vb-form-wrap .wpcf7-form textarea,
 #vb-form-wrap .wpcf7-form select {
     width: 100%;
@@ -142,6 +414,7 @@ $form_id  = $form_ids[ $category ];
 #vb-form-wrap .wpcf7-form input[type="email"]:focus,
 #vb-form-wrap .wpcf7-form input[type="tel"]:focus,
 #vb-form-wrap .wpcf7-form input[type="date"]:focus,
+#vb-form-wrap .wpcf7-form input[type="number"]:focus,
 #vb-form-wrap .wpcf7-form textarea:focus,
 #vb-form-wrap .wpcf7-form select:focus {
     border-color: #0b5c87;
@@ -169,10 +442,11 @@ $form_id  = $form_ids[ $category ];
     box-shadow: 0 10px 25px rgba(11, 92, 135, 0.3);
 }
 
-#vb-form-wrap .wpcf7-not-valid-tip {
-    color: #dc2626;
-    font-size: 13px;
-    margin-top: 5px;
+#vb-form-wrap .wpcf7-form input[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
 }
 
 #vb-form-wrap .wpcf7-response-output {
@@ -182,14 +456,13 @@ $form_id  = $form_ids[ $category ];
     border: 2px solid;
 }
 
-#vb-form-wrap .wpcf7-mail-sent-ok {
+#vb-form-wrap .wpcf7-response-output.is-success {
     border-color: #10b981;
     background-color: #d1fae5;
     color: #065f46;
 }
 
-#vb-form-wrap .wpcf7-validation-errors,
-#vb-form-wrap .wpcf7-mail-sent-ng {
+#vb-form-wrap .wpcf7-response-output.is-error {
     border-color: #ef4444;
     background-color: #fee2e2;
     color: #991b1b;
@@ -298,10 +571,10 @@ $form_id  = $form_ids[ $category ];
 }
 </style>
 
-<!-- Custom date-of-birth picker: replaces the CF7 form's native <input type="date">
-     (a raw OS/browser calendar widget) with a decade → year → month → day drill-down
-     dialog matching the site's navy/gold/blue design. Finds the date input generically
-     so it keeps working even if the CF7 field is renamed in wp-admin. -->
+<!-- Custom date-of-birth picker: replaces the native <input type="date">
+     (a raw OS/browser calendar widget) with a decade → year → month → day
+     drill-down dialog matching the site's navy/gold/blue design. Finds the
+     date input generically so it keeps working regardless of field name. -->
 <script>
 (function () {
     var MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -321,8 +594,8 @@ $form_id  = $form_ids[ $category ];
         var minDecade = Math.floor(minYear / 10) * 10;
         var maxDecade = Math.floor(maxYear / 10) * 10;
 
-        // Hide the native input but keep it in the DOM/tab order untouched for CF7's
-        // own validation and submission — the trigger button only drives its value.
+        // Hide the native input but keep it in the DOM/tab order untouched for
+        // native validation and submission — the trigger button only drives its value.
         nativeInput.style.position = 'absolute';
         nativeInput.style.opacity = '0';
         nativeInput.style.width = '1px';
@@ -341,9 +614,9 @@ $form_id  = $form_ids[ $category ];
         var backdrop = document.createElement('div');
         backdrop.className = 'dob-backdrop';
         backdrop.innerHTML =
-            '<div class="dob-dialog" role="dialog" aria-modal="true" aria-label="Choose date of birth">' +
+            '<div class="dob-dialog" role="dialog" aria-modal="true" aria-label="Choose date">' +
                 '<div class="dob-header">' +
-                    '<div class="dob-header-label">Date of birth</div>' +
+                    '<div class="dob-header-label">Choose date</div>' +
                     '<div class="dob-header-value"><span class="placeholder">Select a date</span></div>' +
                     '<div class="dob-crumbs"></div>' +
                 '</div>' +
@@ -558,13 +831,12 @@ $form_id  = $form_ids[ $category ];
                 }
 
                 var cellDate = new Date(cy, cm, cell.d);
-                var isFuture = cellDate > today;
                 var isToday = cellDate.toDateString() === today.toDateString();
                 var isSelected = state.pending && state.pending.y === cy && state.pending.m === cm && state.pending.d === cell.d;
 
                 if (isToday) btn.classList.add('today');
                 if (isSelected) btn.classList.add('selected');
-                if (isFuture || cy < minYear) btn.disabled = true;
+                if (cy < minYear || cy > maxYear) btn.disabled = true;
 
                 btn.addEventListener('click', function () {
                     state.pending = { y: cy, m: cm, d: cell.d };
@@ -602,7 +874,7 @@ $form_id  = $form_ids[ $category ];
             var sel = state.selected;
             triggerText.textContent = pad(sel.d) + '/' + pad(sel.m + 1) + '/' + sel.y;
             triggerText.classList.remove('dob-trigger-ph');
-            // Native input keeps yyyy-mm-dd so CF7's own [date] validation/mail-tags still work.
+            // Native input keeps yyyy-mm-dd so form submission/validation still works.
             nativeInput.value = sel.y + '-' + pad(sel.m + 1) + '-' + pad(sel.d);
             nativeInput.dispatchEvent(new Event('change', { bubbles: true }));
             closeDialog();
@@ -629,9 +901,51 @@ $form_id  = $form_ids[ $category ];
     } else {
         enhanceAll();
     }
-    // CF7 can re-render the form (e.g. after a validation error response) — re-scan then too.
-    document.addEventListener('wpcf7invalid', enhanceAll);
-    document.addEventListener('wpcf7mailsent', enhanceAll);
+})();
+</script>
+
+<!-- AJAX submit: same pattern as /flu's fluBookingForm handler (functions.php
+     wp_ajax_submit_{category}_booking) — plain FormData POST, JSON response. -->
+<script>
+(function () {
+    var form = document.getElementById('vbBookingForm');
+    if (!form) return;
+    var msg = document.getElementById('vbFormMsg');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var submitBtn = form.querySelector('input[type="submit"]');
+        submitBtn.disabled = true;
+        msg.style.display = 'none';
+        msg.className = 'wpcf7-response-output';
+
+        var formData = new FormData(form);
+
+        fetch(vaccination_ajax.ajax_url, { method: 'POST', body: formData })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                submitBtn.disabled = false;
+                msg.style.display = 'block';
+                if (data.success) {
+                    msg.classList.add('is-success');
+                    msg.textContent = "Booking received! Our team will contact you shortly to confirm your appointment.";
+                    form.reset();
+                    document.querySelectorAll('#vb-form-wrap .dob-trigger-ph').forEach(function (el) {
+                        el.textContent = 'dd/mm/yyyy';
+                    });
+                } else {
+                    msg.classList.add('is-error');
+                    msg.textContent = (data.data && data.data.message) || 'Something went wrong. Please try again or call us.';
+                }
+            })
+            .catch(function () {
+                submitBtn.disabled = false;
+                msg.style.display = 'block';
+                msg.classList.add('is-error');
+                msg.textContent = 'Network error — please try again or call us.';
+            });
+    });
 })();
 </script>
 

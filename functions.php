@@ -354,24 +354,10 @@ function vaccinepk_get_ranked_chips( $limit = 7 ) {
    4. CF7 CUSTOM TAG: [dynamic_vaccines category]
       Renders vaccine checkboxes + "Other Vaccine" card dynamically
    ========================================================================== */
-function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
-
-    // Detect category from tag name or options
-    $category_key = '';
-    $name         = sanitize_key( $tag->name );
-
-    foreach ( [ 'adult', 'child', 'flu', 'travel' ] as $key ) {
-        if ( $name === $key || strpos( $name, $key ) !== false ) {
-            $category_key = $key; break;
-        }
-    }
-    if ( empty( $category_key ) ) {
-        foreach ( array_merge( (array) $tag->options, (array) $tag->values ) as $v ) {
-            if ( in_array( sanitize_key( $v ), [ 'adult', 'child', 'flu', 'travel' ] ) ) {
-                $category_key = sanitize_key( $v ); break;
-            }
-        }
-    }
+// Core renderer shared by the CF7 tag (legacy, now-orphaned forms) and the
+// native booking-page forms (functions.php section 15) — both need the exact
+// same per-vaccine brand picker, so this is the one place its markup lives.
+function vaccinepk_render_vaccine_picker( $category_key, $field_name ) {
 
     $slug_map = [
         'child'  => 'child-vaccines',
@@ -410,7 +396,7 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
         }
     }
 
-    $field_name = esc_attr( $tag->name );
+    $field_name = esc_attr( $field_name );
     $uid        = 'dv_' . $field_name . '_' . uniqid();
 
     // ── Resolve available brands per vaccine. Every vaccine in the category
@@ -572,6 +558,30 @@ function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
     return $html;
 }
 
+// Thin CF7 tag wrapper: kept only because the original three CF7 forms
+// (posts 30/31/33) still reference [dynamic_vaccines ...] and are left in
+// place, unlinked, rather than deleted. The live booking pages now call
+// vaccinepk_render_vaccine_picker() directly — see section 15.
+function vaccination_centre_cf7_dynamic_vaccines( $tag ) {
+    $category_key = '';
+    $name         = sanitize_key( $tag->name );
+
+    foreach ( [ 'adult', 'child', 'flu', 'travel' ] as $key ) {
+        if ( $name === $key || strpos( $name, $key ) !== false ) {
+            $category_key = $key; break;
+        }
+    }
+    if ( empty( $category_key ) ) {
+        foreach ( array_merge( (array) $tag->options, (array) $tag->values ) as $v ) {
+            if ( in_array( sanitize_key( $v ), [ 'adult', 'child', 'flu', 'travel' ] ) ) {
+                $category_key = sanitize_key( $v ); break;
+            }
+        }
+    }
+
+    return vaccinepk_render_vaccine_picker( $category_key, $tag->name );
+}
+
 add_action( 'wpcf7_init', function () {
     if ( function_exists( 'wpcf7_add_form_tag' ) ) {
         wpcf7_add_form_tag(
@@ -582,8 +592,39 @@ add_action( 'wpcf7_init', function () {
     }
 } );
 
+// Small shared field-group renderers for the native child/adult/travel
+// booking forms (template-vaccination-booking.php) — the same three field
+// shapes (location toggle, yes/no radio, time slot select) repeat across
+// all three category templates, so they're built once here.
+function vaccinepk_render_location_radio() {
+    $uid = 'loc_' . uniqid();
+    return '<span class="wpcf7-form-control-wrap" data-name="location">'
+        . '<label style="display:inline-flex;align-items:center;gap:6px;font-weight:normal;margin-right:20px;">'
+        . '<input type="radio" name="location" value="Clinic Visit" checked required> Clinic Visit</label>'
+        . '<label style="display:inline-flex;align-items:center;gap:6px;font-weight:normal;">'
+        . '<input type="radio" name="location" value="Home Service"> Home Service</label>'
+        . '</span>';
+}
 
+function vaccinepk_render_yes_no_radio( $field_name, $no_label, $yes_label ) {
+    $field_name = esc_attr( $field_name );
+    return '<span class="wpcf7-form-control-wrap" data-name="' . $field_name . '">'
+        . '<label style="display:inline-flex;align-items:center;gap:6px;font-weight:normal;margin-right:20px;">'
+        . '<input type="radio" name="' . $field_name . '" value="' . esc_attr( $no_label ) . '" checked> ' . esc_html( $no_label ) . '</label>'
+        . '<label style="display:inline-flex;align-items:center;gap:6px;font-weight:normal;">'
+        . '<input type="radio" name="' . $field_name . '" value="' . esc_attr( $yes_label ) . '"> ' . esc_html( $yes_label ) . '</label>'
+        . '</span>';
+}
 
+function vaccinepk_render_time_slot_select() {
+    $slots = [ 'Morning (9AM - 12PM)', 'Afternoon (12PM - 3PM)', 'Evening (3PM - 6PM)' ];
+    $html  = '<select name="time_slot" class="form-control" required><option value="">Select time</option>';
+    foreach ( $slots as $slot ) {
+        $html .= '<option>' . esc_html( $slot ) . '</option>';
+    }
+    $html .= '</select>';
+    return $html;
+}
 
 /* ==========================================================================
    6. FRONTEND JS: Conditional fields (Home address + Other vaccine toggle)
@@ -1560,4 +1601,377 @@ function vaccinepk_send_flu_booking_emails( $b ) {
         . '<li>Location: ' . esc_html( $location_label ) . '</li>'
         . '</ul><p>We\'ll contact you on WhatsApp shortly to confirm your appointment slot.</p>';
     wp_mail( $b['email'], 'Your Flu Vaccine Booking — Vaccine.Pk', $customer_body, $headers );
+}
+
+/* ==========================================================================
+   15. CHILD / ADULT / TRAVEL BOOKING PAGES — SUBMIT HANDLERS
+       Tables: {$wpdb->prefix}{child,adult,travel}_bookings (see sql/2026-09-*.sql).
+       Same two-tier staff notification as flu: the shared admin_notification_email
+       (vaccinepk_flu_setting — the Pods post type is still named
+       flu_bookings_setting, but the field is now shared across all four booking
+       categories rather than duplicating a settings screen per category) plus
+       the submitted city's city_staff_email, so both an address that watches
+       every booking and the local team for that city get notified.
+   ========================================================================== */
+function vaccinepk_booking_table_exists( $suffix ) {
+    global $wpdb;
+    static $checked = [];
+    if ( ! isset( $checked[ $suffix ] ) ) {
+        $table = $wpdb->prefix . $suffix;
+        $checked[ $suffix ] = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table;
+    }
+    return $checked[ $suffix ];
+}
+
+// [dynamic_vaccines] posts as `{field}[]` (one entry per checked vaccine/brand
+// combo, e.g. "MMR - Priorix") plus a sibling `{field}_other_text` free-text
+// field. Both booking rows and emails need the same flattened "vaccine list"
+// string, so every handler below builds it the same way.
+function vaccinepk_booking_selected_vaccines_text( $field ) {
+    $items = isset( $_POST[ $field ] ) && is_array( $_POST[ $field ] )
+        ? array_map( 'sanitize_text_field', wp_unslash( $_POST[ $field ] ) )
+        : [];
+    $other = isset( $_POST[ $field . '_other_text' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field . '_other_text' ] ) ) : '';
+    if ( $other !== '' ) {
+        $items = array_map( function ( $i ) use ( $other ) { return $i === 'Other' ? 'Other: ' . $other : $i; }, $items );
+    }
+    return implode( ', ', $items );
+}
+
+function vaccinepk_booking_city( $city_id ) {
+    $city = $city_id ? get_post( $city_id ) : null;
+    if ( ! $city || $city->post_type !== 'city' ) return null;
+    return $city;
+}
+
+/* -------------------- CHILD -------------------- */
+function vaccinepk_submit_child_booking_ajax() {
+    check_ajax_referer( 'vaccination_booking_nonce', 'nonce' );
+
+    if ( ! vaccinepk_booking_table_exists( 'child_bookings' ) ) {
+        wp_send_json_error( [ 'message' => 'Booking is temporarily unavailable. Please call or WhatsApp us instead.' ] );
+    }
+
+    $parent_name  = isset( $_POST['parent_name'] ) ? sanitize_text_field( wp_unslash( $_POST['parent_name'] ) ) : '';
+    $f_h_name     = isset( $_POST['f_h_name'] ) ? sanitize_text_field( wp_unslash( $_POST['f_h_name'] ) ) : '';
+    $phone        = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
+    $gender       = isset( $_POST['gender'] ) ? sanitize_text_field( wp_unslash( $_POST['gender'] ) ) : '';
+    $email        = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+    $child_name   = isset( $_POST['child_name'] ) ? sanitize_text_field( wp_unslash( $_POST['child_name'] ) ) : '';
+    $child_dob    = isset( $_POST['child_dob'] ) ? sanitize_text_field( wp_unslash( $_POST['child_dob'] ) ) : '';
+    $city_id      = isset( $_POST['city_id'] ) ? absint( $_POST['city_id'] ) : 0;
+    $appt_date    = isset( $_POST['appointment_date'] ) ? sanitize_text_field( wp_unslash( $_POST['appointment_date'] ) ) : '';
+    $time_slot    = isset( $_POST['time_slot'] ) ? sanitize_text_field( wp_unslash( $_POST['time_slot'] ) ) : '';
+    $location     = ( isset( $_POST['location'] ) && $_POST['location'] === 'Home Service' ) ? 'home' : 'clinic';
+    $home_address = isset( $_POST['home_address'] ) ? sanitize_text_field( wp_unslash( $_POST['home_address'] ) ) : '';
+    $notes        = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
+    $vaccines     = vaccinepk_booking_selected_vaccines_text( 'child' );
+
+    if ( ! $parent_name || ! $phone || ! $email || ! $child_name || ! $city_id ) {
+        wp_send_json_error( [ 'message' => 'Please fill in all required fields.' ] );
+    }
+
+    $city = vaccinepk_booking_city( $city_id );
+    if ( ! $city ) {
+        wp_send_json_error( [ 'message' => 'Please select a valid city.' ] );
+    }
+
+    global $wpdb;
+    $wpdb->insert(
+        $wpdb->prefix . 'child_bookings',
+        [
+            'parent_name'      => $parent_name,
+            'f_h_name'         => $f_h_name,
+            'phone'            => $phone,
+            'gender'           => $gender,
+            'email'            => $email,
+            'child_name'       => $child_name,
+            'child_dob'        => $child_dob ?: null,
+            'city_id'          => $city_id,
+            'city_name'        => $city->post_title,
+            'selected_vaccines'=> $vaccines,
+            'appointment_date' => $appt_date ?: null,
+            'time_slot'        => $time_slot,
+            'location_type'    => $location,
+            'home_address'     => $home_address,
+            'notes'            => $notes,
+            'status'           => 'new',
+            'created_at'       => current_time( 'mysql' ),
+        ],
+        [ '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
+    );
+
+    vaccinepk_send_child_booking_emails( [
+        'parent_name'      => $parent_name,
+        'child_name'       => $child_name,
+        'phone'            => $phone,
+        'email'            => $email,
+        'city_name'        => $city->post_title,
+        'city_staff_email' => get_post_meta( $city_id, 'city_staff_email', true ),
+        'selected_vaccines'=> $vaccines,
+        'appointment_date' => $appt_date,
+        'time_slot'        => $time_slot,
+        'location'         => $location,
+        'home_address'     => $home_address,
+    ] );
+
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_submit_child_booking',        'vaccinepk_submit_child_booking_ajax' );
+add_action( 'wp_ajax_nopriv_submit_child_booking', 'vaccinepk_submit_child_booking_ajax' );
+
+function vaccinepk_send_child_booking_emails( $b ) {
+    $admin_email    = vaccinepk_flu_setting( 'admin_notification_email' );
+    $location_label = $b['location'] === 'home' ? 'Home Service' : 'Clinic Visit';
+    $subject_ref    = 'Child Booking — ' . $b['child_name'] . ' (' . $b['city_name'] . ')';
+
+    $body = "<p><strong>New child vaccine booking</strong></p><ul>"
+        . '<li>Child: ' . esc_html( $b['child_name'] ) . '</li>'
+        . '<li>Parent/Guardian: ' . esc_html( $b['parent_name'] ) . '</li>'
+        . '<li>Phone: ' . esc_html( $b['phone'] ) . '</li>'
+        . '<li>Email: ' . esc_html( $b['email'] ) . '</li>'
+        . '<li>City: ' . esc_html( $b['city_name'] ) . '</li>'
+        . '<li>Vaccines: ' . esc_html( $b['selected_vaccines'] ) . '</li>'
+        . ( $b['appointment_date'] ? '<li>Preferred date: ' . esc_html( $b['appointment_date'] ) . '</li>' : '' )
+        . ( $b['time_slot'] ? '<li>Time slot: ' . esc_html( $b['time_slot'] ) . '</li>' : '' )
+        . '<li>Location: ' . esc_html( $location_label ) . '</li>'
+        . ( $b['home_address'] ? '<li>Address: ' . esc_html( $b['home_address'] ) . '</li>' : '' )
+        . '</ul>';
+
+    $headers = [ 'Content-Type: text/html; charset=UTF-8' ];
+
+    if ( $admin_email ) wp_mail( $admin_email, $subject_ref, $body, $headers );
+    if ( $b['city_staff_email'] ) wp_mail( $b['city_staff_email'], $subject_ref, $body, $headers );
+
+    $customer_body = "<p>Hi " . esc_html( $b['parent_name'] ) . ",</p>"
+        . "<p>Thanks for booking a vaccination appointment for " . esc_html( $b['child_name'] ) . " with Vaccine.Pk. Here's a summary:</p><ul>"
+        . '<li>Vaccines: ' . esc_html( $b['selected_vaccines'] ) . '</li>'
+        . '<li>Location: ' . esc_html( $location_label ) . '</li>'
+        . '</ul><p>Our team will contact you shortly to confirm your appointment slot.</p>';
+    wp_mail( $b['email'], 'Your Child Vaccine Booking — Vaccine.Pk', $customer_body, $headers );
+}
+
+/* -------------------- ADULT -------------------- */
+function vaccinepk_submit_adult_booking_ajax() {
+    check_ajax_referer( 'vaccination_booking_nonce', 'nonce' );
+
+    if ( ! vaccinepk_booking_table_exists( 'adult_bookings' ) ) {
+        wp_send_json_error( [ 'message' => 'Booking is temporarily unavailable. Please call or WhatsApp us instead.' ] );
+    }
+
+    $full_name    = isset( $_POST['full_name'] ) ? sanitize_text_field( wp_unslash( $_POST['full_name'] ) ) : '';
+    $f_h_name     = isset( $_POST['f_h_name'] ) ? sanitize_text_field( wp_unslash( $_POST['f_h_name'] ) ) : '';
+    $phone        = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
+    $gender       = isset( $_POST['gender'] ) ? sanitize_text_field( wp_unslash( $_POST['gender'] ) ) : '';
+    $email        = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+    $age          = isset( $_POST['age'] ) ? absint( $_POST['age'] ) : 0;
+    $city_id      = isset( $_POST['city_id'] ) ? absint( $_POST['city_id'] ) : 0;
+    $appt_date    = isset( $_POST['appointment_date'] ) ? sanitize_text_field( wp_unslash( $_POST['appointment_date'] ) ) : '';
+    $time_slot    = isset( $_POST['time_slot'] ) ? sanitize_text_field( wp_unslash( $_POST['time_slot'] ) ) : '';
+    $location     = ( isset( $_POST['location'] ) && $_POST['location'] === 'Home Service' ) ? 'home' : 'clinic';
+    $home_address = isset( $_POST['home_address'] ) ? sanitize_text_field( wp_unslash( $_POST['home_address'] ) ) : '';
+    $health_cond  = isset( $_POST['health_condition'] ) ? sanitize_text_field( wp_unslash( $_POST['health_condition'] ) ) : '';
+    $medications  = isset( $_POST['medications'] ) ? sanitize_text_field( wp_unslash( $_POST['medications'] ) ) : '';
+    $notes        = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
+    $vaccines     = vaccinepk_booking_selected_vaccines_text( 'adult' );
+
+    if ( ! $full_name || ! $phone || ! $email || ! $city_id ) {
+        wp_send_json_error( [ 'message' => 'Please fill in all required fields.' ] );
+    }
+
+    $city = vaccinepk_booking_city( $city_id );
+    if ( ! $city ) {
+        wp_send_json_error( [ 'message' => 'Please select a valid city.' ] );
+    }
+
+    global $wpdb;
+    $wpdb->insert(
+        $wpdb->prefix . 'adult_bookings',
+        [
+            'full_name'         => $full_name,
+            'f_h_name'          => $f_h_name,
+            'phone'             => $phone,
+            'gender'            => $gender,
+            'email'             => $email,
+            'age'               => $age,
+            'city_id'           => $city_id,
+            'city_name'         => $city->post_title,
+            'selected_vaccines' => $vaccines,
+            'appointment_date'  => $appt_date ?: null,
+            'time_slot'         => $time_slot,
+            'location_type'     => $location,
+            'home_address'      => $home_address,
+            'health_condition'  => $health_cond,
+            'medications'       => $medications,
+            'notes'             => $notes,
+            'status'            => 'new',
+            'created_at'        => current_time( 'mysql' ),
+        ],
+        [ '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
+    );
+
+    vaccinepk_send_adult_booking_emails( [
+        'full_name'         => $full_name,
+        'phone'             => $phone,
+        'email'             => $email,
+        'city_name'         => $city->post_title,
+        'city_staff_email'  => get_post_meta( $city_id, 'city_staff_email', true ),
+        'selected_vaccines' => $vaccines,
+        'appointment_date'  => $appt_date,
+        'time_slot'         => $time_slot,
+        'location'          => $location,
+        'home_address'      => $home_address,
+    ] );
+
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_submit_adult_booking',        'vaccinepk_submit_adult_booking_ajax' );
+add_action( 'wp_ajax_nopriv_submit_adult_booking', 'vaccinepk_submit_adult_booking_ajax' );
+
+function vaccinepk_send_adult_booking_emails( $b ) {
+    $admin_email    = vaccinepk_flu_setting( 'admin_notification_email' );
+    $location_label = $b['location'] === 'home' ? 'Home Service' : 'Clinic Visit';
+    $subject_ref    = 'Adult Booking — ' . $b['full_name'] . ' (' . $b['city_name'] . ')';
+
+    $body = "<p><strong>New adult vaccine booking</strong></p><ul>"
+        . '<li>Name: ' . esc_html( $b['full_name'] ) . '</li>'
+        . '<li>Phone: ' . esc_html( $b['phone'] ) . '</li>'
+        . '<li>Email: ' . esc_html( $b['email'] ) . '</li>'
+        . '<li>City: ' . esc_html( $b['city_name'] ) . '</li>'
+        . '<li>Vaccines: ' . esc_html( $b['selected_vaccines'] ) . '</li>'
+        . ( $b['appointment_date'] ? '<li>Preferred date: ' . esc_html( $b['appointment_date'] ) . '</li>' : '' )
+        . ( $b['time_slot'] ? '<li>Time slot: ' . esc_html( $b['time_slot'] ) . '</li>' : '' )
+        . '<li>Location: ' . esc_html( $location_label ) . '</li>'
+        . ( $b['home_address'] ? '<li>Address: ' . esc_html( $b['home_address'] ) . '</li>' : '' )
+        . '</ul>';
+
+    $headers = [ 'Content-Type: text/html; charset=UTF-8' ];
+
+    if ( $admin_email ) wp_mail( $admin_email, $subject_ref, $body, $headers );
+    if ( $b['city_staff_email'] ) wp_mail( $b['city_staff_email'], $subject_ref, $body, $headers );
+
+    $customer_body = "<p>Hi " . esc_html( $b['full_name'] ) . ",</p>"
+        . "<p>Thanks for booking your vaccination appointment with Vaccine.Pk. Here's a summary:</p><ul>"
+        . '<li>Vaccines: ' . esc_html( $b['selected_vaccines'] ) . '</li>'
+        . '<li>Location: ' . esc_html( $location_label ) . '</li>'
+        . '</ul><p>Our team will contact you shortly to confirm your appointment slot.</p>';
+    wp_mail( $b['email'], 'Your Adult Vaccine Booking — Vaccine.Pk', $customer_body, $headers );
+}
+
+/* -------------------- TRAVEL -------------------- */
+function vaccinepk_submit_travel_booking_ajax() {
+    check_ajax_referer( 'vaccination_booking_nonce', 'nonce' );
+
+    if ( ! vaccinepk_booking_table_exists( 'travel_bookings' ) ) {
+        wp_send_json_error( [ 'message' => 'Booking is temporarily unavailable. Please call or WhatsApp us instead.' ] );
+    }
+
+    $full_name      = isset( $_POST['full_name'] ) ? sanitize_text_field( wp_unslash( $_POST['full_name'] ) ) : '';
+    $f_h_name       = isset( $_POST['f_h_name'] ) ? sanitize_text_field( wp_unslash( $_POST['f_h_name'] ) ) : '';
+    $phone          = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
+    $gender         = isset( $_POST['gender'] ) ? sanitize_text_field( wp_unslash( $_POST['gender'] ) ) : '';
+    $email          = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+    $dob            = isset( $_POST['dob'] ) ? sanitize_text_field( wp_unslash( $_POST['dob'] ) ) : '';
+    $passport       = isset( $_POST['passport'] ) ? sanitize_text_field( wp_unslash( $_POST['passport'] ) ) : '';
+    $destination    = isset( $_POST['destination'] ) ? sanitize_text_field( wp_unslash( $_POST['destination'] ) ) : '';
+    $travel_date    = isset( $_POST['travel_date'] ) ? sanitize_text_field( wp_unslash( $_POST['travel_date'] ) ) : '';
+    $travel_purpose = isset( $_POST['travel_purpose'] ) ? sanitize_text_field( wp_unslash( $_POST['travel_purpose'] ) ) : '';
+    $certificate    = isset( $_POST['certificate'] ) ? sanitize_text_field( wp_unslash( $_POST['certificate'] ) ) : '';
+    $city_id        = isset( $_POST['city_id'] ) ? absint( $_POST['city_id'] ) : 0;
+    $appt_date      = isset( $_POST['appointment_date'] ) ? sanitize_text_field( wp_unslash( $_POST['appointment_date'] ) ) : '';
+    $time_slot      = isset( $_POST['time_slot'] ) ? sanitize_text_field( wp_unslash( $_POST['time_slot'] ) ) : '';
+    $location       = ( isset( $_POST['location'] ) && $_POST['location'] === 'Home Service' ) ? 'home' : 'clinic';
+    $home_address   = isset( $_POST['home_address'] ) ? sanitize_text_field( wp_unslash( $_POST['home_address'] ) ) : '';
+    $prev_vaccines  = isset( $_POST['previous_vaccines'] ) ? sanitize_text_field( wp_unslash( $_POST['previous_vaccines'] ) ) : '';
+    $notes          = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
+    $vaccines       = vaccinepk_booking_selected_vaccines_text( 'travel' );
+
+    if ( ! $full_name || ! $phone || ! $email || ! $destination || ! $city_id ) {
+        wp_send_json_error( [ 'message' => 'Please fill in all required fields.' ] );
+    }
+
+    $city = vaccinepk_booking_city( $city_id );
+    if ( ! $city ) {
+        wp_send_json_error( [ 'message' => 'Please select a valid city.' ] );
+    }
+
+    global $wpdb;
+    $wpdb->insert(
+        $wpdb->prefix . 'travel_bookings',
+        [
+            'full_name'         => $full_name,
+            'f_h_name'          => $f_h_name,
+            'phone'             => $phone,
+            'gender'            => $gender,
+            'email'             => $email,
+            'dob'               => $dob ?: null,
+            'passport'          => $passport,
+            'destination'       => $destination,
+            'travel_date'       => $travel_date ?: null,
+            'travel_purpose'    => $travel_purpose,
+            'certificate'       => $certificate,
+            'city_id'           => $city_id,
+            'city_name'         => $city->post_title,
+            'selected_vaccines' => $vaccines,
+            'appointment_date'  => $appt_date ?: null,
+            'time_slot'         => $time_slot,
+            'location_type'     => $location,
+            'home_address'      => $home_address,
+            'previous_vaccines' => $prev_vaccines,
+            'notes'             => $notes,
+            'status'            => 'new',
+            'created_at'        => current_time( 'mysql' ),
+        ],
+        [ '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
+    );
+
+    vaccinepk_send_travel_booking_emails( [
+        'full_name'         => $full_name,
+        'phone'             => $phone,
+        'email'             => $email,
+        'destination'       => $destination,
+        'city_name'         => $city->post_title,
+        'city_staff_email'  => get_post_meta( $city_id, 'city_staff_email', true ),
+        'selected_vaccines' => $vaccines,
+        'appointment_date'  => $appt_date,
+        'time_slot'         => $time_slot,
+        'location'          => $location,
+        'home_address'      => $home_address,
+    ] );
+
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_submit_travel_booking',        'vaccinepk_submit_travel_booking_ajax' );
+add_action( 'wp_ajax_nopriv_submit_travel_booking', 'vaccinepk_submit_travel_booking_ajax' );
+
+function vaccinepk_send_travel_booking_emails( $b ) {
+    $admin_email    = vaccinepk_flu_setting( 'admin_notification_email' );
+    $location_label = $b['location'] === 'home' ? 'Home Service' : 'Clinic Visit';
+    $subject_ref    = 'Travel Booking — ' . $b['full_name'] . ' (' . $b['destination'] . ')';
+
+    $body = "<p><strong>New travel vaccine booking</strong></p><ul>"
+        . '<li>Name: ' . esc_html( $b['full_name'] ) . '</li>'
+        . '<li>Phone: ' . esc_html( $b['phone'] ) . '</li>'
+        . '<li>Email: ' . esc_html( $b['email'] ) . '</li>'
+        . '<li>Destination: ' . esc_html( $b['destination'] ) . '</li>'
+        . '<li>City: ' . esc_html( $b['city_name'] ) . '</li>'
+        . '<li>Vaccines: ' . esc_html( $b['selected_vaccines'] ) . '</li>'
+        . ( $b['appointment_date'] ? '<li>Preferred date: ' . esc_html( $b['appointment_date'] ) . '</li>' : '' )
+        . ( $b['time_slot'] ? '<li>Time slot: ' . esc_html( $b['time_slot'] ) . '</li>' : '' )
+        . '<li>Location: ' . esc_html( $location_label ) . '</li>'
+        . ( $b['home_address'] ? '<li>Address: ' . esc_html( $b['home_address'] ) . '</li>' : '' )
+        . '</ul>';
+
+    $headers = [ 'Content-Type: text/html; charset=UTF-8' ];
+
+    if ( $admin_email ) wp_mail( $admin_email, $subject_ref, $body, $headers );
+    if ( $b['city_staff_email'] ) wp_mail( $b['city_staff_email'], $subject_ref, $body, $headers );
+
+    $customer_body = "<p>Hi " . esc_html( $b['full_name'] ) . ",</p>"
+        . "<p>Thanks for booking your travel vaccination with Vaccine.Pk. Here's a summary:</p><ul>"
+        . '<li>Destination: ' . esc_html( $b['destination'] ) . '</li>'
+        . '<li>Vaccines: ' . esc_html( $b['selected_vaccines'] ) . '</li>'
+        . '<li>Location: ' . esc_html( $location_label ) . '</li>'
+        . '</ul><p>Our team will contact you shortly to confirm your appointment slot.</p>';
+    wp_mail( $b['email'], 'Your Travel Vaccine Booking — Vaccine.Pk', $customer_body, $headers );
 }
