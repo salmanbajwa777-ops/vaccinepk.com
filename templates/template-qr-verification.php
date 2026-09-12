@@ -98,7 +98,7 @@ if ($mr_input !== '') {
             );
         } elseif ($record_type === 'pid') {
             $verification_url = sprintf(
-                'https://myapi.vaccinepk.com/api/Child/PIDPDF/%d',
+                'https://myapi.vaccinationcentre.com/api/Child/PIDPDF/%d',
                 $child_id
             );
             $pid_record = vc_get_pid_record($child_id);
