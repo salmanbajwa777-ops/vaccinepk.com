@@ -60,31 +60,6 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
 .flu-hero-badges { display: flex; gap: 8px; flex-wrap: wrap; position: relative; z-index: 1; }
 .flu-hero-badge { font-size: 12px; font-weight: 700; padding: 5px 13px; border-radius: 100px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.18); }
 
-.flu-progress {
-    position: sticky; top: var(--flu-header-h, 0px); z-index: 30; display: flex; align-items: center; justify-content: center;
-    gap: 10px; background: var(--color-navy); padding: 12px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-}
-.flu-progress-step {
-    display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--color-sub-on-blue);
-    transition: color .2s;
-}
-.flu-progress-num {
-    width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.12);
-    color: #fff; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display); font-weight: 700; font-size: 13px; flex-shrink: 0;
-    transition: background .2s, color .2s;
-}
-.flu-progress-label { font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-.flu-progress-line { width: 24px; height: 2px; background: rgba(255,255,255,0.18); flex-shrink: 0; }
-.flu-progress-step.is-active { color: #fff; }
-.flu-progress-step.is-active .flu-progress-num { background: var(--color-gold); color: var(--color-navy); }
-.flu-progress-step.is-done .flu-progress-num { background: var(--color-green); color: #fff; }
-@media (max-width: 480px) {
-    .flu-progress { gap: 6px; padding: 10px 10px; }
-    .flu-progress-label { display: none; }
-    .flu-progress-line { width: 16px; }
-}
-
 .flu-section { padding: 32px 0; }
 .flu-section-label { font-size: 15px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; color: var(--color-blue); margin-bottom: 6px; }
 .flu-section h2 { font-family: var(--font-display); font-size: 1.55rem; color: var(--color-ink-strong); margin-bottom: 6px; }
@@ -115,62 +90,37 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
 .flu-brand-price .cur { font-size: .72rem; font-weight: 600; color: var(--color-ink); }
 .flu-empty-brands { background: var(--color-blue-tint); border-radius: 16px; padding: 30px; text-align: center; color: var(--color-ink); }
 
-.flu-calc-section { background: var(--color-ivory); border-top: 1px solid var(--color-sand); border-bottom: 1px solid var(--color-sand); }
-.flu-calc-card { background: #fff; border-radius: 18px; box-shadow: var(--shadow-md); overflow: hidden; }
-.flu-calc-grid { display: grid; grid-template-columns: 1fr 340px; }
-@media (max-width: 860px) { .flu-calc-grid { grid-template-columns: 1fr; } }
-.flu-calc-left { padding: 30px; border-right: 1px solid var(--color-sand); }
-@media (max-width: 860px) { .flu-calc-left { border-right: none; border-bottom: 1px solid var(--color-sand); } }
 .flu-field-group { margin-bottom: 24px; }
 .flu-field-group:last-child { margin-bottom: 0; }
 .flu-field-label { display: block; font-size: 13.5px; font-weight: 700; color: var(--color-ink-strong); margin-bottom: 8px; }
 .flu-field-hint { font-weight: 400; color: var(--color-label-muted); font-size: 12.5px; }
-.flu-selected-chip { display: flex; align-items: center; gap: 10px; background: var(--color-blue-tint); border: 1px solid var(--color-sand); border-radius: 10px; padding: 12px 15px; font-size: 13.5px; color: var(--color-ink); }
 
 .flu-stepper { display: inline-flex; align-items: center; border: 1.5px solid var(--color-sand); border-radius: 10px; overflow: hidden; }
 .flu-stepper button { width: 42px; height: 42px; border: none; background: var(--color-blue-tint); color: var(--color-navy); font-size: 19px; font-weight: 700; cursor: pointer; }
 .flu-stepper button:hover { background: var(--color-sand); }
 .flu-stepper input { width: 60px; text-align: center; border: none; font-size: 16px; font-weight: 700; color: var(--color-ink-strong); background: #fff; height: 42px; }
 
-.flu-tier-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
-.flu-tier-table th, .flu-tier-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--color-sand); }
-.flu-tier-table th { color: var(--color-label-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; }
-.flu-tier-table tr.active-row { background: var(--color-green-tint); }
-.flu-tier-table tr.active-row td { color: #3f6b26; font-weight: 700; }
-
-.flu-info-note { display: flex; gap: 10px; align-items: flex-start; background: var(--color-blue-tint); border-left: 4px solid var(--color-blue); border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--color-ink); margin-top: 18px; }
-
-.flu-calc-right { padding: 30px; background: var(--color-ivory); display: flex; flex-direction: column; }
-.flu-calc-right h3 { font-family: var(--font-display); font-size: 15px; margin-bottom: 16px; color: var(--color-ink-strong); }
-.flu-sum-row { display: flex; justify-content: space-between; font-size: 14px; padding: 9px 0; border-bottom: 1px dashed var(--color-sand); color: var(--color-ink); }
-.flu-sum-row .v { font-weight: 700; color: var(--color-ink-strong); }
-.flu-sum-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--color-sand); }
-.flu-sum-total .label { font-size: 12.5px; color: var(--color-ink); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-.flu-sum-total .amount { font-family: var(--font-display); font-size: 30px; font-weight: 800; color: var(--color-gold); display: inline-block; }
-.flu-sum-total .amount.flu-pulse { animation: fluTotalPulse .4s ease-out; }
+.flu-total-bar { background: var(--color-ivory); border: 1px solid var(--color-sand); border-radius: 14px; padding: 20px 22px; margin: 20px 0 26px; }
+.flu-total-bar-row { display: flex; justify-content: space-between; font-size: 14px; padding: 8px 0; border-bottom: 1px dashed var(--color-sand); color: var(--color-ink); }
+.flu-total-bar-row .v { font-weight: 700; color: var(--color-ink-strong); }
+.flu-total-bar-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 12px; padding-top: 12px; border-top: 2px solid var(--color-sand); }
+.flu-total-bar-total .label { font-size: 12.5px; color: var(--color-ink); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.flu-total-bar-total .amount { font-family: var(--font-display); font-size: 28px; font-weight: 800; color: var(--color-gold); display: inline-block; }
+.flu-total-bar-total .amount.flu-pulse { animation: fluTotalPulse .4s ease-out; }
 @keyframes fluTotalPulse {
     0% { transform: scale(1.12); color: var(--color-green); }
     100% { transform: scale(1); color: var(--color-gold); }
 }
 @media (prefers-reduced-motion: reduce) {
-    .flu-sum-total .amount.flu-pulse { animation: none; }
+    .flu-total-bar-total .amount.flu-pulse { animation: none; }
 }
 
 .flu-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14.5px; padding: 13px 24px; border-radius: 100px; text-decoration: none; white-space: nowrap; border: none; cursor: pointer; transition: transform .15s, box-shadow .15s; }
 .flu-btn-gold { background: var(--color-gold); color: var(--color-navy); }
 .flu-btn-gold:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(201,162,75,.35); color: var(--color-navy); }
-.flu-calc-right .flu-btn { width: 100%; padding: 15px; margin-top: 20px; }
 .flu-fine-print { font-size: 11.5px; color: var(--color-label-muted); text-align: center; margin-top: 10px; }
 
-.flu-booking-summary-strip { display: flex; align-items: center; gap: 26px; padding: 16px 24px; background: var(--color-ivory); border-bottom: 1px solid var(--color-sand); flex-wrap: wrap; }
-.flu-bss-item { display: flex; flex-direction: column; gap: 2px; }
-.flu-bss-item .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--color-label-muted); font-weight: 700; }
-.flu-bss-item .v { font-size: 14px; font-weight: 700; color: var(--color-ink-strong); }
-.flu-bss-total { margin-left: auto; }
-.flu-bss-total .v { color: var(--color-gold); font-family: var(--font-display); font-size: 18px; }
-.flu-bss-edit { font-size: 12.5px; font-weight: 700; color: var(--color-blue); text-decoration: none; white-space: nowrap; }
-
-.flu-booking-form { padding: 30px; }
+.flu-booking-form { padding-top: 4px; }
 .flu-bf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 22px; }
 @media (max-width: 768px) { .flu-bf-grid { grid-template-columns: 1fr; } }
 .flu-bf-input { width: 100%; padding: 12px 14px; border: 2px solid var(--color-sand); border-radius: 8px; font-size: 14.5px; color: var(--color-ink-strong); background: #fff; }
@@ -220,31 +170,22 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     .flu-brand-price { font-size: 1.15rem; }
     .flu-brand-avail { font-size: 10px; padding: 3px 9px; top: 9px; right: 9px; }
 
-    .flu-calc-card { border-radius: 14px; }
-    .flu-calc-left, .flu-calc-right, .flu-booking-form { padding: 18px 16px; }
+    .flu-flow-section { padding: 18px 16px; }
     .flu-field-group { margin-bottom: 20px; }
-    .flu-selected-chip { font-size: 13px; padding: 11px 13px; }
 
     /* Steppers are the main tap target on this page — make them thumb-sized. */
     .flu-stepper button { width: 52px; height: 52px; font-size: 22px; }
     .flu-stepper input { width: 70px; height: 52px; font-size: 18px; }
 
-    .flu-tier-table { font-size: 12px; }
-    .flu-tier-table th, .flu-tier-table td { padding: 7px 6px; }
-
-    .flu-sum-row { font-size: 13.5px; }
-    .flu-sum-total .amount { font-size: 26px; }
+    .flu-total-bar { padding: 16px 16px; margin: 16px 0 20px; }
+    .flu-total-bar-row { font-size: 13.5px; }
+    .flu-total-bar-total .amount { font-size: 24px; }
     .flu-btn { font-size: 14px; padding: 14px 20px; }
-    .flu-calc-right .flu-btn { padding: 16px; }
-
-    .flu-booking-summary-strip { padding: 12px 16px; gap: 16px; }
-    .flu-bss-item .v { font-size: 13px; }
-    .flu-bss-total .v { font-size: 16px; }
 
     /* 16px min font-size on inputs stops iOS Safari auto-zooming on focus,
        which otherwise makes the form feel broken on exactly this class of
        device. */
-    .flu-bf-input, #fluDateDisplay { font-size: 16px; padding: 13px 14px; }
+    .flu-bf-input { font-size: 16px; padding: 13px 14px; }
     .flu-loc-opt { font-size: 13.5px; padding: 13px 14px; }
     .flu-bf-checkbox { font-size: 12.5px; }
 
@@ -258,50 +199,22 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     .flu-sticky-cta .flu-btn { padding: 12px 20px; font-size: 13.5px; }
 }
 
-/* ================= Preferred-date calendar popup ================= */
-.flu-date-field { position: relative; }
-.flu-date-popup {
-    position: absolute; top: calc(100% + 8px); left: 0; z-index: 40;
-    width: 300px; max-width: calc(100vw - 32px); background: #fff; border-radius: 16px;
-    box-shadow: 0 20px 50px rgba(10,42,56,.24); border: 1px solid var(--color-sand);
-    padding: 14px; opacity: 0; pointer-events: none; transform: translateY(6px);
-    transition: opacity .15s, transform .15s;
+/* ===== Unified single-flow layout (no more anchor-jump steps) ===== */
+.flu-flow-card { background: #fff; border-radius: 20px; box-shadow: var(--shadow-md); overflow: hidden; }
+.flu-flow-section { padding: 30px; border-bottom: 1px solid var(--color-sand); }
+.flu-flow-section:last-child { border-bottom: none; }
+.flu-flow-kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.flu-flow-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--color-blue-tint); color: var(--color-blue);
+    display: flex; align-items: center; justify-content: center; font-family: var(--font-display);
+    font-weight: 800; font-size: 13px; flex-shrink: 0;
 }
-.flu-date-popup.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-.flu-date-popup-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.flu-date-popup-title { font-size: 14.5px; font-weight: 700; color: var(--color-ink-strong); }
-.flu-date-nav-btn {
-    width: 30px; height: 30px; border: none; border-radius: 50%; background: transparent;
-    color: var(--color-ink-strong); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: background .15s;
-}
-.flu-date-nav-btn:hover:not(:disabled) { background: var(--color-blue-tint); }
-.flu-date-nav-btn:disabled { opacity: .3; cursor: not-allowed; }
-.flu-date-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px; }
-.flu-date-weekdays span { text-align: center; font-size: 10.5px; font-weight: 700; color: var(--color-ink); opacity: .6; padding: 4px 0; }
-.flu-date-days { display: grid; grid-template-columns: repeat(7,1fr); row-gap: 2px; }
-.flu-date-day {
-    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-    border: none; background: none; border-radius: 50%; font-size: 13px; color: var(--color-ink-strong);
-    cursor: pointer; position: relative; font-variant-numeric: tabular-nums; font-family: inherit;
-}
-.flu-date-day:hover:not(:disabled):not(.selected) { background: var(--color-blue-tint); }
-.flu-date-day.outside { color: var(--color-ink); opacity: .35; }
-.flu-date-day.today { color: var(--color-blue); font-weight: 800; }
-.flu-date-day.today::after {
-    content: ""; position: absolute; bottom: 3px; left: 50%; translate: -50% 0;
-    width: 4px; height: 4px; border-radius: 50%; background: var(--color-gold);
-}
-.flu-date-day.selected { background: var(--color-blue); color: #fff; font-weight: 700; }
-.flu-date-day:disabled { opacity: .25; cursor: not-allowed; }
-.flu-date-popup-foot { display: flex; justify-content: flex-end; padding-top: 8px; margin-top: 8px; border-top: 1px solid var(--color-sand); }
-.flu-date-clear {
-    border: none; background: none; font-weight: 700; font-size: 12.5px; padding: 6px 10px;
-    border-radius: 8px; cursor: pointer; color: var(--color-ink); transition: background .15s; font-family: inherit;
-}
-.flu-date-clear:hover { background: var(--color-sand); }
-@media (prefers-reduced-motion: reduce) {
-    .flu-date-popup { transition: none; }
+.flu-flow-kicker h2 { font-family: var(--font-display); font-size: 1.25rem; color: var(--color-ink-strong); margin: 0; }
+.flu-flow-sub { color: var(--color-ink); font-size: 13.5px; margin: 6px 0 18px; max-width: 62ch; }
+
+@media (max-width: 480px) {
+    .flu-flow-section { padding: 20px 16px; }
+    .flu-flow-kicker h2 { font-size: 1.1rem; }
 }
 </style>
 
@@ -323,30 +236,18 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     </div>
 </section>
 
-<!-- ================= STEP PROGRESS ================= -->
-<nav class="flu-progress" id="fluProgress" aria-label="Booking progress">
-    <a href="#choose-brand" class="flu-progress-step" data-step="1">
-        <span class="flu-progress-num">1</span>
-        <span class="flu-progress-label">Brand</span>
-    </a>
-    <span class="flu-progress-line"></span>
-    <a href="#calculator" class="flu-progress-step" data-step="2">
-        <span class="flu-progress-num">2</span>
-        <span class="flu-progress-label">Total</span>
-    </a>
-    <span class="flu-progress-line"></span>
-    <a href="#your-details" class="flu-progress-step" data-step="3">
-        <span class="flu-progress-num">3</span>
-        <span class="flu-progress-label">Details</span>
-    </a>
-</nav>
+<!-- ================= ONE UNIFIED BOOKING FLOW ================= -->
+<section class="flu-section">
+    <div class="container" style="max-width:900px;">
+        <div class="flu-flow-card">
 
-<!-- ================= BRAND GRID ================= -->
-<section class="flu-section" id="choose-brand">
-    <div class="container">
-        <div class="flu-section-label">Step 1 — Choose a brand</div>
-        <h2>Available flu vaccine brands this season</h2>
-        <p>Packaging changes every year — admin marks each brand available or sold out, and it reflects here immediately.</p>
+        <!-- ---- 1. Brand ---- -->
+        <div class="flu-flow-section" id="choose-brand">
+            <div class="flu-flow-kicker">
+                <span class="flu-flow-num">1</span>
+                <h2>Choose a brand</h2>
+            </div>
+            <p class="flu-flow-sub">Packaging changes every year — admin marks each brand available or sold out, and it reflects here immediately.</p>
 
         <?php if ( $flu_brands ) : ?>
         <div class="flu-brand-grid" id="fluBrandGrid">
@@ -393,84 +294,33 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
             Brand information for this season is being added. Contact us for current pricing and availability.
         </div>
         <?php endif; ?>
-    </div>
-</section>
+        </div>
 
-<!-- ================= CALCULATOR ================= -->
-<section class="flu-section flu-calc-section" id="calculator">
-    <div class="container">
-        <div class="flu-section-label">Step 2 — Your total</div>
-        <h2>Price calculator</h2>
-        <p>Brand price × number of people, plus one shared vaccination service charge for the whole group.</p>
+        <!-- ---- 2. Live total + your details, together ---- -->
+        <div class="flu-flow-section" id="your-details">
+            <div class="flu-flow-kicker">
+                <span class="flu-flow-num">2</span>
+                <h2>Your total &amp; details</h2>
+            </div>
+            <p class="flu-flow-sub">Pick how many people are being vaccinated together — your total updates instantly. We'll contact you on WhatsApp to confirm the appointment.</p>
 
-        <div class="flu-calc-card">
-            <div class="flu-calc-grid">
-                <div class="flu-calc-left">
-                    <div class="flu-field-group">
-                        <label class="flu-field-label">Selected brand</label>
-                        <div class="flu-selected-chip">
-                            <i class="bi bi-check-circle-fill" style="color:var(--color-green);"></i>
-                            <span id="fluSelectedBrandLabel">
-                                <?php if ( $default_brand ) :
-                                    $dm = get_post_meta( $default_brand->ID, 'manufacturer_name', true );
-                                    $dc = get_post_meta( $default_brand->ID, 'country', true );
-                                    $dp = (float) get_post_meta( $default_brand->ID, 'price', true );
-                                ?>
-                                    <strong><?php echo esc_html( $default_brand->post_title ); ?></strong> — PKR <?php echo esc_html( number_format( $dp ) ); ?> / dose<?php echo $dm ? ' · ' . esc_html( $dm ) : ''; ?><?php echo $dc ? ' · Made in ' . esc_html( $dc ) : ''; ?>
-                                <?php else : ?>
-                                    No brand selected yet — choose one above.
-                                <?php endif; ?>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="flu-field-group">
-                        <label class="flu-field-label">Number of people vaccinated together <span class="flu-field-hint">same place, same time</span></label>
-                        <div class="flu-stepper">
-                            <button type="button" id="fluPeopleMinus" aria-label="Decrease">−</button>
-                            <input type="text" id="fluPeopleCount" value="1" inputmode="numeric" aria-label="Number of people">
-                            <button type="button" id="fluPeoplePlus" aria-label="Increase">+</button>
-                        </div>
-
-                        <table class="flu-tier-table">
-                            <thead><tr><th>People</th><th>Service charge</th></tr></thead>
-                            <tbody>
-                                <tr class="active-row"><td>1 – <?php echo (int) $base_group; ?> people</td><td>PKR <?php echo esc_html( number_format( $base_charge ) ); ?> flat (total, not per person)</td></tr>
-                                <tr><td><?php echo (int) $base_group + 1; ?>th person onward</td><td>+ PKR <?php echo esc_html( number_format( $extra_charge ) ); ?> each</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="flu-calc-right">
-                    <h3>Your estimate</h3>
-                    <div class="flu-sum-row"><span id="fluSumVaccineLabel">Vaccine</span><span class="v" id="fluSumVaccine">PKR 0</span></div>
-                    <div class="flu-sum-row"><span>Vaccination service charge</span><span class="v" id="fluSumCharge">PKR 0</span></div>
-                    <div class="flu-sum-total">
-                        <span class="label">Total</span>
-                        <span class="amount" id="fluSumTotal">PKR 0</span>
-                    </div>
-                    <a href="#your-details" class="flu-btn flu-btn-gold"><i class="bi bi-arrow-down-circle-fill"></i> Continue to Booking</a>
-                    <div class="flu-fine-print">No payment now — confirm details below</div>
+            <div class="flu-field-group">
+                <label class="flu-field-label">Number of people vaccinated together <span class="flu-field-hint">same place, same time</span></label>
+                <div class="flu-stepper">
+                    <button type="button" id="fluPeopleMinus" aria-label="Decrease">−</button>
+                    <input type="text" id="fluPeopleCount" value="1" inputmode="numeric" aria-label="Number of people">
+                    <button type="button" id="fluPeoplePlus" aria-label="Increase">+</button>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
 
-<!-- ================= BOOKING DETAILS ================= -->
-<section class="flu-section" id="your-details">
-    <div class="container" style="max-width:780px;">
-        <div class="flu-section-label">Step 3 — Your details</div>
-        <h2>Confirm your booking</h2>
-        <p>We'll contact you on WhatsApp to confirm the appointment slot.</p>
-
-        <div class="flu-calc-card">
-            <div class="flu-booking-summary-strip">
-                <div class="flu-bss-item"><span class="k">Brand</span><span class="v" id="fluBssBrand"><?php echo $default_brand ? esc_html( $default_brand->post_title ) : '—'; ?></span></div>
-                <div class="flu-bss-item"><span class="k">People</span><span class="v" id="fluBssPeople">1</span></div>
-                <div class="flu-bss-item flu-bss-total"><span class="k">Total</span><span class="v" id="fluBssTotal">PKR 0</span></div>
-                <a href="#calculator" class="flu-bss-edit">Edit selection</a>
+            <div class="flu-total-bar">
+                <div class="flu-total-bar-row"><span>Selected brand</span><span class="v" id="fluSelectedBrandLabel"><?php echo $default_brand ? esc_html( $default_brand->post_title ) : 'Choose one above'; ?></span></div>
+                <div class="flu-total-bar-row"><span id="fluSumVaccineLabel">Vaccine</span><span class="v" id="fluSumVaccine">PKR 0</span></div>
+                <div class="flu-total-bar-row"><span>Vaccination service charge</span><span class="v" id="fluSumCharge">PKR 0</span></div>
+                <div class="flu-total-bar-total">
+                    <span class="label">Total</span>
+                    <span class="amount" id="fluSumTotal">PKR 0</span>
+                </div>
             </div>
 
             <form class="flu-booking-form" id="fluBookingForm">
@@ -500,34 +350,6 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
                         <label class="flu-field-label">Address <span class="flu-field-hint">required for home service</span></label>
                         <input type="text" name="address" class="flu-bf-input" placeholder="House, street, area...">
                     </div>
-                    <div class="flu-field-group flu-date-field">
-                        <label class="flu-field-label">Preferred date <span class="flu-field-hint">optional</span></label>
-                        <input type="text" id="fluDateDisplay" class="flu-bf-input" placeholder="dd/mm/yyyy" inputmode="numeric" autocomplete="off" maxlength="10">
-                        <input type="hidden" name="preferred_date" id="fluDateValue">
-                        <div class="flu-date-popup" id="fluDatePopup">
-                            <div class="flu-date-popup-head">
-                                <button type="button" class="flu-date-nav-btn" id="fluDatePrev" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
-                                <div class="flu-date-popup-title" id="fluDateTitle"></div>
-                                <button type="button" class="flu-date-nav-btn" id="fluDateNext" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
-                            </div>
-                            <div class="flu-date-weekdays">
-                                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                            </div>
-                            <div class="flu-date-days" id="fluDateDays"></div>
-                            <div class="flu-date-popup-foot">
-                                <button type="button" class="flu-date-clear" id="fluDateClear">Clear</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flu-field-group">
-                        <label class="flu-field-label">Preferred time slot <span class="flu-field-hint">optional</span></label>
-                        <select name="time_slot" class="flu-bf-input">
-                            <option value="">Select time</option>
-                            <option>Morning (9AM – 12PM)</option>
-                            <option>Afternoon (12PM – 3PM)</option>
-                            <option>Evening (3PM – 6PM)</option>
-                        </select>
-                    </div>
                     <div class="flu-field-group">
                         <label class="flu-field-label">Location*</label>
                         <input type="hidden" name="location_type" id="fluLocationType" value="clinic">
@@ -554,6 +376,7 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
                 <div class="flu-form-msg" id="fluFormMsg"></div>
                 <div class="flu-fine-print">You'll receive a WhatsApp confirmation within a few hours</div>
             </form>
+        </div>
         </div>
     </div>
 </section>
@@ -635,14 +458,9 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
         void totalEl.offsetWidth; // restart the animation on every change
         totalEl.classList.add('flu-pulse');
 
-        document.getElementById('fluBssBrand').textContent = selectedBrand.name || '—';
-        document.getElementById('fluBssPeople').textContent = people;
-        document.getElementById('fluBssTotal').textContent = fmt(total);
         document.getElementById('fluSubmitTotal').textContent = fmt(total);
         document.getElementById('fluStickyTotal').textContent = fmt(total);
-        document.getElementById('fluSelectedBrandLabel').innerHTML = selectedBrand.name
-            ? '<strong>' + selectedBrand.name + '</strong> — ' + fmt(selectedBrand.price) + ' / dose'
-            : 'No brand selected yet — choose one above.';
+        document.getElementById('fluSelectedBrandLabel').textContent = selectedBrand.name || 'Choose one above';
 
         document.getElementById('fluFormBrandId').value = selectedBrand.id || '';
         document.getElementById('fluFormPeopleCount').value = people;
@@ -681,202 +499,6 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     });
 
     recalc();
-
-    // The site header is sticky at top:0 with no fixed height, so the
-    // progress bar's own sticky offset has to match it dynamically or the
-    // two overlap.
-    (function () {
-        var header = document.querySelector('header');
-        function setHeaderOffset() {
-            document.documentElement.style.setProperty('--flu-header-h', (header ? header.offsetHeight : 0) + 'px');
-        }
-        setHeaderOffset();
-        window.addEventListener('resize', setHeaderOffset);
-    })();
-
-    // Step-progress bar: highlights the section currently in view and marks
-    // earlier steps as done, so the visitor always knows how far through the
-    // 3-step flow they are.
-    (function () {
-        var steps = Array.prototype.slice.call(document.querySelectorAll('.flu-progress-step'));
-        var sections = steps.map(function (s) { return document.querySelector(s.getAttribute('href')); }).filter(Boolean);
-        if (!sections.length) return;
-
-        function updateProgress() {
-            var scrollPos = window.scrollY + window.innerHeight * 0.35;
-            var activeIndex = 0;
-            sections.forEach(function (sec, i) {
-                if (sec.offsetTop <= scrollPos) activeIndex = i;
-            });
-            steps.forEach(function (step, i) {
-                step.classList.toggle('is-active', i === activeIndex);
-                step.classList.toggle('is-done', i < activeIndex);
-            });
-        }
-
-        window.addEventListener('scroll', updateProgress, { passive: true });
-        window.addEventListener('resize', updateProgress);
-        updateProgress();
-    })();
-
-    // dd/mm/yyyy display input, kept in sync with a hidden yyyy-mm-dd field
-    // (what the server actually receives) — matches the site's other
-    // properties, since a native <input type="date"> shows whatever format
-    // the visitor's OS/browser locale happens to use. A calendar popup sits
-    // alongside typing so visitors aren't forced to hand-type digits.
-    (function () {
-        var display = document.getElementById('fluDateDisplay');
-        var hidden  = document.getElementById('fluDateValue');
-        var popup   = document.getElementById('fluDatePopup');
-        var titleEl = document.getElementById('fluDateTitle');
-        var daysEl  = document.getElementById('fluDateDays');
-        var prevBtn = document.getElementById('fluDatePrev');
-        var nextBtn = document.getElementById('fluDateNext');
-        var clearBtn = document.getElementById('fluDateClear');
-
-        var MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-        var today = new Date();
-        today.setHours(0, 0, 0, 0);
-        var MAX_DATE = new Date(today);
-        MAX_DATE.setMonth(MAX_DATE.getMonth() + 6);
-
-        function pad(n) { return n < 10 ? '0' + n : '' + n; }
-
-        function applyDigits(digits) {
-            var out = digits;
-            if (digits.length > 4) out = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
-            else if (digits.length > 2) out = digits.slice(0, 2) + '/' + digits.slice(2);
-            display.value = out;
-
-            hidden.value = '';
-            if (digits.length === 8) {
-                var day = parseInt(digits.slice(0, 2), 10);
-                var month = parseInt(digits.slice(2, 4), 10);
-                var year = parseInt(digits.slice(4, 8), 10);
-                var d = new Date(year, month - 1, day);
-                var isReal = d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
-                if (isReal) {
-                    hidden.value = year + '-' + pad(month) + '-' + pad(day);
-                    display.setCustomValidity('');
-                } else {
-                    display.setCustomValidity('Enter a real date as dd/mm/yyyy');
-                }
-            } else if (digits.length > 0) {
-                display.setCustomValidity('Enter the full date as dd/mm/yyyy');
-            } else {
-                display.setCustomValidity('');
-            }
-        }
-
-        display.addEventListener('input', function () {
-            applyDigits(display.value.replace(/[^\d]/g, '').slice(0, 8));
-        });
-
-        // Calendar popup, defaulting to whatever the typed value already resolved to.
-        var viewYear = today.getFullYear(), viewMonth = today.getMonth();
-
-        function parseHidden() {
-            var v = hidden.value;
-            if (!v || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
-            var parts = v.split('-');
-            return { y: parseInt(parts[0], 10), m: parseInt(parts[1], 10) - 1, d: parseInt(parts[2], 10) };
-        }
-
-        function renderCalendar() {
-            titleEl.textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
-
-            var atMin = viewYear === today.getFullYear() && viewMonth === today.getMonth();
-            var atMax = viewYear === MAX_DATE.getFullYear() && viewMonth === MAX_DATE.getMonth();
-            prevBtn.disabled = atMin;
-            nextBtn.disabled = atMax;
-
-            var selected = parseHidden();
-            daysEl.innerHTML = '';
-
-            var firstDow = new Date(viewYear, viewMonth, 1).getDay();
-            var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-            var daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
-
-            var cells = [];
-            for (var i = firstDow - 1; i >= 0; i--) cells.push({ d: daysInPrevMonth - i, outside: true, dir: -1 });
-            for (var d = 1; d <= daysInMonth; d++) cells.push({ d: d, outside: false });
-            var trail = 1;
-            while (cells.length % 7 !== 0) cells.push({ d: trail++, outside: true, dir: 1 });
-
-            cells.forEach(function (cell) {
-                var cy = viewYear, cm = viewMonth;
-                if (cell.outside) {
-                    cm = viewMonth + cell.dir;
-                    cy = viewYear;
-                    if (cm < 0) { cm = 11; cy = viewYear - 1; }
-                    if (cm > 11) { cm = 0; cy = viewYear + 1; }
-                }
-
-                var cellDate = new Date(cy, cm, cell.d);
-                var btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'flu-date-day' + (cell.outside ? ' outside' : '');
-                btn.textContent = cell.d;
-
-                var isToday = cellDate.getTime() === today.getTime();
-                var isSelected = selected && selected.y === cy && selected.m === cm && selected.d === cell.d;
-                var isOutOfRange = cellDate < today || cellDate > MAX_DATE;
-
-                if (isToday) btn.classList.add('today');
-                if (isSelected) btn.classList.add('selected');
-                if (isOutOfRange) btn.disabled = true;
-
-                btn.addEventListener('click', function () {
-                    display.value = pad(cell.d) + '/' + pad(cm + 1) + '/' + cy;
-                    hidden.value = cy + '-' + pad(cm + 1) + '-' + pad(cell.d);
-                    display.setCustomValidity('');
-                    closePopup();
-                });
-                daysEl.appendChild(btn);
-            });
-        }
-
-        function openPopup() {
-            var sel = parseHidden();
-            if (sel) { viewYear = sel.y; viewMonth = sel.m; }
-            else { viewYear = today.getFullYear(); viewMonth = today.getMonth(); }
-            renderCalendar();
-            popup.classList.add('open');
-            document.addEventListener('click', onOutsideClick);
-            document.addEventListener('keydown', onKeydown);
-        }
-        function closePopup() {
-            popup.classList.remove('open');
-            document.removeEventListener('click', onOutsideClick);
-            document.removeEventListener('keydown', onKeydown);
-        }
-        function onOutsideClick(e) {
-            if (!popup.contains(e.target) && e.target !== display) closePopup();
-        }
-        function onKeydown(e) {
-            if (e.key === 'Escape') closePopup();
-        }
-
-        display.addEventListener('focus', openPopup);
-        display.addEventListener('click', function (e) { e.stopPropagation(); if (!popup.classList.contains('open')) openPopup(); });
-
-        prevBtn.addEventListener('click', function () {
-            viewMonth--;
-            if (viewMonth < 0) { viewMonth = 11; viewYear--; }
-            renderCalendar();
-        });
-        nextBtn.addEventListener('click', function () {
-            viewMonth++;
-            if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-            renderCalendar();
-        });
-        clearBtn.addEventListener('click', function () {
-            display.value = '';
-            hidden.value = '';
-            display.setCustomValidity('');
-            closePopup();
-        });
-    })();
 
     var form = document.getElementById('fluBookingForm');
     var msg  = document.getElementById('fluFormMsg');
