@@ -238,7 +238,6 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
                 <span class="flu-flow-num">1</span>
                 <h2>Choose a brand</h2>
             </div>
-            <p class="flu-flow-sub">Packaging changes every year — admin marks each brand available or sold out, and it reflects here immediately.</p>
 
         <?php if ( $flu_brands ) : ?>
         <div class="flu-brand-list" id="fluBrandGrid">
