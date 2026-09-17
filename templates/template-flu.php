@@ -284,7 +284,6 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
                 <span class="flu-flow-num">2</span>
                 <h2>Your total &amp; details</h2>
             </div>
-            <p class="flu-flow-sub">Pick how many people are being vaccinated together — your total updates instantly. We'll contact you on WhatsApp to confirm the appointment.</p>
 
             <div class="flu-field-group">
                 <label class="flu-field-label">Number of people vaccinated together <span class="flu-field-hint">same place, same time</span></label>
