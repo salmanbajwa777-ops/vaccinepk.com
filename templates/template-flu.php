@@ -218,7 +218,7 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
                 <li class="breadcrumb-item active" aria-current="page" style="color:#fff;">Flu Vaccine</li>
             </ol>
         </nav>
-        <h1><i class="bi bi-shield-fill-plus"></i>&nbsp; Flu Vaccine Booking &amp; Pricing</h1>
+        <h1>Flu Vaccine Booking &amp; Pricing</h1>
         <p class="lead">Every brand in stock this season, its manufacturer and country of origin, and your exact price — calculated instantly below.</p>
         <div class="flu-hero-badges">
             <span class="flu-hero-badge"><i class="bi bi-calendar-event"></i> All ages, 6 months+</span>
