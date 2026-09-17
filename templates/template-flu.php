@@ -65,29 +65,23 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
 .flu-section h2 { font-family: var(--font-display); font-size: 1.55rem; color: var(--color-ink-strong); margin-bottom: 6px; }
 .flu-section > p { color: var(--color-ink); font-size: 14.5px; margin: 0 0 26px; max-width: 62ch; }
 
-.flu-brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-@media (max-width: 860px) { .flu-brand-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .flu-brand-grid { grid-template-columns: 1fr; } }
-
-.flu-brand-card {
-    background: #fff; border-radius: 16px; box-shadow: var(--shadow-sm); overflow: hidden;
-    position: relative; border: 2px solid transparent; cursor: pointer;
-    transition: border-color .2s, box-shadow .2s;
+.flu-brand-list { display: flex; flex-direction: column; gap: 10px; }
+.flu-brand-row {
+    display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px;
+    background: #fff; border: 2px solid var(--color-sand); border-radius: 12px; padding: 13px 16px;
+    cursor: pointer; transition: border-color .15s, background .15s;
 }
-.flu-brand-card.is-selected { border-color: var(--color-blue); box-shadow: 0 0 0 2px var(--color-blue), var(--shadow-md); }
-.flu-brand-card.is-unavailable { opacity: .6; cursor: not-allowed; }
-.flu-brand-img { width: 100%; height: 160px; object-fit: contain; background: linear-gradient(135deg, var(--color-blue-tint), #cfe0e8); padding: 14px; box-sizing: border-box; display: block; }
-.flu-brand-avail { position: absolute; top: 12px; right: 12px; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+.flu-brand-row.is-selected { border-color: var(--color-blue); background: var(--color-blue-tint); }
+.flu-brand-row.is-unavailable { opacity: .55; cursor: not-allowed; }
+.flu-brand-row-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.flu-brand-row-name { font-weight: 700; font-size: 14.5px; color: var(--color-ink-strong); }
+.flu-brand-row-meta { font-size: 12px; color: var(--color-label-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flu-brand-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.flu-brand-row-price { font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; color: var(--color-gold); }
+.flu-brand-row-price .cur { font-size: .68rem; font-weight: 600; color: var(--color-ink); }
+.flu-brand-avail { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 9px; border-radius: 100px; }
 .avail-yes { background: var(--color-green-tint); color: #3f6b26; }
 .avail-no { background: #fde8e8; color: #c0392b; }
-.flu-brand-body { padding: 18px 20px; }
-.flu-brand-body h3 { font-size: 1.05rem; color: var(--color-ink-strong); margin-bottom: 6px; }
-.flu-brand-meta { list-style: none; padding: 0; margin: 0 0 12px; font-size: 13px; color: var(--color-ink); }
-.flu-brand-meta li { padding: 3px 0; border-bottom: 1px dashed var(--color-sand); display: flex; justify-content: space-between; gap: 8px; }
-.flu-brand-meta li:last-child { border: none; }
-.flu-brand-meta .label { font-weight: 600; color: var(--color-blue); }
-.flu-brand-price { font-size: 1.3rem; font-weight: 800; color: var(--color-gold); font-family: var(--font-display); }
-.flu-brand-price .cur { font-size: .72rem; font-weight: 600; color: var(--color-ink); }
 .flu-empty-brands { background: var(--color-blue-tint); border-radius: 16px; padding: 30px; text-align: center; color: var(--color-ink); }
 
 .flu-field-group { margin-bottom: 24px; }
@@ -163,12 +157,9 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     .flu-section h2 { font-size: 1.25rem; }
     .flu-section > p { font-size: 13.5px; }
 
-    .flu-brand-card { border-radius: 14px; }
-    .flu-brand-img { height: 130px; }
-    .flu-brand-body { padding: 14px 16px; }
-    .flu-brand-body h3 { font-size: 1rem; }
-    .flu-brand-price { font-size: 1.15rem; }
-    .flu-brand-avail { font-size: 10px; padding: 3px 9px; top: 9px; right: 9px; }
+    .flu-brand-row { padding: 12px 14px; border-radius: 11px; }
+    .flu-brand-row-name { font-size: 14px; }
+    .flu-brand-row-price { font-size: .98rem; }
 
     .flu-flow-section { padding: 18px 16px; }
     .flu-field-group { margin-bottom: 20px; }
@@ -250,40 +241,32 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
             <p class="flu-flow-sub">Packaging changes every year — admin marks each brand available or sold out, and it reflects here immediately.</p>
 
         <?php if ( $flu_brands ) : ?>
-        <div class="flu-brand-grid" id="fluBrandGrid">
+        <div class="flu-brand-list" id="fluBrandGrid">
             <?php foreach ( $flu_brands as $brand ) :
-                $thumb        = get_the_post_thumbnail_url( $brand->ID, 'medium' );
                 $manufacturer = get_post_meta( $brand->ID, 'manufacturer_name', true );
                 $country      = get_post_meta( $brand->ID, 'country', true );
                 $price        = (float) get_post_meta( $brand->ID, 'price', true );
                 $avail        = get_post_meta( $brand->ID, 'availability', true );
                 $avail_bool   = ( $avail === '1' || strtolower( $avail ) === 'yes' || $avail === true );
                 $is_default   = $default_brand && $brand->ID === $default_brand->ID;
+                $meta_bits    = array_filter( [ $manufacturer, $country ] );
             ?>
-            <div class="flu-brand-card<?php echo $avail_bool ? '' : ' is-unavailable'; ?><?php echo $is_default ? ' is-selected' : ''; ?>"
+            <div class="flu-brand-row<?php echo $avail_bool ? '' : ' is-unavailable'; ?><?php echo $is_default ? ' is-selected' : ''; ?>"
                  data-brand-id="<?php echo esc_attr( $brand->ID ); ?>"
                  data-brand-name="<?php echo esc_attr( $brand->post_title ); ?>"
                  data-price="<?php echo esc_attr( $price ); ?>"
-                 data-avail="<?php echo $avail_bool ? 'yes' : 'no'; ?>"
-                 data-manufacturer="<?php echo esc_attr( $manufacturer ); ?>"
-                 data-country="<?php echo esc_attr( $country ); ?>">
-                <span class="flu-brand-avail <?php echo $avail_bool ? 'avail-yes' : 'avail-no'; ?>"><?php echo $avail_bool ? '✓ Available' : '✗ Unavailable'; ?></span>
-                <?php if ( $thumb ) : ?>
-                    <img class="flu-brand-img" src="<?php echo esc_url( $thumb ); ?>" alt="<?php echo esc_attr( $brand->post_title ); ?>">
-                <?php else : ?>
-                    <div class="flu-brand-img" style="display:flex;align-items:center;justify-content:center;"><i class="bi bi-shield-fill-check" style="font-size:2rem;color:var(--color-blue);"></i></div>
-                <?php endif; ?>
-                <div class="flu-brand-body">
-                    <h3><?php echo esc_html( $brand->post_title ); ?></h3>
-                    <ul class="flu-brand-meta">
-                        <?php if ( $manufacturer ) : ?><li><span class="label">Manufacturer</span><span><?php echo esc_html( $manufacturer ); ?></span></li><?php endif; ?>
-                        <?php if ( $country ) : ?><li><span class="label">Made in</span><span><?php echo esc_html( $country ); ?></span></li><?php endif; ?>
-                    </ul>
+                 data-avail="<?php echo $avail_bool ? 'yes' : 'no'; ?>">
+                <div class="flu-brand-row-main">
+                    <span class="flu-brand-row-name"><?php echo esc_html( $brand->post_title ); ?></span>
+                    <?php if ( $meta_bits ) : ?><span class="flu-brand-row-meta"><?php echo esc_html( implode( ' · ', $meta_bits ) ); ?></span><?php endif; ?>
+                </div>
+                <div class="flu-brand-row-right">
                     <?php if ( $price ) : ?>
-                        <div class="flu-brand-price"><span class="cur">PKR</span> <?php echo esc_html( number_format( $price ) ); ?></div>
+                        <span class="flu-brand-row-price"><span class="cur">PKR</span> <?php echo esc_html( number_format( $price ) ); ?></span>
                     <?php else : ?>
-                        <div class="flu-brand-price" style="font-size:.95rem;">Contact Us</div>
+                        <span class="flu-brand-row-price" style="font-size:.85rem;">Contact Us</span>
                     <?php endif; ?>
+                    <span class="flu-brand-avail <?php echo $avail_bool ? 'avail-yes' : 'avail-no'; ?>"><?php echo $avail_bool ? 'Available' : 'Sold out'; ?></span>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -476,15 +459,15 @@ $cities = get_posts( [ 'post_type' => 'city', 'post_status' => 'publish', 'posts
     });
     peopleInput.addEventListener('input', recalc);
 
-    document.querySelectorAll('.flu-brand-card').forEach(function (card) {
-        card.addEventListener('click', function () {
-            if (card.classList.contains('is-unavailable')) return;
-            document.querySelectorAll('.flu-brand-card').forEach(function (c) { c.classList.remove('is-selected'); });
-            card.classList.add('is-selected');
+    document.querySelectorAll('.flu-brand-row').forEach(function (row) {
+        row.addEventListener('click', function () {
+            if (row.classList.contains('is-unavailable')) return;
+            document.querySelectorAll('.flu-brand-row').forEach(function (r) { r.classList.remove('is-selected'); });
+            row.classList.add('is-selected');
             selectedBrand = {
-                id: parseInt(card.getAttribute('data-brand-id'), 10),
-                name: card.getAttribute('data-brand-name'),
-                price: parseFloat(card.getAttribute('data-price')) || 0
+                id: parseInt(row.getAttribute('data-brand-id'), 10),
+                name: row.getAttribute('data-brand-name'),
+                price: parseFloat(row.getAttribute('data-price')) || 0
             };
             recalc();
         });
