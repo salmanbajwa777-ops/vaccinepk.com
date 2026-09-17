@@ -116,21 +116,12 @@ $featured_knowledge_topics = [
 $featured_knowledge = [];
 foreach ( $featured_knowledge_topics as $topic ) {
     $topic_posts = get_posts( [ 'post_type' => 'post', 'post_status' => 'publish', 'title' => $topic, 'posts_per_page' => 1 ] );
-    $match = $topic_posts ? $topic_posts[0] : null;
+    if ( ! $topic_posts ) continue;
     $featured_knowledge[] = [
         'title' => $topic,
-        'post'  => $match,
+        'post'  => $topic_posts[0],
     ];
 }
-
-// ---- Section 5: Interactive Tools (placeholders) ----
-$interactive_tools = [
-    [ 'icon' => 'bi-calculator-fill',   'title' => 'Baby Vaccine Due Calculator', 'desc' => 'Find out which vaccines your baby is due for, by date of birth.' ],
-    [ 'icon' => 'bi-person-check-fill', 'title' => 'Adult Vaccine Finder',        'desc' => 'Discover which vaccines are recommended for your age and lifestyle.' ],
-    [ 'icon' => 'bi-airplane-fill',     'title' => 'Travel Vaccine Advisor',      'desc' => 'Get vaccine recommendations based on your destination.' ],
-    [ 'icon' => 'bi-clock-history',     'title' => 'Missed Vaccine Planner',      'desc' => 'Catch up safely on any vaccines that were missed or delayed.' ],
-    [ 'icon' => 'bi-heart-pulse-fill',  'title' => 'Pregnancy Vaccine Checker',   'desc' => 'See which vaccines are recommended during each trimester.' ],
-];
 
 // ---- Section 9: Why VaccinePk ----
 $why_vaccinepk = [
@@ -388,7 +379,7 @@ $homepage_faqs = [
                                 <i class="bi bi-shield-fill-check"></i>
                             <?php endif; ?>
                             <?php if ( $out_of_stock ) : ?>
-                                <span class="vsv-badge vsv-badge-out"><?php echo $card['has_data'] ? 'Out of Stock' : 'Coming Soon'; ?></span>
+                                <span class="vsv-badge vsv-badge-out">Out of Stock</span>
                             <?php else : ?>
                                 <span class="vsv-badge vsv-badge-in">In Stock</span>
                             <?php endif; ?>
@@ -426,56 +417,23 @@ $homepage_faqs = [
             <p class="section-subtitle">Evergreen, doctor-reviewed guides on vaccines and vaccination.</p>
         </div>
         <div class="row g-4">
-            <?php foreach ( $featured_knowledge as $fk ) :
-                $has_post = ! empty( $fk['post'] );
-                $url      = $has_post ? get_permalink( $fk['post']->ID ) : '';
-                ?>
+            <?php foreach ( $featured_knowledge as $fk ) : ?>
                 <div class="col-lg-3 col-md-6">
-                    <?php if ( $has_post ) : ?>
-                        <a href="<?php echo esc_url( $url ); ?>" class="fk-card">
-                    <?php else : ?>
-                        <div class="fk-card fk-card-soon">
-                    <?php endif; ?>
+                    <a href="<?php echo esc_url( get_permalink( $fk['post']->ID ) ); ?>" class="fk-card">
                         <div class="fk-card-body">
                             <span class="fk-badge"><i class="bi bi-patch-check-fill"></i> Doctor Reviewed</span>
                             <h6><?php echo esc_html( $fk['title'] ); ?></h6>
                             <div class="fk-meta">
-                                <?php if ( $has_post ) : ?>
-                                    <span><i class="bi bi-clock"></i> <?php echo vaccination_centre_reading_time_for( $fk['post']->ID ); ?> min read</span>
-                                    <span><i class="bi bi-calendar3"></i> <?php echo esc_html( get_the_modified_date( 'M j, Y', $fk['post']->ID ) ); ?></span>
-                                <?php else : ?>
-                                    <span class="fk-soon"><i class="bi bi-hourglass-split"></i> Coming Soon</span>
-                                <?php endif; ?>
+                                <span><i class="bi bi-clock"></i> <?php echo vaccination_centre_reading_time_for( $fk['post']->ID ); ?> min read</span>
+                                <span><i class="bi bi-calendar3"></i> <?php echo esc_html( get_the_modified_date( 'M j, Y', $fk['post']->ID ) ); ?></span>
                             </div>
                         </div>
-                    <?php echo $has_post ? '</a>' : '</div>'; ?>
+                    </a>
                 </div>
             <?php endforeach; ?>
         </div>
         <div class="text-center mt-4">
             <a href="<?php echo esc_url( home_url( '/knowledge-centre' ) ); ?>" class="btn btn-outline-primary">Visit Knowledge Centre</a>
-        </div>
-    </div>
-</section>
-
-<!-- ================= SECTION 5: INTERACTIVE TOOLS ================= -->
-<section class="py-5" style="background: var(--bg-light);">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2>Interactive Tools</h2>
-            <p class="section-subtitle">Practical tools to help you plan vaccinations for your whole family.</p>
-        </div>
-        <div class="row g-4">
-            <?php foreach ( $interactive_tools as $tool ) : ?>
-                <div class="col-lg-2 col-md-4 col-6">
-                    <div class="tool-card">
-                        <div class="tool-icon"><i class="bi <?php echo esc_attr( $tool['icon'] ); ?>"></i></div>
-                        <h6><?php echo esc_html( $tool['title'] ); ?></h6>
-                        <p><?php echo esc_html( $tool['desc'] ); ?></p>
-                        <span class="tool-soon">Coming Soon</span>
-                    </div>
-                </div>
-            <?php endforeach; ?>
         </div>
     </div>
 </section>
@@ -838,7 +796,6 @@ $homepage_faqs = [
 .vsv-badge { position: absolute; top: 10px; right: 10px; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 50px; }
 .vsv-badge-in { background: var(--color-green); color: white; }
 .vsv-badge-out { background: #dc3545; color: white; }
-.vsv-badge-soon { background: #ffc107; color: #000; }
 .vsv-card-body { padding: 18px; }
 .vsv-card-body h6 { font-weight: 700; margin-bottom: 6px; }
 .vsv-card-body p { font-size: 0.82rem; color: var(--text-light); min-height: 38px; }
@@ -853,19 +810,10 @@ $homepage_faqs = [
 /* ---- featured knowledge ---- */
 .fk-card { display: block; background: white; border: 1px solid var(--color-sand); border-radius: 16px; text-decoration: none; color: inherit; height: 100%; transition: var(--transition); }
 .fk-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); color: inherit; }
-.fk-card-soon { opacity: 0.7; }
 .fk-card-body { padding: 20px; }
 .fk-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 700; color: var(--color-blue); background: var(--color-blue-tint); padding: 4px 10px; border-radius: 50px; margin-bottom: 12px; }
 .fk-card-body h6 { font-weight: 700; margin-bottom: 10px; }
 .fk-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.74rem; color: var(--text-light); }
-.fk-soon { color: var(--color-label-muted); font-weight: 700; }
-
-/* ---- interactive tools ---- */
-.tool-card { background: white; border: 1px solid var(--color-sand); border-radius: 16px; padding: 24px 16px; text-align: center; height: 100%; }
-.tool-icon { width: 50px; height: 50px; margin: 0 auto 14px; border-radius: 12px; background: var(--color-blue-tint); color: var(--color-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
-.tool-card h6 { font-weight: 700; font-size: 0.88rem; margin-bottom: 8px; }
-.tool-card p { font-size: 0.76rem; color: var(--text-light); min-height: 50px; }
-.tool-soon { display: inline-block; font-size: 0.7rem; font-weight: 700; color: var(--color-label-muted); background: var(--color-sand); padding: 4px 10px; border-radius: 50px; }
 
 /* ---- schedule strip ---- */
 .schedule-strip { display: flex; gap: 14px; overflow-x: auto; padding: 10px 4px 20px; }

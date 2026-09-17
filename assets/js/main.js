@@ -45,7 +45,6 @@ function vaccinationCentreAvailabilityBadge( availability ) {
     const badges = {
         'in_stock':     '<span class="search-result-badge" style="background:#7bb14f;color:#fff;"><i class="bi bi-check-circle-fill"></i> In Stock</span>',
         'out_of_stock': '<span class="search-result-badge" style="background:#dc3545;color:#fff;"><i class="bi bi-x-circle-fill"></i> Out of Stock</span>',
-        'coming_soon':  '<span class="search-result-badge" style="background:#ffc107;color:#000;"><i class="bi bi-clock-fill"></i> Coming Soon</span>',
         'yes':          '<span class="search-result-badge" style="background:#7bb14f;color:#fff;"><i class="bi bi-check-circle-fill"></i> Available</span>',
         '1':            '<span class="search-result-badge" style="background:#7bb14f;color:#fff;"><i class="bi bi-check-circle-fill"></i> Available</span>',
     };
