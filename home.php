@@ -409,6 +409,7 @@ $homepage_faqs = [
     </div>
 </section>
 
+<?php if ( $featured_knowledge ) : ?>
 <!-- ================= SECTION 4: FEATURED KNOWLEDGE ================= -->
 <section class="py-5" style="background: white;">
     <div class="container">
@@ -437,6 +438,7 @@ $homepage_faqs = [
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <!-- ================= SECTION 6: PAKISTAN VACCINATION SCHEDULE ================= -->
 <section class="py-5" style="background: white;">
