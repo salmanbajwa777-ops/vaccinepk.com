@@ -894,65 +894,13 @@ function vaccination_centre_byline( $post_id = null ) {
 
 
 /* ==========================================================================
-   9a. REGISTER DISEASE CUSTOM POST TYPE
+   9a. DISEASE POST TYPE — now registered via Pods (wp-admin > Pods Admin),
+   not here. Pods owns registration, fields, and admin UI directly in the
+   database, so there's no theme-deploy step between an edit and it going
+   live. The vaccine-search code above (~line 164) and single-disease.php
+   still work unmodified — WordPress treats a Pods-registered post type the
+   same as a code-registered one for get_posts()/get_permalink()/etc.
    ========================================================================== */
-function vaccination_centre_register_disease() {
-    register_post_type( 'disease', [
-        'label'    => __( 'Diseases', 'vaccination-centre' ),
-        'labels'   => [
-            'name'          => _x( 'Diseases', 'Post Type General Name', 'vaccination-centre' ),
-            'singular_name' => _x( 'Disease', 'Post Type Singular Name', 'vaccination-centre' ),
-            'menu_name'     => __( 'Diseases', 'vaccination-centre' ),
-            'add_new_item'  => __( 'Add New Disease', 'vaccination-centre' ),
-            'edit_item'     => __( 'Edit Disease', 'vaccination-centre' ),
-            'not_found'     => __( 'No diseases found.', 'vaccination-centre' ),
-        ],
-        'supports'            => [ 'title', 'editor', 'thumbnail', 'excerpt' ],
-        'public'              => true,
-        'show_ui'             => true,
-        'show_in_menu'        => true,
-        'menu_position'       => 6,
-        'menu_icon'           => 'dashicons-shield',
-        'has_archive'         => true,
-        'publicly_queryable'  => true,
-        'capability_type'     => 'post',
-        'show_in_rest'        => true,
-        'rewrite'             => [ 'slug' => 'diseases' ],
-    ] );
-}
-add_action( 'init', 'vaccination_centre_register_disease' );
-
-// Disease entries no longer use fixed Symptoms/Complications/Prevention/
-// Transmission boxes — different diseases don't fit the same rigid shape
-// (one may need a "Who's at risk" section, another a "This season's strain"
-// note, etc.). Editors now write everything in the normal open content
-// editor, same as a Knowledge Centre post. Disease reuses the same
-// free-text Byline box Posts use, so it also needs its own meta box
-// registration (the Posts one is hooked to the 'post' type only).
-add_action( 'add_meta_boxes', function () {
-    add_meta_box( 'disease_byline', __( 'Byline', 'vaccination-centre' ),
-        'vaccination_centre_disease_byline_callback', 'disease', 'side', 'default' );
-} );
-
-function vaccination_centre_disease_byline_callback( $post ) {
-    wp_nonce_field( 'disease_byline_nonce', 'disease_byline_nonce_field' );
-    $byline = get_post_meta( $post->ID, '_byline_name', true );
-    ?>
-    <label for="disease_byline_name"><?php _e( 'Author Name', 'vaccination-centre' ); ?></label>
-    <input type="text" id="disease_byline_name" name="disease_byline_name" value="<?php echo esc_attr( $byline ); ?>" class="widefat" placeholder="<?php esc_attr_e( 'e.g. Dr. Salman Bajwa', 'vaccination-centre' ); ?>">
-    <p class="description"><?php _e( 'Optional. Overrides the WordPress user name shown on the front end.', 'vaccination-centre' ); ?></p>
-    <?php
-}
-
-add_action( 'save_post_disease', function ( $post_id ) {
-    if ( ! isset( $_POST['disease_byline_nonce_field'] ) ||
-         ! wp_verify_nonce( $_POST['disease_byline_nonce_field'], 'disease_byline_nonce' ) ) return;
-    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
-    if ( ! current_user_can( 'edit_post', $post_id ) ) return;
-
-    if ( isset( $_POST['disease_byline_name'] ) )
-        update_post_meta( $post_id, '_byline_name', sanitize_text_field( $_POST['disease_byline_name'] ) );
-} );
 
 
 /* ==========================================================================
