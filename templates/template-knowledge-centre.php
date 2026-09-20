@@ -1,19 +1,22 @@
 <?php
 /**
  * Template Name: Knowledge Centre Page
- * The SEO-facing front door to VaccinePk's evergreen articles (same `post`
- * content as the Blog template), framed around evidence-based authority
- * rather than a chronological blog feed.
+ * The SEO-facing front door to VaccinePk's evergreen articles (regular
+ * `post` content, same as the Blog template) plus `disease` entries (Pods
+ * post type, Title + open content, no fixed fields), framed around
+ * evidence-based authority rather than a chronological blog feed.
  */
 get_header();
 
 $paged = get_query_var( 'paged' ) ? get_query_var( 'paged' ) : 1;
 
 $articles_query = new WP_Query( [
-    'post_type'      => 'post',
+    'post_type'      => [ 'post', 'disease' ],
     'posts_per_page' => 9,
     'paged'          => $paged,
     'post_status'    => 'publish',
+    'orderby'        => 'date',
+    'order'          => 'DESC',
 ] );
 ?>
 
@@ -72,7 +75,11 @@ $articles_query = new WP_Query( [
                                     <span><i class="bi bi-clock"></i> <?php echo vaccination_centre_reading_time(); ?> min read</span>
                                     <span><i class="bi bi-calendar3"></i> Updated <?php echo get_the_modified_date( 'M j, Y' ); ?></span>
                                 </div>
-                                <span class="kc-reviewed-badge mb-2 d-inline-flex"><i class="bi bi-patch-check-fill"></i> Doctor Reviewed</span>
+                                <?php if ( get_post_type() === 'disease' ) : ?>
+                                    <span class="kc-reviewed-badge mb-2 d-inline-flex" style="color: var(--color-navy); background: var(--color-gold-tint, #f5e9cf);"><i class="bi bi-shield-fill-check"></i> Disease Guide</span>
+                                <?php else : ?>
+                                    <span class="kc-reviewed-badge mb-2 d-inline-flex"><i class="bi bi-patch-check-fill"></i> Doctor Reviewed</span>
+                                <?php endif; ?>
                                 <h3><a href="<?php the_permalink(); ?>" style="color:#16232b;text-decoration:none;"><?php the_title(); ?></a></h3>
                                 <p class="text-muted small mb-0"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 16 ) ); ?></p>
                             </div>
