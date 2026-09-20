@@ -922,51 +922,36 @@ function vaccination_centre_register_disease() {
 }
 add_action( 'init', 'vaccination_centre_register_disease' );
 
+// Disease entries no longer use fixed Symptoms/Complications/Prevention/
+// Transmission boxes — different diseases don't fit the same rigid shape
+// (one may need a "Who's at risk" section, another a "This season's strain"
+// note, etc.). Editors now write everything in the normal open content
+// editor, same as a Knowledge Centre post. Disease reuses the same
+// free-text Byline box Posts use, so it also needs its own meta box
+// registration (the Posts one is hooked to the 'post' type only).
 add_action( 'add_meta_boxes', function () {
-    add_meta_box( 'disease_details', __( 'Disease Details', 'vaccination-centre' ),
-        'vaccination_centre_disease_details_callback', 'disease', 'normal', 'high' );
+    add_meta_box( 'disease_byline', __( 'Byline', 'vaccination-centre' ),
+        'vaccination_centre_disease_byline_callback', 'disease', 'side', 'default' );
 } );
 
-function vaccination_centre_disease_details_callback( $post ) {
-    wp_nonce_field( 'disease_details_nonce', 'disease_details_nonce_field' );
-    $symptoms      = get_post_meta( $post->ID, 'disease_symptoms', true );
-    $complications = get_post_meta( $post->ID, 'disease_complications', true );
-    $prevention    = get_post_meta( $post->ID, 'disease_prevention', true );
-    $transmission  = get_post_meta( $post->ID, 'disease_transmission', true );
+function vaccination_centre_disease_byline_callback( $post ) {
+    wp_nonce_field( 'disease_byline_nonce', 'disease_byline_nonce_field' );
+    $byline = get_post_meta( $post->ID, '_byline_name', true );
     ?>
-    <table class="form-table">
-        <tr>
-            <th><label for="disease_symptoms"><?php _e( 'Symptoms', 'vaccination-centre' ); ?></label></th>
-            <td><textarea id="disease_symptoms" name="disease_symptoms" rows="4" class="large-text"><?php echo esc_textarea( $symptoms ); ?></textarea></td>
-        </tr>
-        <tr>
-            <th><label for="disease_complications"><?php _e( 'Complications', 'vaccination-centre' ); ?></label></th>
-            <td><textarea id="disease_complications" name="disease_complications" rows="4" class="large-text"><?php echo esc_textarea( $complications ); ?></textarea></td>
-        </tr>
-        <tr>
-            <th><label for="disease_prevention"><?php _e( 'Prevention', 'vaccination-centre' ); ?></label></th>
-            <td><textarea id="disease_prevention" name="disease_prevention" rows="4" class="large-text"><?php echo esc_textarea( $prevention ); ?></textarea></td>
-        </tr>
-        <tr>
-            <th><label for="disease_transmission"><?php _e( 'Transmission (optional)', 'vaccination-centre' ); ?></label></th>
-            <td><input type="text" id="disease_transmission" name="disease_transmission" value="<?php echo esc_attr( $transmission ); ?>" class="regular-text"></td>
-        </tr>
-    </table>
+    <label for="disease_byline_name"><?php _e( 'Author Name', 'vaccination-centre' ); ?></label>
+    <input type="text" id="disease_byline_name" name="disease_byline_name" value="<?php echo esc_attr( $byline ); ?>" class="widefat" placeholder="<?php esc_attr_e( 'e.g. Dr. Salman Bajwa', 'vaccination-centre' ); ?>">
+    <p class="description"><?php _e( 'Optional. Overrides the WordPress user name shown on the front end.', 'vaccination-centre' ); ?></p>
     <?php
 }
 
 add_action( 'save_post_disease', function ( $post_id ) {
-    if ( ! isset( $_POST['disease_details_nonce_field'] ) ||
-         ! wp_verify_nonce( $_POST['disease_details_nonce_field'], 'disease_details_nonce' ) ) return;
+    if ( ! isset( $_POST['disease_byline_nonce_field'] ) ||
+         ! wp_verify_nonce( $_POST['disease_byline_nonce_field'], 'disease_byline_nonce' ) ) return;
     if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
     if ( ! current_user_can( 'edit_post', $post_id ) ) return;
 
-    $fields = [ 'disease_symptoms', 'disease_complications', 'disease_prevention', 'disease_transmission' ];
-    foreach ( $fields as $field ) {
-        if ( isset( $_POST[ $field ] ) ) {
-            update_post_meta( $post_id, $field, sanitize_textarea_field( $_POST[ $field ] ) );
-        }
-    }
+    if ( isset( $_POST['disease_byline_name'] ) )
+        update_post_meta( $post_id, '_byline_name', sanitize_text_field( $_POST['disease_byline_name'] ) );
 } );
 
 

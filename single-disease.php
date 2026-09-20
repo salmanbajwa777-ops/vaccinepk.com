@@ -4,11 +4,6 @@
  */
 get_header();
 
-$symptoms      = get_post_meta( get_the_ID(), 'disease_symptoms', true );
-$complications = get_post_meta( get_the_ID(), 'disease_complications', true );
-$prevention    = get_post_meta( get_the_ID(), 'disease_prevention', true );
-$transmission  = get_post_meta( get_the_ID(), 'disease_transmission', true );
-
 // Find vaccines that protect against this disease (free-text match on vaccine.disease_name)
 $disease_title  = get_the_title();
 $related_vaccines = get_posts( [
@@ -46,6 +41,9 @@ $related_vaccines = get_posts( [
     color: var(--color-blue); font-weight: 600; text-decoration: none; margin: 0 8px 8px 0;
 }
 .vaccine-chip-link:hover { background: var(--color-blue); color: white; }
+.disease-detail-card :where(h2,h3,h4) { color: var(--color-blue); font-weight: 700; }
+.disease-detail-card p { margin-bottom: 1em; }
+.disease-byline { color: rgba(255,255,255,0.85); font-size: 0.95rem; margin-top: 10px; }
 </style>
 
 <section class="disease-hero">
@@ -59,7 +57,14 @@ $related_vaccines = get_posts( [
         </nav>
         <div class="accent-bar"></div>
         <h1 class="display-4 fw-bold mb-2"><i class="bi bi-virus2 me-3"></i><?php the_title(); ?></h1>
-        <p class="lead mb-0">Symptoms, complications, prevention, and vaccination guidance.</p>
+        <p class="lead mb-0">Vaccination guidance and disease information.</p>
+        <?php $disease_byline = vaccination_centre_byline(); ?>
+        <?php if ( $disease_byline ) : ?>
+        <p class="disease-byline mb-0">
+            <i class="bi bi-person-badge me-1"></i>By <?php echo esc_html( $disease_byline ); ?>
+            &nbsp;&middot;&nbsp; <?php echo get_the_date( 'F j, Y' ); ?>
+        </p>
+        <?php endif; ?>
     </div>
 </section>
 
@@ -67,38 +72,13 @@ $related_vaccines = get_posts( [
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
-                <?php if ( $symptoms ) : ?>
-                <div class="disease-detail-card">
-                    <h2><i class="bi bi-clipboard2-pulse me-2"></i>Symptoms</h2>
-                    <p><?php echo esc_html( $symptoms ); ?></p>
-                </div>
-                <?php endif; ?>
-
-                <?php if ( $complications ) : ?>
-                <div class="disease-detail-card">
-                    <h2><i class="bi bi-exclamation-triangle me-2"></i>Complications</h2>
-                    <p><?php echo esc_html( $complications ); ?></p>
-                </div>
-                <?php endif; ?>
-
-                <?php if ( $prevention ) : ?>
-                <div class="disease-detail-card">
-                    <h2><i class="bi bi-shield-check me-2"></i>Prevention</h2>
-                    <p><?php echo esc_html( $prevention ); ?></p>
-                </div>
-                <?php endif; ?>
-
-                <?php if ( $transmission ) : ?>
-                <div class="disease-detail-card">
-                    <h2><i class="bi bi-arrow-left-right me-2"></i>Transmission</h2>
-                    <p><?php echo esc_html( $transmission ); ?></p>
-                </div>
-                <?php endif; ?>
-
                 <?php if ( get_the_content() ) : ?>
                 <div class="disease-detail-card">
-                    <h2><i class="bi bi-info-circle me-2"></i>More Information</h2>
-                    <div><?php the_content(); ?></div>
+                    <?php the_content(); ?>
+                </div>
+                <?php else : ?>
+                <div class="disease-detail-card">
+                    <p class="text-muted mb-0">Content for this disease is being added. Please check back soon.</p>
                 </div>
                 <?php endif; ?>
             </div>
