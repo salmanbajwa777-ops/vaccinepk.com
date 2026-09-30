@@ -57,6 +57,34 @@ $verification_url = '';
 $record_type = '';
 $pid_record = null;
 
+$inv_input = isset($_GET['inv']) ? sanitize_text_field(wp_unslash($_GET['inv'])) : '';
+
+// view: landing (choose), vaccination (MR form) or invoice (invoice-no form).
+// QR codes only ever carry ?type=vaccination or ?type=invoice - never a prefilled number.
+// Legacy ?type=pid&mr= links keep working as a vaccination lookup.
+$view = 'landing';
+if ($type_input === 'invoice' || $inv_input !== '') {
+    $view = 'invoice';
+} elseif ($type_input === 'vaccination' || $type_input === 'pid' || $mr_input !== '') {
+    $view = 'vaccination';
+}
+$invoice_url = '';
+
+if ($inv_input !== '') {
+    $inv_compact = preg_replace('/\s+/', '', $inv_input);
+    if (preg_match('/^[A-Za-z0-9_\-]{1,40}$/', $inv_compact)) {
+        $api_url = 'https://myapi.vaccinationcentre.com/api/child/invoice/' . rawurlencode($inv_compact) . '/invoice-file';
+        $resp = wp_remote_get($api_url, array('timeout' => 10, 'limit_response_size' => 2048));
+        if (!is_wp_error($resp) && (int) wp_remote_retrieve_response_code($resp) === 200) {
+            $invoice_url = $api_url;
+        } else {
+            $error_message = 'No invoice found for this Invoice No.';
+        }
+    } else {
+        $error_message = 'Please enter a valid Invoice No.';
+    }
+}
+
 if ($mr_input !== '') {
     $mr_compact = preg_replace('/\s+/', '', $mr_input);
 
@@ -190,6 +218,14 @@ if ($mr_input !== '') {
     font-size: 15px;
     background: #fff;
 }
+.vc-simple-choices { display: flex; gap: 12px; flex-wrap: wrap; }
+.vc-simple-choice {
+    flex: 1; min-width: 180px; padding: 18px; text-align: center; text-decoration: none;
+    border: 1px solid #cbd5e1; border-radius: 10px; background: #f9fafb;
+    color: #0b4f6c; font-weight: 600;
+}
+.vc-simple-back { margin: 0 0 8px; font-size: 13px; }
+.vc-simple-back a { color: #0b4f6c; text-decoration: none; }
 .vc-simple-summary {
     margin-top: 18px;
     border: 1px solid #e5e7eb;
@@ -219,52 +255,72 @@ if ($mr_input !== '') {
 <div class="vc-simple-verify">
     <div class="vc-simple-card">
         <h1 class="vc-simple-title">Verification</h1>
-        <p class="vc-simple-subtitle">Enter MR No to view travel, schedule, or PID verification record.</p>
 
-        <form class="vc-simple-form" method="get" action="">
-            <input
-                class="vc-simple-input"
-                type="text"
-                name="mr"
-                placeholder="Enter MR No (e.g. 2026-16472 or 16472)"
-                value="<?php echo esc_attr($mr_input); ?>"
-                required
-            >
-            <select class="vc-simple-select" name="record_type">
-                <option value="schedule" <?php selected($manual_type, 'schedule'); ?>>Schedule</option>
-                <option value="pid" <?php selected($manual_type, 'pid'); ?>>PID</option>
-            </select>
-            <button class="vc-simple-btn" type="submit">Submit</button>
-        </form>
-
-        <?php if ($error_message !== '') : ?>
-            <p class="vc-simple-error"><?php echo esc_html($error_message); ?></p>
-        <?php endif; ?>
-
-        <p class="vc-simple-note">Year-based MR (e.g. 2026-16472) opens travel verification. Raw child ID MR opens schedule verification. For a PID card, select "PID" (or scan its QR code directly).</p>
-
-        <?php if ($pid_record) : ?>
-            <div class="vc-simple-summary">
-                <h2>Immunization Record</h2>
-                <table>
-                    <tr><td>Name</td><td><?php echo esc_html($pid_record['Name']); ?></td></tr>
-                    <tr><td>Father/Guardian</td><td><?php echo esc_html($pid_record['FatherName']); ?></td></tr>
-                    <tr><td>Date of Birth</td><td><?php echo esc_html(date('d-M-Y', strtotime($pid_record['DOB']))); ?></td></tr>
-                    <tr><td>Passport/ID</td><td><?php echo esc_html($pid_record['CNIC']); ?></td></tr>
-                    <tr><td>Clinic</td><td><?php echo esc_html($pid_record['ClinicName']); ?> (<?php echo esc_html($pid_record['RegNo']); ?>)</td></tr>
-                    <tr><td>Doctor</td><td><?php echo esc_html($pid_record['DoctorName']); ?></td></tr>
-                </table>
+        <?php if ($view === 'landing') : ?>
+            <p class="vc-simple-subtitle">What would you like to verify?</p>
+            <div class="vc-simple-choices">
+                <a class="vc-simple-choice" href="?type=vaccination">Verify Vaccination Status</a>
+                <a class="vc-simple-choice" href="?type=invoice">Verify Invoice</a>
             </div>
-        <?php endif; ?>
 
-        <?php if ($verification_url !== '') : ?>
-            <div class="vc-simple-result">
-                <iframe
-                    src="<?php echo esc_url($verification_url); ?>"
-                    title="Verification Result"
-                    loading="lazy"
-                ></iframe>
-            </div>
+        <?php elseif ($view === 'invoice') : ?>
+            <p class="vc-simple-back"><a href="?">&larr; Back</a></p>
+            <p class="vc-simple-subtitle">Enter the Invoice No printed on the invoice, then press Submit.</p>
+            <form class="vc-simple-form" method="get" action="">
+                <input type="hidden" name="type" value="invoice">
+                <input class="vc-simple-input" type="text" name="inv" placeholder="Invoice No"
+                       value="<?php echo esc_attr($inv_input); ?>" required>
+                <button class="vc-simple-btn" type="submit">Submit</button>
+            </form>
+            <?php if ($error_message !== '') : ?>
+                <p class="vc-simple-error"><?php echo esc_html($error_message); ?></p>
+            <?php endif; ?>
+            <?php if ($invoice_url !== '') : ?>
+                <div class="vc-simple-result">
+                    <iframe src="<?php echo esc_url($invoice_url); ?>" title="Invoice Verification Result" loading="lazy"></iframe>
+                </div>
+            <?php endif; ?>
+
+        <?php else : ?>
+            <p class="vc-simple-back"><a href="?">&larr; Back</a></p>
+            <p class="vc-simple-subtitle">Enter the MR No printed on the document, then press Submit.</p>
+            <form class="vc-simple-form" method="get" action="">
+                <input type="hidden" name="type" value="vaccination">
+                <input class="vc-simple-input" type="text" name="mr"
+                       placeholder="Enter MR No (e.g. 2026-16472 or 16472)"
+                       value="<?php echo esc_attr($mr_input); ?>" required>
+                <select class="vc-simple-select" name="record_type">
+                    <option value="schedule" <?php selected($manual_type, 'schedule'); ?>>Schedule</option>
+                    <option value="pid" <?php selected($manual_type, 'pid'); ?>>PID</option>
+                </select>
+                <button class="vc-simple-btn" type="submit">Submit</button>
+            </form>
+
+            <?php if ($error_message !== '') : ?>
+                <p class="vc-simple-error"><?php echo esc_html($error_message); ?></p>
+            <?php endif; ?>
+
+            <p class="vc-simple-note">Year-based MR (e.g. 2026-16472) opens travel verification. Raw child ID MR opens schedule verification. For a PID card, select "PID".</p>
+
+            <?php if ($pid_record) : ?>
+                <div class="vc-simple-summary">
+                    <h2>Immunization Record</h2>
+                    <table>
+                        <tr><td>Name</td><td><?php echo esc_html($pid_record['Name']); ?></td></tr>
+                        <tr><td>Father/Guardian</td><td><?php echo esc_html($pid_record['FatherName']); ?></td></tr>
+                        <tr><td>Date of Birth</td><td><?php echo esc_html(date('d-M-Y', strtotime($pid_record['DOB']))); ?></td></tr>
+                        <tr><td>Passport/ID</td><td><?php echo esc_html($pid_record['CNIC']); ?></td></tr>
+                        <tr><td>Clinic</td><td><?php echo esc_html($pid_record['ClinicName']); ?> (<?php echo esc_html($pid_record['RegNo']); ?>)</td></tr>
+                        <tr><td>Doctor</td><td><?php echo esc_html($pid_record['DoctorName']); ?></td></tr>
+                    </table>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($verification_url !== '') : ?>
+                <div class="vc-simple-result">
+                    <iframe src="<?php echo esc_url($verification_url); ?>" title="Verification Result" loading="lazy"></iframe>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
