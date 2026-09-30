@@ -32,7 +32,6 @@ if ($type_input === 'invoice' || $inv_input !== '') {
 
 $error_message = '';
 $record = null;
-$invoice_url = '';
 
 if ($mr_input !== '') {
     $resp = wp_remote_get(VC_VERIFY_API . 'VerifyRecord?mr=' . rawurlencode($mr_input), array('timeout' => 12));
@@ -47,19 +46,24 @@ if ($mr_input !== '') {
     }
 }
 
+$invoice = null;
+$invoice_pdf_url = '';
 if ($inv_input !== '') {
-    $inv_compact = preg_replace('/\s+/', '', $inv_input);
-    if (preg_match('/^[A-Za-z0-9_\-]{1,40}$/', $inv_compact)) {
-        $api_url = VC_VERIFY_API . 'invoice/' . rawurlencode($inv_compact) . '/invoice-file';
-        $resp = wp_remote_get($api_url, array('timeout' => 10, 'limit_response_size' => 2048));
-        if (!is_wp_error($resp) && (int) wp_remote_retrieve_response_code($resp) === 200) {
-            $invoice_url = $api_url;
-        } else {
-            $error_message = 'No invoice found for this Invoice No.';
-        }
+    $resp = wp_remote_get(VC_VERIFY_API . 'VerifyInvoice?inv=' . rawurlencode($inv_input), array('timeout' => 12));
+    $code = is_wp_error($resp) ? 0 : (int) wp_remote_retrieve_response_code($resp);
+    $data = $code ? json_decode(wp_remote_retrieve_body($resp), true) : null;
+    if ($code === 200 && is_array($data)) {
+        $invoice = array_change_key_case($data, CASE_LOWER);
+        $invoice_pdf_url = VC_VERIFY_API . 'invoice/' . rawurlencode(preg_replace('/\s+/', '', $inv_input)) . '/invoice-file';
+    } elseif ($code === 404 && is_array($data) && !empty($data['message'])) {
+        $error_message = $data['message'];
     } else {
-        $error_message = 'Please enter a valid Invoice No.';
+        $error_message = 'Verification is temporarily unavailable. Please try again shortly.';
     }
+}
+
+function vc_money($n) {
+    return number_format((float) $n, 0);
 }
 
 $hero_title = 'VERIFY';
@@ -91,6 +95,10 @@ table.vc-rec { width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb
 .vc-vscroll { overflow-x: auto; }
 table.vc-vt { border-collapse: collapse; width: 100%; min-width: 640px; }
 .vc-vt th, .vc-vt td { border: 1px solid #d1d5db; padding: 10px 12px; font-size: 14px; background: #fff; text-align: left; }
+.vc-r { text-align: right !important; }
+.vc-vt tfoot td { font-weight: 700; background: #f3f8fb; }
+.vc-vpdf { display: inline-block; margin: 14px 0 0; padding: 11px 18px; border-radius: 8px; border: 1px solid #3d8fb0; color: #3d8fb0; font-weight: 700; text-decoration: none; }
+.vc-vvoid { margin: 0; padding: 12px 14px; background: #fff1f1; border: 1px solid #f8b4b4; border-top: 0; font-size: 14px; color: #7f1d1d; }
 .vc-vfoot { color: #6b7280; font-size: 14px; margin: 12px 0; }
 .vc-vfoot a { color: #3d8fb0; }
 .vc-vresult { margin-top: 18px; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
@@ -114,6 +122,10 @@ table.vc-vt { border-collapse: collapse; width: 100%; min-width: 640px; }
     .vc-vt td::before { content: attr(data-label); color: #6b7280; text-align: left; flex: 0 0 40%; }
     .vc-vt td:first-child { border-top: 0; background: #f3f8fb; font-weight: 700; text-align: left; }
     .vc-vt td:first-child::before { display: none; }
+    .vc-vt tfoot, .vc-vt tfoot tr { display: block; }
+    .vc-vt tfoot tr { display: flex; justify-content: space-between; border: 0; padding: 8px 12px; background: transparent; }
+    .vc-vt tfoot td { display: block; width: auto; border: 0; padding: 0; background: transparent; }
+    .vc-vpdf { display: block; text-align: center; }
     .vc-vt td.vc-given { font-weight: 700; color: #0b4f6c; }
 }
 </style>
@@ -133,7 +145,7 @@ table.vc-vt { border-collapse: collapse; width: 100%; min-width: 640px; }
 
 <?php elseif ($view === 'invoice') : ?>
     <p class="vc-vback"><a href="?">&larr; Back</a></p>
-    <div class="vc-vbar<?php echo ($error_message === '' && $invoice_url === '') ? ' solo' : ''; ?>">
+    <div class="vc-vbar<?php echo ($error_message === '' && !$invoice) ? ' solo' : ''; ?>">
         <form class="vc-vform" method="get" action="">
             <input type="hidden" name="type" value="invoice">
             <input class="vc-vinput" type="text" name="inv" placeholder="Enter Invoice No" value="<?php echo esc_attr($inv_input); ?>" required>
@@ -141,8 +153,50 @@ table.vc-vt { border-collapse: collapse; width: 100%; min-width: 640px; }
         </form>
     </div>
     <?php if ($error_message !== '') : ?><div class="vc-verr"><?php echo esc_html($error_message); ?></div><?php endif; ?>
-    <?php if ($invoice_url !== '') : ?>
-        <div class="vc-vresult"><iframe src="<?php echo esc_url($invoice_url); ?>" title="Invoice Verification Result" loading="lazy"></iframe></div>
+
+    <?php if ($invoice && $invoice['status'] === 'Cancelled') : ?>
+        <table class="vc-rec"><tbody>
+            <tr><th>Status</th><td class="vc-status none">Cancelled &ndash; no longer valid</td></tr>
+            <tr><th>Invoice No.</th><td><?php echo esc_html($invoice['invoiceno']); ?></td></tr>
+            <?php if (!empty($invoice['replacedby'])) : ?><tr><th>Replaced by</th><td><?php echo esc_html($invoice['replacedby']); ?></td></tr><?php endif; ?>
+        </tbody></table>
+        <p class="vc-vvoid">This invoice was cancelled and replaced. Please request the updated invoice from the clinic.</p>
+
+    <?php elseif ($invoice) : $lines = (isset($invoice['lines']) && is_array($invoice['lines'])) ? $invoice['lines'] : array(); ?>
+        <table class="vc-rec"><tbody>
+            <tr><th>Status</th><td class="vc-status">Valid Invoice</td></tr>
+            <tr><th>Invoice No.</th><td><?php echo esc_html($invoice['invoiceno']); ?></td></tr>
+            <tr><th>Invoice Date</th><td><?php echo esc_html($invoice['invoicedate']); ?></td></tr>
+            <tr><th>Patient</th><td><?php echo esc_html($invoice['patient']); ?> (MR <?php echo esc_html($invoice['mrno']); ?>)</td></tr>
+            <tr><th>Services</th><td>
+                <div class="vc-vscroll"><table class="vc-vt vc-vinv">
+                    <thead><tr><th>Vaccine</th><th>Brand</th><th>Date Given</th><th class="vc-r">Amount (PKR)</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($lines as $l) : $l = array_change_key_case((array) $l, CASE_LOWER); ?>
+                        <tr>
+                            <td data-label="Vaccine"><?php echo esc_html($l['vaccine']); ?></td>
+                            <td data-label="Brand"><?php echo esc_html($l['brand']); ?></td>
+                            <td data-label="Date Given"><?php echo esc_html($l['dategiven']); ?></td>
+                            <td data-label="Amount" class="vc-r"><?php echo esc_html(vc_money($l['amount'])); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if ((float) $invoice['charges'] > 0) : ?>
+                        <tr>
+                            <td data-label="Item">Consultation/Vaccination Charges</td>
+                            <td data-label="Brand">&ndash;</td>
+                            <td data-label="Date Given">&ndash;</td>
+                            <td data-label="Amount" class="vc-r"><?php echo esc_html(vc_money($invoice['charges'])); ?></td>
+                        </tr>
+                    <?php endif; ?>
+                    </tbody>
+                    <tfoot><tr class="vc-total"><td colspan="3">Total</td><td class="vc-r"><?php echo esc_html(vc_money($invoice['total'])); ?></td></tr></tfoot>
+                </table></div>
+            </td></tr>
+            <tr><th>Physician/Doctor</th><td><?php echo nl2br(esc_html($invoice['doctor'])); ?></td></tr>
+            <tr><th>Center</th><td><?php echo esc_html($invoice['center']); ?></td></tr>
+        </tbody></table>
+        <a class="vc-vpdf" href="<?php echo esc_url($invoice_pdf_url); ?>" target="_blank" rel="noopener">View invoice PDF</a>
+        <p class="vc-vfoot">If there are &lsquo;no results found&rsquo; please enter a correct / new <a href="?type=invoice">Invoice number again.</a></p>
     <?php endif; ?>
 
 <?php else : ?>
