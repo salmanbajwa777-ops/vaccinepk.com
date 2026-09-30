@@ -187,7 +187,7 @@ table.vc-vt { border-collapse: collapse; width: 100%; min-width: 640px; }
                 </table></div>
                 <?php else : ?>No vaccines recorded.<?php endif; ?>
             </td></tr>
-            <tr><th>Physician/Doctor</th><td><?php echo esc_html($record['doctor']); ?></td></tr>
+            <tr><th>Physician/Doctor</th><td><?php echo nl2br(esc_html($record['doctor'])); ?></td></tr>
             <tr><th>Center</th><td><?php echo esc_html($record['center']); ?></td></tr>
         </tbody></table>
         <p class="vc-vfoot">If there are &lsquo;no results found&rsquo; please enter a correct / new <a href="?type=vaccination">MR number again.</a></p>
