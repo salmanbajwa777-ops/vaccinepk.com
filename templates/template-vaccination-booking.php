@@ -78,77 +78,78 @@ $nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
                         <input type="hidden" name="nonce" value="<?php echo esc_attr( $nonce ); ?>">
 
                         <?php if ( $category === 'child' ) : ?>
+                            <div class="vb-sec">Child</div>
                             <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>Parent/Guardian Name*</label>
-                                    <input type="text" name="parent_name" class="form-control" placeholder="Enter full name" required>
+                                <div class="col-12 mb-3">
+                                    <label>Child's Name*</label>
+                                    <input type="text" name="child_name" class="form-control" placeholder="Enter child's name" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label>Father / Husband Name*</label>
-                                    <input type="text" name="f_h_name" class="form-control" placeholder="Enter father/husband name" required>
+                                    <label>Gender*</label>
+                                    <div class="vb-choices vb-gender">
+                                        <input type="radio" name="gender" id="vbGenderM" value="Male" required><label for="vbGenderM">Male</label>
+                                        <input type="radio" name="gender" id="vbGenderF" value="Female"><label for="vbGenderF">Female</label>
+                                        <input type="radio" name="gender" id="vbGenderO" value="Other"><label for="vbGenderO">Other</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Child's Date of Birth*</label>
+                                    <input type="date" name="child_dob" class="form-control" max="<?php echo esc_attr( current_time( 'Y-m-d' ) ); ?>" required>
+                                </div>
+                            </div>
+
+                            <div class="vb-sec">Parent</div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Parent Name*</label>
+                                    <input type="text" name="parent_name" class="form-control" placeholder="Enter full name" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label>Phone Number*</label>
                                     <input type="tel" name="phone" class="form-control" placeholder="+92 3XX XXXXXXX" required>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>Gender*</label>
-                                    <select name="gender" class="form-control" required>
-                                        <option value="">Select</option>
-                                        <option>Male</option><option>Female</option><option>Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-12 mb-3">
                                     <label>Email Address*</label>
                                     <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>Child's Name*</label>
-                                    <input type="text" name="child_name" class="form-control" placeholder="Enter child's name" required>
-                                </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>Child's Date of Birth*</label>
-                                    <input type="date" name="child_dob" class="form-control" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label>Preferred Appointment Date*</label>
-                                    <input type="date" name="appointment_date" class="form-control" required>
-                                </div>
+
+                            <div class="vb-sec">City*</div>
+                            <div class="vb-choices vb-cities mb-3">
+                                <?php foreach ( $cities as $i => $city ) : $cid = 'vbCity' . (int) $city->ID; ?>
+                                    <input type="radio" name="city_id" id="<?php echo esc_attr( $cid ); ?>" value="<?php echo esc_attr( $city->ID ); ?>"<?php echo $i === 0 ? ' required' : ''; ?>><label for="<?php echo esc_attr( $cid ); ?>"><?php echo esc_html( $city->post_title ); ?></label>
+                                <?php endforeach; ?>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>City*</label>
-                                    <select name="city_id" class="form-control" required>
-                                        <option value="">Select city</option>
-                                        <?php foreach ( $cities as $city ) : ?>
-                                            <option value="<?php echo esc_attr( $city->ID ); ?>"><?php echo esc_html( $city->post_title ); ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
+
+                            <div class="vb-sec">Vaccines</div>
                             <div class="mb-4">
                                 <label class="fw-bold mb-3">Select Vaccines (check all that apply)*</label>
                                 <?php echo vaccinepk_render_vaccine_picker( 'child', 'child' ); ?>
                             </div>
-                            <div class="mb-3">
-                                <label>Preferred Location*</label>
-                                <?php echo vaccinepk_render_location_radio(); ?>
+
+                            <div class="vb-sec">Visit</div>
+                            <div class="vb-choices vb-two mb-3">
+                                <?php /* value stays "Home Service": the server and the site-wide address script key off it */ ?>
+                                <input type="radio" name="location" id="vbLocClinic" value="Clinic Visit" required><label for="vbLocClinic">Clinic Visit</label>
+                                <input type="radio" name="location" id="vbLocHome" value="Home Service"><label for="vbLocHome">Home Visit</label>
                             </div>
-                            <div class="home-address-wrap mb-3">
-                                <label>Delivery Address*</label>
-                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, City..."></textarea>
-                                <p class="home-address-hint">🏠 Our staff will provide services at this address.</p>
+                            <div class="home-address-wrap mb-3" id="vbHomeAddress">
+                                <label>Home Address*</label>
+                                <textarea name="home_address" class="address-box form-control" rows="3" placeholder="House, Street, Area..."></textarea>
+                                <p class="home-address-hint">🏠 Our staff will visit this address.</p>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Preferred Appointment Date <span class="vb-opt">(optional)</span></label>
+                                    <input type="date" name="appointment_date" class="form-control" data-native="1" min="<?php echo esc_attr( current_time( 'Y-m-d' ) ); ?>">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Preferred Time Slot*</label>
+                                    <?php echo vaccinepk_render_time_slot_select(); ?>
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label>Preferred Time Slot*</label>
-                                <?php echo vaccinepk_render_time_slot_select(); ?>
-                            </div>
-                            <div class="mb-3">
-                                <label>Additional Notes</label>
+                                <label>Additional Notes <span class="vb-opt">(optional)</span></label>
                                 <textarea name="notes" class="form-control" rows="4" placeholder="Any allergies, medical conditions, or special requirements..."></textarea>
                             </div>
 
@@ -337,7 +338,7 @@ $nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
                         <div class="mb-3">
                             <label class="d-flex align-items-start gap-2">
                                 <input type="checkbox" required style="margin-top:4px;">
-                                <span>I agree to the terms and conditions and privacy policy*</span>
+                                <span>I agree to the <a href="<?php echo esc_url( home_url( '/terms' ) ); ?>" target="_blank" rel="noopener">terms and conditions</a> and <a href="<?php echo esc_url( home_url( '/privacy-policy' ) ); ?>" target="_blank" rel="noopener">privacy policy</a>*</span>
                             </label>
                         </div>
                         <div class="text-center mt-4">
@@ -473,6 +474,33 @@ $nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
         padding: 18px;
     }
 }
+
+/* ================= Child form: sections + one-click choice buttons ================= */
+#vb-form-wrap .vb-sec { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #0b5c87; margin: 26px 0 14px; padding-bottom: 8px; border-bottom: 1px solid #e7e0d3; }
+#vb-form-wrap .wpcf7-form input[name="nonce"] + .vb-sec { margin-top: 0; }
+#vb-form-wrap .vb-opt { font-weight: 400; color: #8a959a; font-size: 13px; }
+#vb-form-wrap .vb-choices { display: flex; flex-wrap: wrap; gap: 10px; }
+#vb-form-wrap .vb-choices input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+#vb-form-wrap .wpcf7-form .vb-choices label { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 10px 22px; margin: 0; border: 2px solid #e7e0d3; border-radius: 10px; background: #fff; font-weight: 600; font-size: 15px; cursor: pointer; transition: .15s; user-select: none; }
+#vb-form-wrap .wpcf7-form .vb-choices label:hover { border-color: #0b5c87; background: #eaf2f6; }
+#vb-form-wrap .vb-choices input[type="radio"]:checked + label { border-color: #0b5c87 !important; background: #0b5c87 !important; color: #fff; box-shadow: 0 3px 14px rgba(11,92,135,.25); }
+#vb-form-wrap .vb-choices input[type="radio"]:focus-visible + label { outline: 3px solid rgba(11,92,135,.35); outline-offset: 2px; }
+#vb-form-wrap .vb-gender label { flex: 1; min-width: 90px; }
+#vb-form-wrap .vb-two { display: grid; grid-template-columns: 1fr 1fr; }
+#vb-form-wrap .vb-two label { width: 100%; }
+@media (max-width: 600px) {
+    #vb-form-wrap .vb-cities { display: grid; grid-template-columns: 1fr 1fr; }
+    #vb-form-wrap .vb-cities label { width: 100%; }
+}
+
+/* Vaccine picker cards: the generic "#vb-form-wrap label {display:block}" rule above
+   out-ranks the picker's own flex layout, which stacked checkbox/radio over its text and
+   dropped the price onto its own line. Restore the intended row layout. */
+#vb-form-wrap .wpcf7-form label.dv-label,
+#vb-form-wrap .wpcf7-form label.dv-brand-label { display: flex; margin-bottom: 0; font-weight: inherit; }
+
+/* age shown inside the DOB trigger once a date is picked */
+.dob-trigger .age-in { margin-left: auto; margin-right: 10px; font-size: 13px; font-weight: 600; color: #0b5c87; }
 
 /* ================= DOB picker: trigger field ================= */
 .dob-trigger{
@@ -893,7 +921,9 @@ $nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
     }
 
     function enhanceAll() {
-        document.querySelectorAll('#vb-form-wrap input[type="date"]').forEach(enhanceDateInput);
+        // [data-native] = keep the browser's own date input (the drill-down picker
+        // is built for past dates / DOB and can't select future days).
+        document.querySelectorAll('#vb-form-wrap input[type="date"]:not([data-native])').forEach(enhanceDateInput);
     }
 
     if (document.readyState === 'loading') {
@@ -912,8 +942,61 @@ $nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
     if (!form) return;
     var msg = document.getElementById('vbFormMsg');
 
+    // ---- child form only: home-address toggle, age in DOB field, vaccine check ----
+    var homeWrap = document.getElementById('vbHomeAddress');
+    var childVaccines = form.querySelectorAll('input[name="child[]"]');
+
+    function syncHomeAddress() {
+        if (!homeWrap) return;
+        var home = form.querySelector('input[name="location"]:checked');
+        var isHome = !!home && home.value === 'Home Service';
+        var ta = homeWrap.querySelector('textarea');
+        homeWrap.style.display = isHome ? 'block' : 'none';
+        if (isHome) { ta.setAttribute('required', 'required'); }
+        else { ta.removeAttribute('required'); ta.value = ''; }
+    }
+    form.querySelectorAll('input[name="location"]').forEach(function (r) { r.addEventListener('change', syncHomeAddress); });
+
+    function ageText(iso) {
+        var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+        if (!m) return '';
+        var now = new Date(), months = (now.getFullYear() - +m[1]) * 12 + (now.getMonth() - (+m[2] - 1));
+        if (now.getDate() < +m[3]) months--;
+        if (months < 0) return '';
+        if (months < 1) return 'Newborn';
+        if (months < 24) return months + (months === 1 ? ' month' : ' months');
+        var y = Math.floor(months / 12), rem = months % 12;
+        return y + (y === 1 ? ' year' : ' years') + (rem ? ' ' + rem + ' mo' : '');
+    }
+    function showAge() {
+        var dob = form.querySelector('input[name="child_dob"]');
+        var trig = dob && dob.nextElementSibling;
+        if (!trig || !trig.classList.contains('dob-trigger')) return;
+        var span = trig.querySelector('.age-in');
+        if (!span) {
+            span = document.createElement('span');
+            span.className = 'age-in';
+            trig.insertBefore(span, trig.querySelector('svg'));
+        }
+        span.textContent = ageText(dob.value);
+    }
+    var dobInput = form.querySelector('input[name="child_dob"]');
+    if (dobInput) dobInput.addEventListener('change', showAge);
+
+    form.addEventListener('reset', function () {
+        setTimeout(function () { syncHomeAddress(); showAge(); }, 0);
+    });
+
     form.addEventListener('submit', function (e) {
         e.preventDefault();
+
+        if (childVaccines.length && !form.querySelector('input[name="child[]"]:checked')) {
+            msg.style.display = 'block';
+            msg.className = 'wpcf7-response-output is-error';
+            msg.textContent = 'Please select at least one vaccine (choose a brand, or tick "Request this vaccine").';
+            childVaccines[0].closest('.dv-group').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
 
         var submitBtn = form.querySelector('input[type="submit"]');
         submitBtn.disabled = true;
@@ -931,8 +1014,12 @@ $nonce  = wp_create_nonce( 'vaccination_booking_nonce' );
                     msg.classList.add('is-success');
                     msg.textContent = "Booking received! Our team will contact you shortly to confirm your appointment.";
                     form.reset();
-                    document.querySelectorAll('#vb-form-wrap .dob-trigger-ph').forEach(function (el) {
-                        el.textContent = 'dd/mm/yyyy';
+                    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // the picker drops .dob-trigger-ph once a date is chosen, so reset by trigger instead
+                    document.querySelectorAll('#vb-form-wrap .dob-trigger').forEach(function (t) {
+                        var s = t.querySelector('span');
+                        s.textContent = 'dd/mm/yyyy';
+                        s.classList.add('dob-trigger-ph');
                     });
                 } else {
                     msg.classList.add('is-error');

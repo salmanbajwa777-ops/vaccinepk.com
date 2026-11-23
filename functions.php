@@ -1589,8 +1589,9 @@ function vaccinepk_submit_child_booking_ajax() {
         wp_send_json_error( [ 'message' => 'Booking is temporarily unavailable. Please call or WhatsApp us instead.' ] );
     }
 
+    // Father/Husband name is no longer collected on the child form (the
+    // f_h_name column is nullable and stays for old rows / adult+travel).
     $parent_name  = isset( $_POST['parent_name'] ) ? sanitize_text_field( wp_unslash( $_POST['parent_name'] ) ) : '';
-    $f_h_name     = isset( $_POST['f_h_name'] ) ? sanitize_text_field( wp_unslash( $_POST['f_h_name'] ) ) : '';
     $phone        = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
     $gender       = isset( $_POST['gender'] ) ? sanitize_text_field( wp_unslash( $_POST['gender'] ) ) : '';
     $email        = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
@@ -1599,13 +1600,46 @@ function vaccinepk_submit_child_booking_ajax() {
     $city_id      = isset( $_POST['city_id'] ) ? absint( $_POST['city_id'] ) : 0;
     $appt_date    = isset( $_POST['appointment_date'] ) ? sanitize_text_field( wp_unslash( $_POST['appointment_date'] ) ) : '';
     $time_slot    = isset( $_POST['time_slot'] ) ? sanitize_text_field( wp_unslash( $_POST['time_slot'] ) ) : '';
-    $location     = ( isset( $_POST['location'] ) && $_POST['location'] === 'Home Service' ) ? 'home' : 'clinic';
+    $location_in  = isset( $_POST['location'] ) ? sanitize_text_field( wp_unslash( $_POST['location'] ) ) : '';
+    $location     = $location_in === 'Home Service' ? 'home' : 'clinic';
     $home_address = isset( $_POST['home_address'] ) ? sanitize_text_field( wp_unslash( $_POST['home_address'] ) ) : '';
     $notes        = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) : '';
     $vaccines     = vaccinepk_booking_selected_vaccines_text( 'child' );
 
-    if ( ! $parent_name || ! $phone || ! $email || ! $child_name || ! $city_id ) {
+    // These were enforced only by the browser before; the server now enforces
+    // the same rules so a direct POST can't create an empty/invalid booking.
+    $valid_date = function ( $s ) {
+        $d = DateTime::createFromFormat( '!Y-m-d', $s );
+        return $d && $d->format( 'Y-m-d' ) === $s;
+    };
+    $today = current_time( 'Y-m-d' );
+
+    if ( ! $child_name || ! $parent_name || ! $phone || ! $email || ! $city_id ) {
         wp_send_json_error( [ 'message' => 'Please fill in all required fields.' ] );
+    }
+    if ( ! in_array( $gender, [ 'Male', 'Female', 'Other' ], true ) ) {
+        wp_send_json_error( [ 'message' => 'Please select the child\'s gender.' ] );
+    }
+    if ( ! $valid_date( $child_dob ) || $child_dob > $today ) {
+        wp_send_json_error( [ 'message' => 'Please enter a valid date of birth for the child.' ] );
+    }
+    if ( strlen( preg_replace( '/\D/', '', $phone ) ) < 10 ) {
+        wp_send_json_error( [ 'message' => 'Please enter a valid phone number.' ] );
+    }
+    if ( $vaccines === '' ) {
+        wp_send_json_error( [ 'message' => 'Please select at least one vaccine.' ] );
+    }
+    if ( ! in_array( $location_in, [ 'Clinic Visit', 'Home Service' ], true ) ) {
+        wp_send_json_error( [ 'message' => 'Please choose Clinic Visit or Home Visit.' ] );
+    }
+    if ( $location === 'home' && $home_address === '' ) {
+        wp_send_json_error( [ 'message' => 'Please enter the home address for the visit.' ] );
+    }
+    if ( $time_slot === '' ) {
+        wp_send_json_error( [ 'message' => 'Please select a preferred time slot.' ] );
+    }
+    if ( $appt_date !== '' && ( ! $valid_date( $appt_date ) || $appt_date < $today ) ) {
+        wp_send_json_error( [ 'message' => 'Preferred appointment date cannot be in the past.' ] );
     }
 
     $city = vaccinepk_booking_city( $city_id );
@@ -1618,7 +1652,6 @@ function vaccinepk_submit_child_booking_ajax() {
         $wpdb->prefix . 'child_bookings',
         [
             'parent_name'      => $parent_name,
-            'f_h_name'         => $f_h_name,
             'phone'            => $phone,
             'gender'           => $gender,
             'email'            => $email,
@@ -1635,12 +1668,14 @@ function vaccinepk_submit_child_booking_ajax() {
             'status'           => 'new',
             'created_at'       => current_time( 'mysql' ),
         ],
-        [ '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
+        [ '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
     );
 
     vaccinepk_send_child_booking_emails( [
         'parent_name'      => $parent_name,
         'child_name'       => $child_name,
+        'gender'           => $gender,
+        'child_dob'        => $child_dob,
         'phone'            => $phone,
         'email'            => $email,
         'city_name'        => $city->post_title,
@@ -1663,7 +1698,7 @@ function vaccinepk_send_child_booking_emails( $b ) {
     $subject_ref    = 'Child Booking — ' . $b['child_name'] . ' (' . $b['city_name'] . ')';
 
     $body = "<p><strong>New child vaccine booking</strong></p><ul>"
-        . '<li>Child: ' . esc_html( $b['child_name'] ) . '</li>'
+        . '<li>Child: ' . esc_html( $b['child_name'] ) . ' (' . esc_html( $b['gender'] ) . ', born ' . esc_html( $b['child_dob'] ) . ')</li>'
         . '<li>Parent/Guardian: ' . esc_html( $b['parent_name'] ) . '</li>'
         . '<li>Phone: ' . esc_html( $b['phone'] ) . '</li>'
         . '<li>Email: ' . esc_html( $b['email'] ) . '</li>'
