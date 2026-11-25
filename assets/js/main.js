@@ -73,7 +73,7 @@ function vaccinationCentreInitSearch( ids, contact ) {
         const query = this.value.trim();
         clearTimeout( searchTimeout );
 
-        if ( query.length < 3 ) {
+        if ( query.length < 2 ) {
             results.innerHTML = '';
             if ( loading ) loading.style.display = 'none';
             return;
@@ -103,7 +103,7 @@ function vaccinationCentreInitSearch( ids, contact ) {
                 if ( loading ) loading.style.display = 'none';
 
                 if ( data.success && data.data.results.length > 0 ) {
-                    displayResults( data.data.results );
+                    displayResults( data.data.results, data.data.multi );
                 } else {
                     displayNoResults( query );
                 }
@@ -115,12 +115,35 @@ function vaccinationCentreInitSearch( ids, contact ) {
             } );
     }
 
-    function displayResults( items ) {
+    function displayResults( items, multi ) {
         let html = '';
+
+        // One typed term matched several vaccines (e.g. "DTP"): tell the parent to pick theirs.
+        if ( multi && multi.count > 1 ) {
+            html += `
+                <div class="search-multi-head">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <div><b>&ldquo;${ vaccinationCentreEscapeHtml( multi.term ) }&rdquo; is part of ${ parseInt( multi.count, 10 ) } vaccines.</b> Pick the one written on your card, or ask us on WhatsApp.</div>
+                </div>
+            `;
+        }
 
         items.forEach( function ( item ) {
             const meta = item.meta || {};
             const metaBits = [];
+
+            // Alias hit: why this result appeared, plus its note.
+            let matchHtml = '';
+            if ( meta.matched ) {
+                const m = meta.matched;
+                const kind = `<span class="search-match-kind">${ vaccinationCentreEscapeHtml( m.kind ) }</span>`;
+                matchHtml = m.fuzzy
+                    ? `<div class="search-match-line">Closest match to <b>&ldquo;${ vaccinationCentreEscapeHtml( m.typed ) }&rdquo;</b>: <b>${ vaccinationCentreEscapeHtml( m.alias ) }</b> ${ kind }</div>`
+                    : `<div class="search-match-line">Matched <b>&ldquo;${ vaccinationCentreEscapeHtml( m.alias ) }&rdquo;</b> ${ kind }</div>`;
+                if ( meta.note ) {
+                    matchHtml += `<div class="search-match-note">${ vaccinationCentreEscapeHtml( meta.note ) }</div>`;
+                }
+            }
 
             if ( meta.availability ) metaBits.push( vaccinationCentreAvailabilityBadge( meta.availability ) );
             if ( meta.disease ) metaBits.push( `<span class="text-muted">Disease: ${ vaccinationCentreEscapeHtml( meta.disease ) }</span>` );
@@ -133,6 +156,7 @@ function vaccinationCentreInitSearch( ids, contact ) {
                         <i class="bi bi-shield-fill-check me-2"></i>${ vaccinationCentreEscapeHtml( item.title ) }
                         ${ vaccinationCentreTypeBadge( item.type ) }
                     </div>
+                    ${ matchHtml }
                     <div class="search-result-meta">${ metaBits.join( ' ' ) }</div>
                 </a>
             `;

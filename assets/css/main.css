@@ -1060,6 +1060,46 @@ footer {
 .search-type-badge.type-city    { background: rgba(10,42,56,0.08);   color: var(--color-navy); }
 .search-type-badge.type-article { background: var(--color-blue-tint); color: var(--color-blue); }
 
+/* Alias search: why a result matched (spec VACCINE_ALIAS_SEARCH_SPEC.md, approved mock) */
+.search-match-line {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink);
+  margin: -1px 0 4px;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.search-match-line b { color: var(--color-ink-strong); font-weight: 600; }
+.search-match-kind {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #f1efe9;
+  color: var(--color-ink);
+}
+.search-match-note {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink);
+  margin-bottom: 6px;
+}
+.search-multi-head {
+  font-family: var(--font-body);
+  font-size: 13px;
+  background: var(--color-blue-tint);
+  color: var(--color-navy);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.search-multi-head i { color: var(--color-blue); margin-top: 2px; }
+
 .no-results {
   text-align: center;
   padding: 40px 20px;

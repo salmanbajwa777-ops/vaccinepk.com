@@ -1,6 +1,9 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+// Vaccine alias search: brand / generic / abbreviation lookup + misses log + admin page.
+require_once get_template_directory() . '/inc/vaccine-alias-search.php';
+
 /* ==========================================================================
    1. ENQUEUE STYLES & SCRIPTS
    ========================================================================== */
@@ -123,16 +126,42 @@ function vaccine_search_ajax() {
 
     check_ajax_referer( 'vaccination_booking_nonce', 'nonce' );
 
-    $query = isset( $_POST['query'] ) ? sanitize_text_field( $_POST['query'] ) : '';
-    if ( strlen( $query ) < 3 ) {
+    global $wpdb;
+
+    $query = isset( $_POST['query'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['query'] ) ) ) : '';
+    $qlen  = function_exists( 'mb_strlen' ) ? mb_strlen( $query ) : strlen( $query );
+    if ( $qlen < 2 ) {
         wp_send_json_error( [ 'message' => 'Query too short' ] );
         return;
     }
 
     vaccinepk_record_chip_search( $query );
 
-    $results = [];
-    $like    = esc_sql( $query );
+    $results   = [];
+    $seen_urls = [];
+    $multi     = null;
+
+    // ---- Alias matches first (brand / generic / abbreviation / EPI name). Fail-safe. ----
+    try {
+        $match = vaccinepk_alias_match( $query );
+        foreach ( vaccinepk_alias_result_items( $query, $match ) as $item ) {
+            $results[] = $item;
+            $seen_urls[ $item['url'] ] = true;
+        }
+        if ( $match['multi'] >= 2 ) {
+            $multi = [ 'term' => $query, 'count' => (int) $match['multi'] ];
+        }
+    } catch ( \Throwable $e ) {
+        $results = []; $seen_urls = []; $multi = null;
+    }
+
+    // Two characters: alias exact matches only (spec §4.4).
+    if ( $qlen < 3 ) {
+        wp_send_json_success( [ 'results' => $results, 'multi' => $multi ] );
+        return;
+    }
+
+    $like = esc_sql( $wpdb->esc_like( $query ) );
 
     // ---- Vaccines (Pods) — match title, disease name, or brand ----
     $vaccines = pods( 'vaccine', [
@@ -227,7 +256,21 @@ function vaccine_search_ajax() {
         ];
     }
 
-    wp_send_json_success( [ 'results' => $results ] );
+    // Drop repeats (an alias hit and the title search can return the same vaccine page).
+    $unique = [];
+    foreach ( $results as $r ) {
+        $u = isset( $r['url'] ) ? (string) $r['url'] : '';
+        if ( $u !== '' && isset( $seen_urls[ $u ] ) && empty( $r['meta']['matched'] ) ) continue;
+        $seen_urls[ $u ] = true;
+        $unique[] = $r;
+    }
+    $results = $unique;
+
+    if ( ! $results ) {
+        vaccinepk_log_search_miss( $query );
+    }
+
+    wp_send_json_success( [ 'results' => $results, 'multi' => $multi ] );
 }
 add_action( 'wp_ajax_vaccine_search',        'vaccine_search_ajax' );
 add_action( 'wp_ajax_nopriv_vaccine_search', 'vaccine_search_ajax' );
