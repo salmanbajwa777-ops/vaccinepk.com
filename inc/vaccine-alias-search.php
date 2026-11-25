@@ -80,17 +80,25 @@ function vaccinepk_alias_rows( $include_inactive = false ) {
         $p = pods( 'vaccine_alias', $params );
         if ( ! $p || ( method_exists( $p, 'valid' ) && ! $p->valid() ) ) return $rows;
 
+        // Kind is read straight from the table column: Pods' pick-list output depends on
+        // how the field's options were typed, and silently drops values it doesn't recognize.
+        global $wpdb;
+        $raw_kinds = $wpdb->get_results( "SELECT id, kind FROM {$wpdb->prefix}pods_vaccine_alias", OBJECT_K );
+
         while ( $p->fetch() ) {
+            $row_id   = (int) $p->id();
+            $raw_kind = isset( $raw_kinds[ $row_id ] ) ? (string) $raw_kinds[ $row_id ]->kind : '';
             $alias = (string) $p->field( 'name' );
             $key   = vaccinepk_alias_key( $alias );
             $vid   = vaccinepk_alias_rel_id( $p->field( 'vaccine.ID' ) );
             if ( $key === '' || ! $vid ) continue;
 
             $rows[] = [
-                'id'         => (int) $p->id(),
+                'id'         => $row_id,
                 'alias'      => $alias,
                 'key'        => $key,
-                'kind'       => vaccinepk_alias_kind_key( $p->field( 'kind' ) ),
+                'kind'       => vaccinepk_alias_kind_key( $raw_kind !== '' ? $raw_kind : $p->field( 'kind' ) ),
+                'kind_raw'   => $raw_kind,
                 'vaccine_id' => $vid,
                 'brand_id'   => vaccinepk_alias_rel_id( $p->field( 'brand.ID' ) ),
                 'note'       => trim( (string) $p->field( 'note' ) ),
@@ -354,17 +362,32 @@ add_action( 'admin_post_vaccinepk_alias_seed', function () {
     @set_time_limit( 300 );
     $seed = require __DIR__ . '/vaccine-alias-seed.php';
 
-    $existing = [];
+    global $wpdb;
+    $table = $wpdb->prefix . 'pods_vaccine_alias';
+
+    $existing = []; // key|vaccine => row
     foreach ( vaccinepk_alias_rows( true ) as $r ) {
-        $existing[ $r['key'] . '|' . $r['vaccine_id'] ] = true;
+        $existing[ $r['key'] . '|' . $r['vaccine_id'] ] = $r;
     }
 
-    $added = $skipped = $failed = 0;
+    $added = $skipped = $failed = $repaired = 0;
     $pod = pods( 'vaccine_alias' );
     foreach ( $seed as $s ) {
         list( $alias, $kind, $vid, $bid, $note ) = $s;
         $k = vaccinepk_alias_key( $alias ) . '|' . (int) $vid;
-        if ( isset( $existing[ $k ] ) || get_post_status( (int) $vid ) === false ) { $skipped++; continue; }
+
+        if ( isset( $existing[ $k ] ) ) {
+            // Repair: earlier loads lost Kind (Pods dropped the pick value). Fill it only if empty.
+            $row = $existing[ $k ];
+            if ( $row['id'] && $row['kind_raw'] === '' ) {
+                $wpdb->update( $table, [ 'kind' => $kind ], [ 'id' => $row['id'] ], [ '%s' ], [ '%d' ] );
+                $repaired++;
+            } else {
+                $skipped++;
+            }
+            continue;
+        }
+        if ( get_post_status( (int) $vid ) === false ) { $skipped++; continue; }
 
         $data = [
             'name'      => $alias,
@@ -376,15 +399,22 @@ add_action( 'admin_post_vaccinepk_alias_seed', function () {
         if ( $bid ) $data['brand'] = (int) $bid;
 
         try {
-            $new_id = $pod->add( $data );
-            if ( $new_id ) { $added++; $existing[ $k ] = true; } else { $failed++; }
+            $new_id = (int) $pod->add( $data );
+            if ( $new_id ) {
+                // Write Kind directly as well; Pods may drop it (see repair above).
+                $wpdb->update( $table, [ 'kind' => $kind ], [ 'id' => $new_id ], [ '%s' ], [ '%d' ] );
+                $added++;
+                $existing[ $k ] = [ 'id' => $new_id, 'kind_raw' => $kind ];
+            } else {
+                $failed++;
+            }
         } catch ( \Throwable $e ) {
             $failed++;
         }
     }
 
     vaccinepk_alias_flush_cache();
-    wp_safe_redirect( vaccinepk_search_admin_url( [ 'msg' => 'seeded', 'a' => $added, 's' => $skipped, 'f' => $failed ] ) );
+    wp_safe_redirect( vaccinepk_search_admin_url( [ 'msg' => 'seeded', 'a' => $added, 'r' => $repaired, 's' => $skipped, 'f' => $failed ] ) );
     exit;
 } );
 
@@ -415,6 +445,7 @@ function vaccinepk_render_search_admin() {
 
         <?php if ( $msg === 'seeded' ) : ?>
             <div class="notice notice-success"><p>Starter aliases: <b><?php echo (int) ( $_GET['a'] ?? 0 ); ?></b> added,
+                <b><?php echo (int) ( $_GET['r'] ?? 0 ); ?></b> repaired (Kind filled in),
                 <?php echo (int) ( $_GET['s'] ?? 0 ); ?> skipped (already there),
                 <?php echo (int) ( $_GET['f'] ?? 0 ); ?> failed.</p></div>
         <?php elseif ( $msg === 'junk' ) : ?>
